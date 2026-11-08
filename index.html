@@ -3066,7 +3066,8 @@ var gc={tok:'',exp:0,client:null,cb:null,eb:null},cs={st:'',msg:'',at:0,busy:fal
 var ALV=[0,5,10,15,30,60,120,1440];
 function alLab(m){return m===0?'All\'ora':m<60?m+'\'':m<1440?(m/60)+' h':(m/1440)+' g'}
 function alToggle(a,m){a=a.slice();var i=a.indexOf(m);if(i>=0)a.splice(i,1);else{if(a.length>=5){toast('Al massimo 5 avvisi');return a}a.push(m)}return a.sort(function(x,y){return y-x})}
-function calOn(){return GDon()&&!!lsGet(CON)}
+function calOn(){if(!GDon())return false;var o=st.cal&&st.cal.on;return o===1?true:o===0?false:!!lsGet(CON)}
+function calSet(v){lsSet(CON,v?1:0);if(!st.cal)st.cal={};if(st.cal.on!==(v?1:0)){st.cal.on=v?1:0;save()}}
 function calCfg(){var c=st.cal||{};return {id:(typeof c.id==='string'&&c.id)||(function(){try{return localStorage.getItem(CID)||''}catch(e){return ''}})(),fx:Array.isArray(c.fx)?c.fx:[30,5],pl:Array.isArray(c.pl)?c.pl:[]}}
 function gcSave(){try{localStorage.setItem(CTK,JSON.stringify({t:gc.tok,e:gc.exp}))}catch(e){}}
 function gcRead(){try{var o=JSON.parse(localStorage.getItem(CTK)||'null');if(o&&o.t&&o.e>Date.now()+60000){gc.tok=o.t;gc.exp=o.e;return true}}catch(e){}return false}
@@ -3139,14 +3140,14 @@ async function calSync(){
     Object.keys(rem.map).forEach(function(k){if(!want[k])del(rem.map[k].id)});rem.dup.forEach(del);
     n.t=jobs.length;var dn=0;
     if(jobs.length){cs.msg='';await calPool(jobs,4,function(){dn++;if(dn%5===0||dn===n.t){cs.msg=dn+'/'+n.t;calShow()}})}
-    cs.st='ok';cs.at=Date.now();cs.nw=nw;cs.nt=Object.keys(want).filter(function(k){return want[k].start.dateTime.slice(0,10)===isoOf(new Date())}).length;cs.msg=n.t?(n.i?n.i+' nuovi':'')+(n.u?(n.i?', ':'')+n.u+' aggiornati':'')+(n.d?((n.i||n.u)?', ':'')+n.d+' tolti':''):'';
+    cs.st='ok';cs.at=Date.now();if(!st.cal||st.cal.on!==1)calSet(1);cs.nw=nw;cs.nt=Object.keys(want).filter(function(k){return want[k].start.dateTime.slice(0,10)===isoOf(new Date())}).length;cs.msg=n.t?(n.i?n.i+' nuovi':'')+(n.u?(n.i?', ':'')+n.u+' aggiornati':'')+(n.d?((n.i||n.u)?', ':'')+n.d+' tolti':''):'';
   }catch(e){cs.st='err';cs.msg=(e&&e.message)||'errore';cs.auth=!!(e&&e.code==='auth')}
   finally{cs.busy=false;calShow();if(cs.again){cs.again=false;calQueue(1500)}}
 }
 function calLogin(then){
   if(!(window.google&&google.accounts&&google.accounts.oauth2)){toast('Carico l\'accesso Google, riprova tra un attimo');gdLoad().catch(function(){});return}
-  gcAsk('').then(function(){lsSet(CON,1);cs.st='busy';cs.auth=false;calShow();calSync()}).catch(function(e){cs.st='err';cs.auth=false;cs.msg=(e&&e.message)||'accesso non riuscito.';calShow()})}
-function calOff(){lsSet(CON,0);gcDrop();cs.st='';cs.msg='';cs.del=false;clearTimeout(cs.timer);calShow()}
+  gcAsk('').then(function(){calSet(1);cs.st='busy';cs.auth=false;calShow();calSync()}).catch(function(e){cs.st='err';cs.auth=false;cs.msg=(e&&e.message)||'accesso non riuscito.';calShow()})}
+function calOff(){calSet(0);gcDrop();cs.st='';cs.msg='';cs.del=false;clearTimeout(cs.timer);calShow()}
 async function calDelete(){
   var id=calCfg().id;cs.del=false;
   try{if(id)await gcFetch('/calendars/'+encodeURIComponent(id),{method:'DELETE'}).catch(function(e){if(!(e&&(e.status===404||e.status===410)))throw e});
@@ -3306,7 +3307,7 @@ function renewTap(){
   p.catch(function(e){rnw.fail=Date.now();if(needGd()){dv.st='err';dv.msg=dvErr(e);dv.auth=true;dvShow()}else{cs.st='err';cs.auth=true;cs.msg=(e&&e.message)||'accesso non riuscito.';calShow()}})
    .then(function(){rnw.busy=0})}
 document.addEventListener('click',renewTap,true);
-if(GDon()&&lsGet(GOK)&&needGd())setTimeout(function(){if(needGd())toast('Tocca lo schermo per riprendere la sincronizzazione')},1500);
+if(GDon()&&lsGet(GOK)&&(needGd()||needGc()))setTimeout(function(){if(needGd()||needGc())toast('Tocca lo schermo per riprendere la sincronizzazione')},1500);
 setInterval(function(){
   if(!dv.on||document.hidden||dv.busy||ui.sheet)return;
   var ae=document.activeElement;if(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName))return;
