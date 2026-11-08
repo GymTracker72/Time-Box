@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-09-0300">
+<meta name="tb-build" content="2026-11-09-0320">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -779,8 +779,6 @@ body.m-voci .top>div:first-child,body.m-voci .datebox,body.m-voci #stats,body.m-
 .ant{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.anm{border:0;background:var(--surface);color:var(--ink);border-radius:18px;padding:11px 14px;height:56px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;font:600 16px/1 var(--body);cursor:pointer;text-align:left}.anm.cur{background:var(--ink);color:var(--surface);font-weight:700}.anm.fut{opacity:.45}.anm .dd{display:flex;gap:5px}.anm .dd i{width:8px;height:8px;border-radius:50%;display:block}
 .gpcur{display:flex;flex-direction:column;gap:8px;background:var(--bg);border-radius:18px;padding:12px 14px}.gpcur .t{font:600 18px/1.25 var(--body)}.gpcur .input{border:0;border-radius:12px;background:var(--surface)}.gprow{display:flex;gap:8px;align-items:center}.gprow .input{flex:1;min-width:0}
 @keyframes blkp{0%,100%{box-shadow:0 0 0 0 rgba(255,59,48,0)}30%{box-shadow:0 0 0 5px rgba(255,59,48,.55)}}.blk.pulse{animation:blkp 1.1s ease-in-out 2;z-index:5}
-<<<<<<< HEAD
-=======
 .blk.fixed,.blk.fixed.L,.blk.fixed.F,.blk.fixed.P{--c:var(--muted);background:var(--surface);color:var(--ink);font-size:15px;font-weight:600;line-height:1.2;padding-left:14px;border-radius:10px;box-shadow:inset 4px 0 0 var(--c),0 1px 3px rgba(0,0,0,.10)}
 .blk.fixed.L{--c:var(--blue)}.blk.fixed.F{--c:var(--green)}.blk.fixed.P{--c:var(--red)}
 .blk.fixed>div:not(.sm){color:color-mix(in srgb,var(--c) 72%,var(--ink))}
@@ -812,7 +810,6 @@ body.m-plan #overload:empty{display:none}
 .wkg .mock{width:24px;height:24px;margin-top:0;border-width:2.2px}
 .wkg .mock.dn::after{left:7px;top:3px;width:6px;height:11px}
 .wkg .mogt{font-size:16px}
->>>>>>> 08131174021470a82aebc52935f9564b248d24aa
 /* Oggi: impostazione essenziale */
 .ohead .dvdot{width:14px;height:14px;margin:0 6px 12px 0;align-self:flex-end}
 body.m-oggi .top>div:first-child,body.m-mese .top>div:first-child,body.m-sett.w2on .top>div:first-child{display:none!important}
@@ -1808,7 +1805,7 @@ function openItem(i){
 }
 function openSheet(i){
   /* se la voce è già in calendario, la scheda parte dalla data, dall'ora e dalla durata esistenti */
-  var ex=null;Object.keys(st.days).sort().forEach(function(k){(st.days[k].blocks||[]).forEach(function(b){if(!ex&&b.ref===i.id)ex={date:k,s:b.s,n:b.n,kind:b.kind}})});
+  var ex=null,tdy=isoOf(new Date());Object.keys(st.days).sort().forEach(function(k){if(k<tdy&&i.st!=='d')return;(st.days[k].blocks||[]).forEach(function(b){if(!ex&&b.ref===i.id)ex={date:k,s:b.s,n:b.n,kind:b.kind}})});
   if(ex)return {id:i.id,date:ex.date,s:ex.s,n:ex.n,kind:ex.kind,err:'',ex:true};
   var dd=st.days[st.date],tmp={blocks:dd?dd.blocks:[]},s=placeSlots(tmp,1,curSlot());
   return {id:i.id,date:st.date,s:s<0?18:s,n:1,kind:'flex',err:''};
@@ -2062,11 +2059,7 @@ function blkHtml(sh,b){
     '<label><span class="lbl">Durata</span><select data-chg="sheet" data-f="n">'+durs+'</select></label>'+
     '<label><span class="lbl">Tipo</span><select data-chg="sheet" data-f="kind"><option value="flex"'+(sh.kind==='flex'?' selected':'')+'>Flessibile</option><option value="fixed"'+(sh.kind==='fixed'?' selected':'')+'>Fisso</option></select></label></div>'+repHtml(sh)+'</div>'+
     (b.rid&&st.rec[b.rid]?'<div class="sub">Fa parte di una serie: '+esc(repLabel(st.rec[b.rid],sh.date))+'.</div>':'')+alHtml(sh)+
-<<<<<<< HEAD
-    (sh.err?'<div class="note" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+
-=======
     (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+
->>>>>>> 08131174021470a82aebc52935f9564b248d24aa
     (it?itemChips(it)+(it.sub?subHtml(it,''):subBtn(it))+'<div class="bsc bsl">'+frogRow(sh,it,sh.from)+'<label><span class="lbl">Scadenza</span><span style="display:flex;align-items:center;gap:8px"><input type="date" data-chg="edit" data-f="due" value="'+esc(it.due)+'">'+(it.due?'<button class="mini" data-act="ed-clear-due" data-id="'+it.id+'" type="button">Togli</button>':'')+'</span></label></div>':'')+
     notesHtml(noteOwner(sh))+
     '<button class="btn" data-act="sheet-ok" type="button">Salva</button><div class="bsf"><button class="mini" data-act="sheet-close" type="button">Annulla</button><button class="mini" data-act="blk-copy" type="button">Copia</button><button class="mini red" data-act="blk-del" type="button">Togli dal piano</button>'+(it?(sh.confirm?'<button class="mini red" data-act="ed-del2" data-id="'+it.id+'" type="button">Conferma: cancella</button>':'<button class="mini red" data-act="ed-del" data-id="'+it.id+'" type="button">Elimina voce</button>'):'')+'</div></div></div>';
@@ -2258,11 +2251,7 @@ function schedFields(sh,i){
     '<label><span class="lbl">Durata</span><select data-chg="sheet" data-f="n">'+durs+'</select></label>'+
     '<label><span class="lbl">Tipo</span><select data-chg="sheet" data-f="kind"><option value="flex"'+(sh.kind==='flex'?' selected':'')+'>Flessibile</option><option value="fixed"'+(sh.kind==='fixed'?' selected':'')+'>Fisso</option></select></label></div>'+
     repHtml(sh)+frogRow(sh,i,sh.date)+
-<<<<<<< HEAD
-    (sh.err?'<div class="note" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'');
-=======
     (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'');
->>>>>>> 08131174021470a82aebc52935f9564b248d24aa
   return {html:html,blocked:over};
 }
 function setSheet(h){
@@ -2723,11 +2712,7 @@ function renderStorico(){
 }
 function renderVoci(){
   var all=quickList(),nowMs=Date.now();
-<<<<<<< HEAD
-  document.getElementById('voci').innerHTML='<div class="vh2"><button type="button" class="mini" data-act="mode" data-m="oggi">‹ Oggi</button></div><h1 class="vt2">Tutte le voci<span>'+all.length+'</span></h1><section class="oquick">'+
-=======
   document.getElementById('voci').innerHTML='<div class="vh2"><button type="button" class="mini" data-act="mode" data-m="'+(ui.vback==='plan'?'plan':'oggi')+'">‹ '+(ui.vback==='plan'?'Pianifica':'Oggi')+'</button></div><h1 class="vt2">Tutte le voci<span>'+all.length+'</span></h1><section class="oquick">'+
->>>>>>> 08131174021470a82aebc52935f9564b248d24aa
     (all.length?all.map(function(i){return quickRow(i,nowMs)}).join(''):'<div class="sub" style="padding:16px 0">Nessuna voce da pianificare.</div>')+(doneList().length?'<div class="oalls"><button type="button" class="mini oall" data-act="storico-open">Completate ('+doneList().length+')</button></div>':'')+'</section>';
 }
 function renderOggi(d){
@@ -2882,22 +2867,14 @@ function tpickHtml(sh){
 }
 function setGoal(lv,a,text,due){
   var per=gKey(lv,st.date),g=goalsFor(lv,per).filter(function(x){return x.area===a})[0];
-<<<<<<< HEAD
-  var par=lv==='O'?goalsFor('T',st.date.slice(0,4)).filter(function(x){return x.area===a&&x.text})[0]:null;
-=======
   var par=lv==='O'?goalsFor('T',st.date.slice(0,4)).filter(function(x){return x.area===a&&x.text})[0]:lv==='R'?goalsFor('O',st.date.slice(0,7)).filter(function(x){return x.area===a&&x.text})[0]:null;
->>>>>>> 08131174021470a82aebc52935f9564b248d24aa
   if(g){g.text=text;g.st='';g.measure='';g.due=due||'';if(par)g.up=par.id}
   else st.goals.push({id:uid(),lv:lv,per:per,area:a,text:text,measure:'',due:due||'',up:par?par.id:'',st:'',frog:false});
 }
 function gpickHtml(sh){
   var lv=sh.lv,a=sh.a,per=gKey(lv,st.date),g=goalsFor(lv,per).filter(function(x){return x.area===a&&x.text})[0],att='data-lv="'+lv+'" data-a="'+a+'"';
   var o=dumpOpenList().sort(function(x,y){return ((x.area===a||!x.area)?0:1)-((y.area===a||!y.area)?0:1)});
-<<<<<<< HEAD
-  return '<div class="sheet-bg" data-act="sheet-bg"><div class="sheet prep bs" role="dialog" aria-label="Priorità '+(lv==='T'?'dell\'anno':'del mese')+'"><div class="ph">'+(lv==='T'?'Priorità dell\'anno':'Priorità del mese')+' · '+AREAS[a]+'</div>'+
-=======
   return '<div class="sheet-bg" data-act="sheet-bg"><div class="sheet prep bs" role="dialog" aria-label="Priorità '+(lv==='T'?'dell\'anno':lv==='R'?'della settimana':'del mese')+'"><div class="ph">'+(lv==='T'?'Priorità dell\'anno':lv==='R'?'Priorità della settimana':'Priorità del mese')+' · '+AREAS[a]+'</div>'+
->>>>>>> 08131174021470a82aebc52935f9564b248d24aa
     (g?'<div class="gpcur"><div class="t">'+esc(g.text)+'</div><input class="input" data-chg="goal" data-f="measure" '+att+' value="'+esc(g.measure)+'" placeholder="Come capisci che è raggiunto" aria-label="Risultato atteso"><div class="gprow"><input type="date" class="input" data-chg="goal" data-f="due" '+att+' value="'+esc(g.due)+'" aria-label="Scadenza"><button type="button" class="mini'+(g.frog?' on':'')+'" data-act="goal-frog" data-id="'+g.id+'" style="'+(g.frog?'background:var(--ink);color:var(--surface)':'')+'">Rana</button><button type="button" class="mini" data-act="gpick-clear">Togli</button></div></div>':'')+
     '<div style="display:flex;gap:8px;align-items:center"><input class="input" id="gpnew" placeholder="Nuova priorità…" aria-label="Nuova priorità" autocomplete="off" style="flex:1;border-radius:22px;padding:11px 16px"><button type="button" class="btn" data-act="gpick-new">Aggiungi</button></div>'+
     (o.length?'<div class="osh" style="padding:8px 0 0"><b>Da Svuota la mente</b></div><div class="plist">'+o.map(function(i){return '<button type="button" class="pr1" data-act="gpick-sel" data-id="'+i.id+'"><span class="bd'+(i.pr?'':' none')+'">'+(i.pr||'?')+'</span><span class="dot '+(i.area||a)+'"></span><span class="tt">'+esc(i.text)+'</span><span class="rt">'+(i.due?ddmm(i.due):'')+'</span></button>'}).join('')+'</div>':'<div class="pst">Svuota la mente è vuoto.</div>')+
