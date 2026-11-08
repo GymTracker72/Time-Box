@@ -3285,6 +3285,22 @@ dvShow();
 if(GDon()){gdLoad().catch(function(){});if(!lsGet(GOK)){dv.on=false;gateShow()}else{dv.on=true;setTimeout(dvSync,700)}}
 else if(dv.on)setTimeout(dvSync,700);else if(fk0===null&&window.claude)setTimeout(dvOn,900);
 calShow();
+/* permesso Google scaduto (dura circa un'ora): il browser non permette di riaprire l'accesso da solo,
+   serve un gesto. Al primo tocco in qualunque punto rinnovo Drive e Calendar e riparto. */
+var rnw={busy:0,fail:0};
+function needGd(){return GDon()&&dv.on&&!(gd.tok&&Date.now()<gd.exp)&&!gdRead()}
+function needGc(){return GDon()&&calOn()&&!gcHas()}
+function renewTap(){
+  if(rnw.busy||!(window.google&&google.accounts&&google.accounts.oauth2))return;
+  if(!needGd()&&!needGc())return;
+  if(Date.now()-rnw.fail<60000)return;
+  rnw.busy=1;
+  var p=needGd()?gdAsk('').then(function(){dv.auth=false;dv.st='busy';dvShow();dvSync()}):Promise.resolve();
+  p.then(function(){if(needGc())return gcAsk('').then(function(){cs.auth=false;calSync()})})
+   .catch(function(e){rnw.fail=Date.now();if(needGd()){dv.st='err';dv.msg=dvErr(e);dv.auth=true;dvShow()}else{cs.st='err';cs.auth=true;cs.msg=(e&&e.message)||'accesso non riuscito.';calShow()}})
+   .then(function(){rnw.busy=0})}
+document.addEventListener('click',renewTap,true);
+if(GDon()&&lsGet(GOK)&&needGd())setTimeout(function(){if(needGd())toast('Tocca lo schermo per riprendere la sincronizzazione')},1500);
 setInterval(function(){
   if(!dv.on||document.hidden||dv.busy||ui.sheet)return;
   var ae=document.activeElement;if(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName))return;
