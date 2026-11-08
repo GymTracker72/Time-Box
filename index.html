@@ -413,6 +413,34 @@ button,select,input{touch-action:manipulation}
 .o3r.pl .o3t{font-size:17px}.o3r.pl.fr .o3t{font-size:19px}.o3r .o3f.off{opacity:.28}.o3r .o3f svg{width:24px;height:18px}
 .o3r .o3p{flex:none;border-radius:10px;padding:7px 10px;font-size:12.5px}
 .o3m{flex:none;font-size:12.5px;color:var(--muted);padding-right:4px}
+/* Oggi: impostazione essenziale */
+.ohead{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;padding:6px 2px 4px}
+.odow{font:600 13px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.odate{font:800 44px/1 var(--head);letter-spacing:-.02em;margin-top:4px}
+.o3n{gap:0}.o3n .o3h{margin:6px 2px 6px}
+.q3r{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--soft);background:transparent;color:var(--ink);padding:10px 2px;min-height:52px;font:inherit}
+.q3r:last-child{border-bottom:0}
+.q3r svg:first-child{width:28px;height:28px;flex:none}
+.q3t{flex:1;min-width:0;font:500 17px/1.25 var(--body);overflow-wrap:anywhere}
+.q3s{flex:none;display:flex;align-items:center;color:var(--ink)}.q3s svg{width:26px;height:20px}
+.q3a{flex:none;font:600 12px/1 var(--body)}
+.q3r.L .q3a{color:var(--blue)}.q3r.F .q3a{color:var(--green)}.q3r.P .q3a{color:var(--red)}
+.q3r.done .q3t{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1.5px}
+.q3e .q3t{color:var(--muted)}
+.q3r.L:not(.q3e) .rt{stroke:var(--blue)}.q3r.F:not(.q3e) .rt{stroke:var(--green)}.q3r.P:not(.q3e) .rt{stroke:var(--red)}
+.ocap2{display:flex;gap:10px;align-items:center;margin:2px 0 0}
+.ocap2 .input{flex:1;min-width:0;height:48px;border:1px solid var(--soft);border-radius:24px;background:var(--surface);padding:0 18px;font-size:16px!important}
+.ocap2 .input::placeholder{font-size:16px;color:var(--muted);opacity:1}
+.ocap2 .ocapb{width:48px;height:48px;border-radius:50%;border:0;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;flex:none}
+#oggi .ora.adesso{background:var(--ink);color:var(--bg)}
+#oggi .ora.adesso .olab{color:var(--soft)}
+#oggi .ora.adesso .ttl{font-size:21px}
+#oggi .ora.adesso .obar{margin-top:12px;height:6px;border-radius:3px;background:rgba(127,127,127,.35);overflow:hidden}
+#oggi .ora.adesso .obar i{display:block;height:100%;background:var(--blue)}
+#oggi .ora.adesso.L .obar i{background:#5b9bd0}#oggi .ora.adesso.F .obar i{background:#5fae74}#oggi .ora.adesso.P .obar i{background:#e07a72}
+#oggi .ora.adesso .oleft{font-size:14px;color:var(--soft)}
+#oggi .ora.adesso .ofrog{background:var(--bg);color:var(--ink)}
+#oggi .ora.adesso .obtn,#oggi .ora.adesso .obtn.p{background:var(--bg);color:var(--ink)}
 body.m-oggi .datebox .nav:not([data-act=day-today]),body.m-oggi #daybar .nav,body.m-oggi .dwrap input[type=date]{display:none!important}
 .qplace{display:flex;flex-direction:column;gap:8px}.qplace .btn{min-height:48px;font-size:16px;border-radius:12px}.qplace .mini{align-self:center;border:0;text-decoration:underline;color:var(--muted)}
 .pg{width:559px;height:794px;padding:24px;background:#fff;color:#1f2a28;font-family:Hind,sans-serif;overflow:hidden}
@@ -931,7 +959,7 @@ function render(){
   ['oggi','sett','mese','anno','obj','stampa','voci','storico'].forEach(function(k){document.getElementById(k).hidden=M!==k});
   ['overload','footd'].forEach(function(k){document.getElementById(k).hidden=M!=='plan'});
   document.getElementById('plancols').hidden=M!=='plan';
-  var nd=M==='sett'||M==='mese'||M==='anno'||(M==='stampa'&&printScope()!=='day');document.querySelector('.datebox').hidden=nd;document.getElementById('stats').hidden=M!=='plan';
+  var nd=M==='oggi'||M==='sett'||M==='mese'||M==='anno'||(M==='stampa'&&printScope()!=='day');document.querySelector('.datebox').hidden=nd;document.getElementById('stats').hidden=M!=='plan';
   [].forEach.call(document.querySelectorAll('.tabs button'),function(b){b.classList.toggle('on',b.getAttribute('data-m')===M)});
   renderSheet();calShow();
   if(M==='oggi')renderOggi(d);if(M==='sett')renderSett();if(M==='mese')renderMese();if(M==='anno')renderAnno();if(M==='stampa')renderStampa();if(M==='voci')renderVoci();if(M==='storico')renderStorico();if(M==='obj')renderObj();
@@ -2154,19 +2182,21 @@ function renderOggi(d){
   var fi=frogItem(d),topsDone=0,topsTot=0,finH='';
     var recAll=quickList();
   /* Top compatte */
-  h+='<section class="o3"><h2 class="o3h">Top 3 priorità</h2>'+AK.slice().sort(function(a,b){return (d.frog===b?1:0)-(d.frog===a?1:0)}).map(function(a){var v=d.tops[a],isF=d.frog===a;
+  var dtH=parse(st.date);
+  h+='<div class="ohead"><div><div class="odow">'+DOW[dtH.getDay()]+'</div><div class="odate">'+dtH.getDate()+' '+MON[dtH.getMonth()]+(dtH.getFullYear()!==now.getFullYear()?' '+dtH.getFullYear():'')+'</div></div>'+(isToday?'':'<button type="button" class="mini" data-act="day-today">Oggi</button>')+'</div>';
+  h+='<section class="o3 o3n"><h2 class="o3h">Top 3 priority</h2>'+AK.slice().sort(function(a,b){return (d.frog===b?1:0)-(d.frog===a?1:0)}).map(function(a){var v=d.tops[a],isF=d.frog===a;
     if(v&&v!=='empty'){var i=item(v);if(!i)return '';topsTot++;if(i.st==='d')topsDone++;
-      return '<button class="o3r '+a+(isF?' fr':'')+(i.st==='d'?' done':'')+'" data-act="tog-item" data-id="'+i.id+'" aria-label="'+AREAS[a]+': '+esc(i.text)+', tocca per cambiare stato">'+ringSvg(i.st,a)+'<span class="o3b"><span class="o3a">'+(isF?'La rana di oggi · ':'')+AREAS[a]+'</span><span class="o3t">'+esc(i.text)+'</span></span>'+(isF?'<span class="o3f">'+FROG+'</span>':'')+'</button>'}
-    if(v==='empty')return '<span class="o3r o3e '+a+'">'+ringSvg('',a)+'<span class="o3b"><span class="o3a">'+AREAS[a]+'</span><span class="o3t">Nessuna Top oggi</span></span></span>';
-    return '<button class="o3r o3e '+a+'" data-act="to-dump" aria-label="Scegli la Top '+AREAS[a]+' dal Brain Dump">'+ringSvg('',a)+'<span class="o3b"><span class="o3a">'+AREAS[a]+'</span><span class="o3t">Scegli la Top</span></span></button>';
+      return '<button class="q3r '+a+(i.st==='d'?' done':'')+'" data-act="tog-item" data-id="'+i.id+'" aria-label="'+AREAS[a]+': '+esc(i.text)+(isF?', la rana di oggi':'')+', tocca per cambiare stato">'+ringSvg(i.st,a)+'<span class="q3t">'+esc(i.text)+'</span>'+(isF?'<span class="q3s" role="img" aria-label="La rana di oggi">'+FROG+'</span>':'')+'<span class="q3a">'+AREAS[a]+'</span></button>'}
+    if(v==='empty')return '<span class="q3r q3e '+a+'">'+ringSvg('',a)+'<span class="q3t">Nessuna Top oggi</span><span class="q3a">'+AREAS[a]+'</span></span>';
+    return '<button class="q3r q3e '+a+'" data-act="to-dump" aria-label="Scegli la Top '+AREAS[a]+' dal Brain Dump">'+ringSvg('',a)+'<span class="q3t">Scegli la Top</span><span class="q3a">'+AREAS[a]+'</span></button>';
   }).join('')+'</section>';
+  /* Svuota la mente: subito sotto le Top */
+  h+='<form id="oggiform" class="ocap2" autocomplete="off"><input class="input" id="ogginew" placeholder="Svuota la mente…" aria-label="Svuota la mente: nuova voce" enterkeyhint="done"><button type="submit" class="ocapb" aria-label="Aggiungi"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></button></form>'+(recAll.length?'<div class="oalls" style="margin-top:-4px"><button type="button" class="mini oall" data-act="mode" data-m="voci">'+recAll.length+' da pianificare</button></div>':'');
   if(!fi&&topsTot){
     h+='<div class="ocard"><div class="olab" style="display:flex;gap:6px;align-items:center;font:600 15px/1 var(--body);color:var(--muted)">'+FROG+'<span>Rana di oggi</span></div><div class="sub" style="padding-top:4px;font-size:12px">Quale Top è la più difficile? Fai quella per prima.</div><div style="display:flex;flex-direction:column;gap:6px;padding-top:10px">'+
       AK.map(function(a){var v=d.tops[a],i=v&&v!=='empty'?item(v):null;return i?'<button type="button" class="obtn" style="background:var(--bg);text-align:left;padding:0 16px;font-size:15px;display:flex;align-items:center;gap:8px" data-act="frog" data-a="'+a+'"><span class="dot '+a+'" style="width:10px;height:10px"></span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(i.text)+'</span></button>':''}).join('')+'</div></div>';
   }
   h+=prepCard(isToday,nowMin);
-  h+='<section class="oquick ocap"><div class="ocaph">Cattura</div><form id="oggiform" autocomplete="off"><svg class="qi" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="13" cy="13" r="11"/><path d="M13 7.5v11M7.5 13h11"/></svg><input class="input" id="ogginew" placeholder="Cosa ti passa per la mente?" aria-label="Nuova voce" enterkeyhint="done"></form>'+
-    (recAll.length?'<div class="oalls"><button type="button" class="mini oall" data-act="mode" data-m="voci">'+recAll.length+' da pianificare</button></div>':'')+'<div class="sub" style="padding-top:8px;font-size:12px;line-height:1.35">Puoi scrivere anche quando e come: «domani alle 15», «lunedì», «1h», «entro venerdì». In fondo area e priorità: «famiglia B».</div></section>';
   var loose=isToday?todayLoose(d):[];
   if(loose.length)h+='<div class="ora"><div class="olab">Da programmare oggi</div><div class="ttl">'+(loose.length===1?'1 voce':loose.length+' voci')+' senza orario</div><div class="oleft">'+loose.slice(0,3).map(function(i){return esc(i.text)}).join(' · ')+(loose.length>3?' …':'')+'</div><div class="row2"><button class="obtn p" data-act="fill-day">Metti in fila da adesso</button><button class="obtn" data-act="mode" data-m="plan">Pianifica</button></div></div>';
   /* Ora */
@@ -2174,8 +2204,8 @@ function renderOggi(d){
     var undn=undone(d);
     if(nowB){
       var it0=nowB.ref&&item(nowB.ref),isF=fi&&nowB.ref===fi.id,left=S0+30*(nowB.s+nowB.n)-nowMin;
-      h+='<div class="ora '+(nowB.area||'')+'"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="olab">Ora, '+slotLab(nowB.s)+'–'+slotLab(nowB.s+nowB.n)+'</span>'+(isF?'<span class="ofrog">'+FROG+' Rana</span>':'')+'</div>'+
-        '<div class="ttl">'+(nowB.rid?'↻ ':'')+esc(nowB.title)+'</div><div class="oleft">'+(nowB.kind==='fixed'?'Impegno fisso · ':'')+'Restano '+fmtLeft(Math.max(left,0))+'</div>'+
+      h+='<div class="ora adesso '+(nowB.area||'')+'"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="olab">Adesso · '+slotLab(nowB.s)+'–'+slotLab(nowB.s+nowB.n)+'</span>'+(isF?'<span class="ofrog">'+FROG+' Rana</span>':'')+'</div>'+
+        '<div class="ttl">'+(nowB.rid?'↻ ':'')+esc(nowB.title)+'</div><div class="obar"><i style="width:'+Math.max(2,Math.min(100,Math.round(100*(1-left/(nowB.n*30)))))+'%"></i></div><div class="oleft">'+(nowB.kind==='fixed'?'Impegno fisso · ':'')+'Restano '+fmtLeft(Math.max(left,0))+'</div>'+
         (nowB.kind==='fixed'?'':'<div class="row2"><button class="obtn p" data-act="blk-done" data-id="'+nowB.id+'">Fatto</button><button class="obtn" data-act="edit-block" data-id="'+nowB.id+'">Rimanda</button></div>')+'</div>';
     }else if(!bl.length){
       h+='<div class="ora"><div class="ttl">Nessun blocco oggi</div><div class="oleft">Programma in calendario le Top e il resto.</div><div class="row2"><button class="obtn p" data-act="mode" data-m="plan">Pianifica la giornata</button></div></div>';
