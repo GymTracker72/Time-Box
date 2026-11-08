@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-09-0230">
+<meta name="tb-build" content="2026-11-09-0300">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -1766,7 +1766,7 @@ function editorHtml(i,sh){
   var schedBlock='';
   if((!i.pr||i.pr==='A'||i.pr==='B'||i.pr==='C')&&(i.status==='open'||i.status==='prog'||i.status==='top')){
     if(!sh.ex&&!sh.manual){
-      schedBlock='<div class="qplace"><span class="lbl">Programma in calendario</span>'+(sh.err?'<div class="note" style="margin:0">'+esc(sh.err)+'</div>':'')+'<button class="btn" data-act="quick-place" data-id="'+i.id+'" type="button">Programma nel primo spazio libero</button><button class="mini" data-act="sheet-manual" type="button">Scegli tu data e ora</button></div>';
+      schedBlock='<div class="qplace"><span class="lbl">Programma in calendario</span>'+(sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':'')+'<button class="btn" data-act="quick-place" data-id="'+i.id+'" type="button">Programma nel primo spazio libero</button><button class="mini" data-act="sheet-manual" type="button">Scegli tu data e ora</button></div>';
     }else{
     var sf=schedFields(sh,i);
     schedBlock='<div style="display:flex;flex-direction:column;gap:10px"><span class="lbl">Programma in calendario</span><div class="bsc">'+sf.html+'</div><button class="btn" data-act="sheet-ok" type="button"'+(sf.blocked?' disabled':'')+'>Programma in calendario</button></div>';
@@ -1884,7 +1884,7 @@ function prepHtml(sh){
       '<label><span class="lbl">Fatta quando…</span><input data-chg="sheet" data-f="res" value="'+esc(sh.res)+'" placeholder="Il risultato concreto, in una riga" autocomplete="off"></label>'+
       '<div><span class="lbl">Cos\'altro '+lab+'</span><div class="pst" style="padding-top:2px">Prima le A, poi le scadenze. Le D ed E restano fuori.</div><div class="plist">'+
       c.filter(function(i){return i.id!==sh.frog}).map(function(i){return prepRow(i,'prep-tog',!!sh.sel[i.id],used)}).join('')+'</div></div>'+
-      (sh.err?'<div class="note" style="margin:0">'+esc(sh.err)+'</div>':'')+
+      (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':'')+
       '<div class="pfoot"><label style="flex-direction:row;align-items:center;gap:6px"><span class="lbl">Dalle</span><select data-chg="sheet" data-f="start" style="width:auto;height:46px">'+starts+'</select></label><button class="btn" data-act="prep-ok" type="button"'+(n?'':' disabled')+'>Metti in fila ('+n+')</button></div>';
   }
   return '<div class="sheet-bg" data-act="sheet-bg"><div class="sheet prep" role="dialog" aria-label="Prepara la giornata">'+h+'</div></div>';
@@ -2059,7 +2059,7 @@ function blkHtml(sh,b){
     '<label><span class="lbl">Durata</span><select data-chg="sheet" data-f="n">'+durs+'</select></label>'+
     '<label><span class="lbl">Tipo</span><select data-chg="sheet" data-f="kind"><option value="flex"'+(sh.kind==='flex'?' selected':'')+'>Flessibile</option><option value="fixed"'+(sh.kind==='fixed'?' selected':'')+'>Fisso</option></select></label></div>'+repHtml(sh)+'</div>'+
     (b.rid&&st.rec[b.rid]?'<div class="sub">Fa parte di una serie: '+esc(repLabel(st.rec[b.rid],sh.date))+'.</div>':'')+alHtml(sh)+
-    (sh.err?'<div class="note" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+
+    (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+
     (it?itemChips(it)+(it.sub?subHtml(it,''):subBtn(it))+'<div class="bsc bsl">'+frogRow(sh,it,sh.from)+'<label><span class="lbl">Scadenza</span><span style="display:flex;align-items:center;gap:8px"><input type="date" data-chg="edit" data-f="due" value="'+esc(it.due)+'">'+(it.due?'<button class="mini" data-act="ed-clear-due" data-id="'+it.id+'" type="button">Togli</button>':'')+'</span></label></div>':'')+
     notesHtml(noteOwner(sh))+
     '<button class="btn" data-act="sheet-ok" type="button">Salva</button><div class="bsf"><button class="mini" data-act="sheet-close" type="button">Annulla</button><button class="mini" data-act="blk-copy" type="button">Copia</button><button class="mini red" data-act="blk-del" type="button">Togli dal piano</button>'+(it?(sh.confirm?'<button class="mini red" data-act="ed-del2" data-id="'+it.id+'" type="button">Conferma: cancella</button>':'<button class="mini red" data-act="ed-del" data-id="'+it.id+'" type="button">Elimina voce</button>'):'')+'</div></div></div>';
@@ -2103,7 +2103,7 @@ function blkOk(scope){
   }
   var it=b.ref&&item(b.ref);
   if(it){
-    if(sh.date!==sh.from){var er=scheduleItem(it,sh.date,s,n,sh.kind,sh.frog===true);if(er){sh.err=er;return}it.text=title;var nb=d2.blocks.filter(function(x){return x.ref===it.id})[0];if(nb)nb.title=title}
+    if(sh.date!==sh.from){if(sh.frog===undefined&&it.pr==='A'&&frogOn(sh,it,sh.from))sh.frog=true;var er=scheduleItem(it,sh.date,s,n,sh.kind,sh.frog===true);if(er){sh.err=er;return}it.text=title;var nb=d2.blocks.filter(function(x){return x.ref===it.id})[0];if(nb)nb.title=title}
     else{it.text=title;b.title=title;b.s=s;b.n=n;b.kind=sh.kind}
     applyFrog(sh,it,sh.date);
   }else{
@@ -2160,7 +2160,7 @@ function groupHtml(sh){
     '<div class="g"><label><span class="lbl">Area</span><select data-chg="sheet" data-f="area">'+areaOpts(sh.area,true)+'</select></label>'+
     '<label><span class="lbl">Priorità</span><select data-chg="sheet" data-f="pr">'+po+'</select></label></div>'+
     '<div class="sub">Le voci diventano le righe di una lista dentro una sola voce. Priorità e scadenza valgono per tutto il gruppo.</div>'+
-    (sh.err?'<div class="note" style="margin:0">'+esc(sh.err)+'</div>':'')+
+    (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':'')+
     '<div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn sec" data-act="sheet-close" type="button">Annulla</button><button class="btn" data-act="group-ok" type="button">Crea il gruppo</button></div></div></div>';
 }
 function groupOk(){
@@ -2198,7 +2198,7 @@ function renderSheet(){
       '<datalist id="whos">'+whoList().map(function(w){return '<option value="'+esc(w)+'">'}).join('')+'</datalist>'+
       '<div class="g"><label><span class="lbl">Controllo entro</span><input type="date" data-chg="sheet" data-f="due" value="'+esc(sh.due)+'"></label>'+
       '<label><span class="lbl">Tipo</span><select data-chg="sheet" data-f="wait"><option value="0"'+(sh.wait==='0'?' selected':'')+'>Delegata</option><option value="1"'+(sh.wait==='1'?' selected':'')+'>In attesa di qualcosa</option></select></label></div>'+
-      (sh.err?'<div class="note" style="margin:0">'+esc(sh.err)+'</div>':'')+
+      (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':'')+
       '<div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn sec" data-act="sheet-close" type="button">Annulla</button><button class="btn" data-act="sheet-ok" type="button">Delega</button></div></div></div>');
     return;
   }
@@ -2251,13 +2251,14 @@ function schedFields(sh,i){
     '<label><span class="lbl">Durata</span><select data-chg="sheet" data-f="n">'+durs+'</select></label>'+
     '<label><span class="lbl">Tipo</span><select data-chg="sheet" data-f="kind"><option value="flex"'+(sh.kind==='flex'?' selected':'')+'>Flessibile</option><option value="fixed"'+(sh.kind==='fixed'?' selected':'')+'>Fisso</option></select></label></div>'+
     repHtml(sh)+frogRow(sh,i,sh.date)+
-    (sh.err?'<div class="note" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'');
+    (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'');
   return {html:html,blocked:over};
 }
 function setSheet(h){
   var el=document.getElementById('sheet'),old=el.querySelector('.sheet'),sc=old?old.scrollTop:0;
   el.innerHTML=h;el.hidden=false;
   var nw=el.querySelector('.sheet');if(nw&&sc)nw.scrollTop=sc;
+  var en=el.querySelector('.note.err');if(en){try{en.scrollIntoView({block:'center'})}catch(x){}}
 }
 /* ---- stampa A5 ---- */
 var CC={L:'#2f6188',F:'#2e6a3d',P:'#c0443c'};
@@ -3283,7 +3284,7 @@ document.addEventListener('click',function(e){
     case 'blk-scope':if(ui.sheet&&ui.sheet.mode==='blk'){var scv=t.getAttribute('data-v'),sak=ui.sheet.ask;ui.sheet.ask='';if(scv!=='back'){if(sak==='del')blkDelScope(scv);else blkOk(scv)}}break;
     case 'sheet-frog':if(ui.sheet){var shf=ui.sheet,fit=shf.mode==='blk'?(function(){var fb=blkFind(shf);return fb&&fb.ref?item(fb.ref):null})():(shf.mode==='new'?(shf.src?item(shf.src):null):item(shf.id));
       if(fit){var fdt=shf.mode==='blk'?shf.from:shf.date;shf.frog=!frogOn(shf,fit,fdt);if(isTopOn(fit,fdt))applyFrog(shf,fit,fdt)}}break;
-    case 'sheet-ok':if(ui.sheet&&ui.sheet.mode==='deleg')delegOk();else if(ui.sheet&&ui.sheet.mode==='blk')blkOk();else if(ui.sheet&&ui.sheet.mode==='new')newOk();else sheetOk();break;
+    case 'sheet-ok':if(ui.sheet&&ui.sheet.mode==='deleg')delegOk();else if(ui.sheet&&ui.sheet.mode==='blk')blkOk();else if(ui.sheet&&ui.sheet.mode==='new')newOk();else sheetOk();if(ui.sheet&&ui.sheet.err)toast(ui.sheet.err);break;
     case 'note-add':var no=noteOwner(ui.sheet),nta=document.getElementById('notenew'),ntx=nta?nta.value.trim():'';if(no&&ntx){(no.notes=no.notes||[]).push({id:uid(),c:Date.now(),x:ntx})}break;
     case 'note-del':var nd=noteOwner(ui.sheet);if(nd&&nd.notes){var nid=t.getAttribute('data-n');nd.notes=nd.notes.filter(function(x){return x.id!==nid});if(!nd.notes.length)delete nd.notes}break;
     case 'view-block':var vbk=d.blocks.filter(function(x){return x.id===id})[0];if(vbk)ui.sheet={mode:'view',bid:vbk.id,from:st.date};break;
@@ -3451,7 +3452,7 @@ function newHtml(sh){
     '<label><span class="lbl">Durata</span><select data-chg="sheet" data-f="n">'+durs+'</select></label>'+
     '<label><span class="lbl">Tipo</span><select data-chg="sheet" data-f="kind"><option value="flex"'+(sh.kind==='flex'?' selected':'')+'>Flessibile</option><option value="fixed"'+(sh.kind==='fixed'?' selected':'')+'>Fisso</option></select></label></div>'+
     repHtml(sh)+'</div>'+frogBtn(sh,it,sh.date)+
-    (sh.err?'<div class="note" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+
+    (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+
     '<div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn sec" data-act="sheet-close" type="button">Annulla</button><button class="btn" data-act="sheet-ok" type="button">Aggiungi</button></div></div></div>';
 }
 function newOk(){
