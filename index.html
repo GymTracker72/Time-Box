@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-09-0135">
+<meta name="tb-build" content="2026-11-09-0155">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -2832,10 +2832,10 @@ function dumpOpenList(){
 }
 function slotHtml(sh){
   var list=dumpOpenList(),dt=parse(sh.date),lab=(sh.date===isoOf(new Date())?'':DOW[dt.getDay()]+' '+dt.getDate()+' · ')+'Dalle '+slotLab(sh.s);
-  return '<div class="sheet-bg" data-act="sheet-bg"><div class="sheet prep" role="dialog" aria-label="Cosa metti qui?"><div class="ph" style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">'+esc(lab)+'</div><h2 style="margin:0;font:800 24px/1.1 var(--body)">Cosa metti qui?</h2>'+
-    '<div style="display:flex;gap:8px;align-items:center"><input class="input" id="slotnew" placeholder="Nuovo blocco…" aria-label="Nuovo blocco" autocomplete="off" style="flex:1;border-radius:22px;padding:11px 16px"><button type="button" class="btn" data-act="slot-new">Aggiungi</button></div>'+
-    (list.length?'<div class="osh" style="padding:6px 0 0"><b>Dalla lista</b></div><div class="plist">'+list.map(function(i){return '<button type="button" class="pr1" data-act="slot-pick" data-id="'+i.id+'"><span class="bd'+(i.pr?'':' none')+'">'+(i.pr||'?')+'</span>'+(i.area?'<span class="dot '+i.area+'"></span>':'<span style="width:9px;flex:none"></span>')+'<span class="tt">'+esc(i.text)+'</span><span class="rt">'+(i.due?ddmm(i.due):'')+'</span></button>'}).join('')+'</div>':'<div class="pst">La lista è vuota.</div>')+
-    '<div style="display:flex;gap:8px;justify-content:space-between;align-items:center"><button class="mini" data-act="slot-more" type="button">Altre opzioni…</button><button class="btn sec" data-act="sheet-close" type="button">Annulla</button></div></div></div>';
+  return '<div class="sheet-bg" data-act="sheet-bg"><div class="sheet prep bs" role="dialog" aria-label="Nuovo blocco"><div class="ph" style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">'+esc(lab)+'</div>'+
+    '<input class="bst" id="slotnew" placeholder="Nuovo blocco" aria-label="Nuovo blocco" autocomplete="off">'+
+    (list.length?'<div class="osh" style="padding:6px 0 0"><b>Dalla lista</b></div><div class="plist">'+list.slice(0,5).map(function(i){return '<button type="button" class="pr1" data-act="slot-pick" data-id="'+i.id+'"><span class="bd'+(i.pr?'':' none')+'">'+(i.pr||'?')+'</span>'+(i.area?'<span class="dot '+i.area+'"></span>':'<span style="width:9px;flex:none"></span>')+'<span class="tt">'+esc(i.text)+'</span><span class="rt">'+(i.due?ddmm(i.due):'')+'</span></button>'}).join('')+'</div>':'')+
+    '<div style="display:flex;gap:10px;justify-content:space-between;align-items:center;padding-top:6px"><button class="mini" data-act="slot-more" type="button">Dettagli ›</button><span style="display:flex;gap:8px"><button class="btn sec" data-act="sheet-close" type="button">Annulla</button><button type="button" class="btn" data-act="slot-new">Aggiungi</button></span></div></div></div>';
 }
 function tslotHtml(sh){
   var i=item(sh.id);if(!i)return '';
@@ -3235,7 +3235,7 @@ document.addEventListener('click',function(e){
     case 'tslot-skip':if(ui.sheet&&ui.sheet.mode==='tslot'){var ti=item(ui.sheet.id);if(ti){setTop(ui.sheet.a,ti.id,ui.sheet.date)}ui.sheet=null}break;
     case 'tslot-ok':if(ui.sheet&&ui.sheet.mode==='tslot'){tslotRead();var tsh=ui.sheet,ti2=item(tsh.id),snt=JSON.stringify(st);if(ti2){var nt=slotN(tsh.date,tsh.s,tsh.n),ert=scheduleItem(ti2,tsh.date,tsh.s,nt,'flex');
       if(ert){st=JSON.parse(snt);toast(ert)}else{ui.sheet=null;ui.undo=snt;toastAct('«'+ti2.text+'» '+qWhen(tsh.date,tsh.s),'<button type="button" data-act="q-undo">Annulla</button>')}}}break;
-    case 'slot-more':if(ui.sheet&&ui.sheet.mode==='slot'){var so=ui.sheet;ui.sheet={mode:'new',date:so.date,s:so.s,n:so.n,kind:'flex',title:'',area:'',pr:'',src:'',rep:'',rend:'n',rdate:'',rcount:10,err:''}}break;
+    case 'slot-more':if(ui.sheet&&ui.sheet.mode==='slot'){var so=ui.sheet,sti=document.getElementById('slotnew'),stt=sti?sti.value.trim():'';ui.sheet={mode:'new',date:so.date,s:so.s,n:Math.max(so.n,2),kind:'flex',title:stt,tedit:!!stt,area:'',pr:'',src:'',rep:'',rend:'n',rdate:'',rcount:10,err:''}}break;
     case 'slot-pick':if(i&&ui.sheet&&ui.sheet.mode==='slot'){var sp=ui.sheet,snp=JSON.stringify(st),np=slotN(sp.date,sp.s,2),erp=scheduleItem(i,sp.date,sp.s,np,'flex');
       if(erp){st=JSON.parse(snp);toast(erp)}else{ui.sheet=null;ui.undo=snp;toastAct('«'+i.text+'» '+qWhen(sp.date,sp.s),'<button type="button" data-act="q-undo">Annulla</button>')}}break;
     case 'slot-new':if(ui.sheet&&ui.sheet.mode==='slot'){var inp=document.getElementById('slotnew'),raw=inp?inp.value.trim():'';if(!raw){if(inp)inp.focus();break}
@@ -3441,16 +3441,16 @@ function newHtml(sh){
   var src='<option value="">Voce libera</option>'+newCands(sh.date).map(function(i){return '<option value="'+i.id+'"'+(sh.src===i.id?' selected':'')+'>'+esc(i.pr||'?')+' · '+esc(i.text)+'</option>'}).join('');
   var starts='';for(var k=0;k<NSLOT;k++)starts+='<option value="'+k+'"'+(+sh.s===k?' selected':'')+'>'+slotLab(k)+'</option>';
   var durs='';for(var n=1;n<=10;n++)durs+='<option value="'+n+'"'+(+sh.n===n?' selected':'')+'>'+hm(n*30)+'</option>';
-  return '<div class="sheet-bg" data-act="sheet-bg"><div class="sheet" role="dialog" aria-label="Nuovo blocco">'+
-    '<span class="lbl">Nuovo blocco, '+ddmm(sh.date)+'</span>'+
-    '<label><span class="lbl">Da</span><select data-chg="sheet" data-f="src">'+src+'</select></label>'+
-    '<label><span class="lbl">Titolo</span><input data-chg="sheet" data-f="title" value="'+esc(it&&!sh.tedit?it.text:sh.title)+'" placeholder="Cosa fai in questo blocco" autocomplete="off"></label>'+
-    (it?'':'<label><span class="lbl">Area</span><select data-chg="sheet" data-f="area">'+areaOpts(sh.area,true)+'</select></label>')+
-    (it||sh.kind!=='flex'||sh.rep?'':'<label><span class="lbl">Priorità</span><select data-chg="sheet" data-f="pr"><option value=""'+(!sh.pr?' selected':'')+'>Da classificare</option><option value="A"'+(sh.pr==='A'?' selected':'')+'>A · Top priority</option><option value="B"'+(sh.pr==='B'?' selected':'')+'>B · minore</option><option value="C"'+(sh.pr==='C'?' selected':'')+'>C · nessuna</option></select></label>')+
+  var areaR=it?'':'<label><span class="lbl">Area</span><select data-chg="sheet" data-f="area">'+areaOpts(sh.area,true)+'</select></label>';
+  var prR=(it||sh.kind!=='flex'||sh.rep)?'':'<label><span class="lbl">Priorità</span><select data-chg="sheet" data-f="pr"><option value=""'+(!sh.pr?' selected':'')+'>Da classificare</option><option value="A"'+(sh.pr==='A'?' selected':'')+'>A · Top priority</option><option value="B"'+(sh.pr==='B'?' selected':'')+'>B · minore</option><option value="C"'+(sh.pr==='C'?' selected':'')+'>C · nessuna</option></select></label>';
+  return '<div class="sheet-bg" data-act="sheet-bg"><div class="sheet prep bs" role="dialog" aria-label="Nuovo blocco">'+
+    '<div class="ph" style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Nuovo blocco · '+ddmm(sh.date)+'</div>'+
+    '<input class="bst" data-chg="sheet" data-f="title" value="'+esc(it&&!sh.tedit?it.text:sh.title)+'" placeholder="Nuovo blocco" aria-label="Titolo" autocomplete="off">'+
+    '<div class="bsc"><label><span class="lbl">Da</span><select data-chg="sheet" data-f="src">'+src+'</select></label>'+areaR+prR+
     '<div class="g"><label><span class="lbl">Inizio</span><select data-chg="sheet" data-f="s">'+starts+'</select></label>'+
     '<label><span class="lbl">Durata</span><select data-chg="sheet" data-f="n">'+durs+'</select></label>'+
     '<label><span class="lbl">Tipo</span><select data-chg="sheet" data-f="kind"><option value="flex"'+(sh.kind==='flex'?' selected':'')+'>Flessibile</option><option value="fixed"'+(sh.kind==='fixed'?' selected':'')+'>Fisso</option></select></label></div>'+
-    repHtml(sh)+frogBtn(sh,it,sh.date)+
+    repHtml(sh)+'</div>'+frogBtn(sh,it,sh.date)+
     (sh.err?'<div class="note" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+
     '<div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn sec" data-act="sheet-close" type="button">Annulla</button><button class="btn" data-act="sheet-ok" type="button">Aggiungi</button></div></div></div>';
 }
