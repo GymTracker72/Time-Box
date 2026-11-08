@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-09-0001">
+<meta name="tb-build" content="2026-11-09-0010">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -1540,7 +1540,7 @@ function wkCols(m){
     if(dd)conflicts(dd).forEach(function(p){cl[p[0].id]=1;cl[p[1].id]=1});
     h+='<div class="wcc'+(x===today?' td':'')+'" data-d="'+x+'" data-rh="'+RH+'" style="height:'+(NSLOT*RH)+'px">'+bl.map(function(b){
       var L=lay[b.id],it=b.ref&&item(b.ref),isTop=it&&it.status==='top',dn=bst(b)==='d';
-      var cls='wcb '+(b.kind==='fixed'?'fixed ':isTop?'top ':'')+(b.area||'')+(dn?' dn':'')+(cl[b.id]?' clash':'');
+      var cls='wcb '+(b.kind==='fixed'?'fixed ':isTop?'top ':'')+((it&&b.kind!=='fixed'?it.area:b.area)||'')+(dn?' dn':'')+(cl[b.id]?' clash':'');
       var sty='top:'+(b.s*RH+1)+'px;height:'+(b.n*RH-2)+'px;left:calc('+(L.c*100/L.n)+'% + 1px);width:calc('+(100/L.n)+'% - 2px)';
       var hc=b.kind!=='fixed';
       return '<div role="button" tabindex="0" class="'+cls+(hc?' hascb':'')+'" style="'+sty+'" data-act="wk-view" data-d="'+x+'" data-id="'+b.id+'" aria-label="Apri '+esc(b.title)+'">'+(hc?'<button class="cb '+(bst(b)||'')+'" data-act="wk-cyc" data-d="'+x+'" data-id="'+esc(b.id)+'" aria-label="Stato: '+(bst(b)==='d'?'fatto':bst(b)==='p'?'parziale':'da fare')+'"></button>':'')+(fi&&b.ref===fi.id?'<span class="fr2">'+FROG+'</span>':'')+'<span class="tt">'+(cl[b.id]?'! ':'')+(b.rid?'↻ ':'')+esc(b.title)+'</span>'+(b.n>=2?'<span class="tm">'+slotLab(b.s)+'–'+slotLab(b.s+b.n)+'</span>':'')+'<span class="rz" aria-hidden="true"></span></div>'}).join('')+
@@ -2926,7 +2926,7 @@ function renderSched(d){
   var fi=frogItem(d);
   h+='<div class="blks">'+d.blocks.map(function(b){
     var L=lay[b.id],it=b.ref&&item(b.ref),isTop=it&&it.status==='top';
-    var cls='blk '+(b.kind==='fixed'?'fixed '+(b.area||''):isTop?'top '+b.area:'flex '+(b.area||''))+(cl[b.id]?' clash':'')+(fi&&b.ref===fi.id?' fg':'');
+    var cls='blk '+(b.kind==='fixed'?'fixed '+(b.area||''):isTop?'top '+(it.area||''):'flex '+((it?it.area:b.area)||''))+(cl[b.id]?' clash':'')+(fi&&b.ref===fi.id?' fg':'');
     var style='top:'+(b.s*ROWH+1)+'px;height:'+(b.n*ROWH-2)+'px;left:calc('+(L.c*100/L.n)+'% + 2px);width:calc('+(100/L.n)+'% - 4px);';
     var frog=fi&&b.ref===fi.id?'<span class="fr" style="color:#1f2a28">'+FROG+'</span>':'';
     return '<div class="'+cls+'" style="'+style+'" data-act="view-block" data-id="'+b.id+'" role="button" tabindex="0" aria-label="Apri '+esc(b.title)+'">'+(b.kind==='fixed'?'':cbH(bst(b),'cyc-block',b.id))+frog+'<span class="rz" aria-hidden="true"></span><div>'+(cl[b.id]?'! ':'')+(b.rid?'↻ ':'')+esc(b.title)+(notesOf(b).length?' ✎':'')+'</div>'+(b.n>1?'<div class="sm">'+slotLab(b.s)+'–'+slotLab(b.s+b.n)+''+'</div>':'')+'</div>';
