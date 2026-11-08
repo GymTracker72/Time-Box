@@ -454,6 +454,29 @@ button,select,input{touch-action:manipulation}
 .w2f{flex:none;display:flex;color:var(--ink)}.w2f svg{width:22px;height:17px}
 .w2ap{margin-top:6px;font:400 13px/1.5 var(--body);color:var(--muted)}
 .w2m{margin-top:18px}.w2m summary{cursor:pointer;color:var(--muted);font:500 14px/1.2 var(--body);padding:8px 0;min-height:44px;display:flex;align-items:center}
+/* giorno corrente: cerchio rosso; Pianifica essenziale */
+.rcirc{width:44px;height:44px;border-radius:50%;background:#ff3b30;color:#fff;font:700 22px/1 var(--body);display:inline-flex;align-items:center;justify-content:center;flex:none;margin:0 0 4px auto}
+.odate.tdy{color:var(--ink)!important}
+.w2n.tdy{background:#ff3b30;color:#fff;font-weight:700}
+.cell.today .n{background:#ff3b30!important;color:#fff!important;border:0!important;font-weight:700}
+#phead{padding:calc(14px + env(safe-area-inset-top,0px)) 2px 6px}
+#phead[hidden]{display:none}
+.pstrip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px 4px;text-align:center;margin-top:12px}
+.pstrip button{border:0;background:transparent;color:inherit;font:inherit;padding:0;min-height:36px;cursor:pointer}
+body.m-plan .top>div:first-child,body.m-plan .datebox>.nav,body.m-plan .datebox .dwrap,body.m-plan .datebox .todayrow{display:none!important}
+body.m-plan .datebox.card{border:0;background:transparent;box-shadow:none;padding:4px 2px}
+body.m-plan #daybar{display:none!important}
+.srow{border-top:1px solid transparent}
+.srow.h{border-top:1px solid var(--soft)}
+.srow span{border-right:0}
+.blk{border:0!important;border-radius:10px;color:#fff;background:var(--muted);padding-top:4px}
+.blk.flex.L,.blk.fixed.L,.blk.top.L{background:var(--blue)}.blk.flex.F,.blk.fixed.F,.blk.top.F{background:var(--green)}.blk.flex.P,.blk.fixed.P,.blk.top.P{background:var(--red)}
+.blk.fixed{background-image:none;color:#fff}
+.blk .fr{background:#fff;color:#1f2a28}
+.blk.clash{box-shadow:inset 0 0 0 3px var(--amber)}
+.blk.fg>div:not(.sm){font-weight:800}
+.nowline .nt{background:var(--surface);left:-50px;top:-11px;width:48px;line-height:22px;text-align:center;padding:0;border-radius:6px}
+.nowline{border-top-width:2px}
 /* Oggi: impostazione essenziale */
 .ohead .dvdot{width:14px;height:14px;margin:0 6px 12px 0;align-self:flex-end}
 body.m-oggi .top>div:first-child,body.m-sett.w2on .top>div:first-child{display:none!important}
@@ -590,6 +613,7 @@ html,body{touch-action:manipulation;min-height:100vh}
 </style>
 
 <div class="wrap">
+  <div id="phead" hidden></div>
   <div class="top">
     <div style="display:flex;align-items:center;padding-right:8px"><h1>TIMEBOX<br class="hbr"> DAILY</h1><button id="dvdot" class="dvdot" data-act="dv-dot" aria-label="Sincronizzazione con Drive"></button></div>
     <div class="card datebox">
@@ -980,11 +1004,20 @@ var PRW={A:'Top',B:'minore',C:'nessuna',D:'delega',E:'elimina'};
 var PRM={A:'conseguenze rilevanti',B:'conseguenze minori',C:'nessuna conseguenza',D:'da delegare',E:'da eliminare','':'da classificare'};
 function dayBar(){var b=document.getElementById('daybar'),bx=document.querySelector('.datebox');if(!b||!bx)return;var r=bx.getBoundingClientRect();b.classList.toggle('on',ui.mode==='plan'&&r.bottom<0)}
 window.addEventListener('scroll',dayBar,{passive:true});
+function renderPHead(){
+  var el=document.getElementById('phead');if(!el)return;
+  var on=ui.mode==='plan';el.hidden=!on;document.body.classList.toggle('m-plan',on);if(!on)return;
+  var now=new Date(),today=isoOf(now),dt=parse(st.date),m=mondayOf(st.date),isT=st.date===today;
+  var days=[];for(var q=0;q<7;q++)days.push(addDays(m,q));
+  var h='<div class="ohead"><div class="ohl"><div class="odowr"><span class="odow">'+DOW[dt.getDay()]+'</span>'+(isT?'':'<button type="button" class="otd" data-act="day-today" aria-label="Torna a oggi">'+(st.date>today?'‹ Oggi':'Oggi ›')+'</button>')+'</div><div class="odate">'+dt.getDate()+' '+MON[dt.getMonth()]+(dt.getFullYear()!==now.getFullYear()?' '+dt.getFullYear():'')+'</div></div></div>';
+  h+='<div class="pstrip">'+['L','M','M','G','V','S','D'].map(function(l){return '<span class="w2l">'+l+'</span>'}).join('')+days.map(function(x){return '<button type="button" data-act="pday" data-d="'+x+'" aria-label="'+DOW[parse(x).getDay()]+' '+parse(x).getDate()+'"><span class="w2n'+(x===today?' tdy':'')+(x===st.date?' sel':'')+'">'+parse(x).getDate()+'</span></button>'}).join('')+'</div>';
+  el.innerHTML=h;
+}
 function render(){
   if(ui.mode==='oggi'&&!ui.oggiNav)st.date=isoOf(new Date());
   document.body.classList.toggle('m-oggi',ui.mode==='oggi');document.body.classList.toggle('m-sett',ui.mode==='sett');document.body.classList.toggle('w2on',ui.mode==='sett'&&wkMode()==='list');
   clipBar();norm();var d=day(),s=stats(d),dt=parse(st.date);
-  document.getElementById('date').value=st.date;
+  document.getElementById('date').value=st.date;renderPHead();
   document.querySelector('.top h1').innerHTML='TIMEBOX<br class="hbr"> '+(ui.mode==='stampa'?'PRINT':({sett:'WEEKLY',mese:'MONTHLY',anno:'YEARLY'}[ui.mode]||'DAILY'));
   document.getElementById('dlab').textContent=DOW[dt.getDay()].slice(0,3).toLowerCase()+' '+dt.getDate()+' '+MON[dt.getMonth()].slice(0,3).toLowerCase()+' '+dt.getFullYear();
   document.getElementById('dlab').classList.toggle('today',st.date===isoOf(new Date()));
@@ -2285,7 +2318,7 @@ function renderOggi(d){
     var recAll=quickList();
   /* Top compatte */
   var dtH=parse(st.date);
-  h+='<div class="ohead"><div class="ohl"><div class="odowr"><span class="odow">'+DOW[dtH.getDay()]+'</span>'+(isToday?'':'<button type="button" class="otd" data-act="day-today" aria-label="Torna a oggi">'+(st.date>isoOf(now)?'‹ Oggi':'Oggi ›')+'</button>')+'</div><div class="odate'+(isToday?' tdy':'')+'">'+dtH.getDate()+' '+MON[dtH.getMonth()]+(dtH.getFullYear()!==now.getFullYear()?' '+dtH.getFullYear():'')+'</div></div><button type="button" id="dvdot2" class="dvdot" data-act="dv-dot" aria-label="Sincronizzazione con Drive"></button></div>';
+  h+='<div class="ohead"><div class="ohl"><div class="odowr"><span class="odow">'+DOW[dtH.getDay()]+'</span>'+(isToday?'':'<button type="button" class="otd" data-act="day-today" aria-label="Torna a oggi">'+(st.date>isoOf(now)?'‹ Oggi':'Oggi ›')+'</button>')+'</div><div class="odate'+(isToday?' tdy':'')+'">'+dtH.getDate()+' '+MON[dtH.getMonth()]+(dtH.getFullYear()!==now.getFullYear()?' '+dtH.getFullYear():'')+'</div></div>'+(isToday?'<span class="rcirc" aria-label="Oggi">'+dtH.getDate()+'</span>':'')+'<button type="button" id="dvdot2" class="dvdot" data-act="dv-dot" aria-label="Sincronizzazione con Drive"></button></div>';
   h+='<section class="o3 o3n"><h2 class="o3h">Top 3 priority</h2>'+AK.slice().sort(function(a,b){return (d.frog===b?1:0)-(d.frog===a?1:0)}).map(function(a){var v=d.tops[a],isF=d.frog===a;
     if(v&&v!=='empty'){var i=item(v);if(!i)return '';topsTot++;if(i.st==='d')topsDone++;
       return '<button class="q3r '+a+(isF?' fg':'')+(i.st==='d'?' done':'')+'" data-act="tog-item" data-id="'+i.id+'" aria-label="'+AREAS[a]+': '+esc(i.text)+(isF?', la rana di oggi':'')+', tocca per cambiare stato">'+ringSvg(i.st,a)+'<span class="q3t">'+esc(i.text)+'</span>'+(isF?'<span class="q3s" role="img" aria-label="La rana di oggi">'+FROG+'</span>':'')+'<span class="q3a">'+AREAS[a]+'</span></button>'}
@@ -2475,7 +2508,7 @@ function renderSched(d){
   var fi=frogItem(d);
   h+='<div class="blks">'+d.blocks.map(function(b){
     var L=lay[b.id],it=b.ref&&item(b.ref),isTop=it&&it.status==='top';
-    var cls='blk '+(b.kind==='fixed'?'fixed '+(b.area||''):isTop?'top '+b.area:'flex '+(b.area||''))+(cl[b.id]?' clash':'');
+    var cls='blk '+(b.kind==='fixed'?'fixed '+(b.area||''):isTop?'top '+b.area:'flex '+(b.area||''))+(cl[b.id]?' clash':'')+(fi&&b.ref===fi.id?' fg':'');
     var style='top:'+(b.s*ROWH+1)+'px;height:'+(b.n*ROWH-2)+'px;left:calc('+(L.c*100/L.n)+'% + 2px);width:calc('+(100/L.n)+'% - 4px);';
     var frog=fi&&b.ref===fi.id?'<span class="fr" style="color:#1f2a28">'+FROG+'</span>':'';
     return '<div class="'+cls+'" style="'+style+'" data-act="view-block" data-id="'+b.id+'" role="button" tabindex="0" aria-label="Apri '+esc(b.title)+'">'+(b.kind==='fixed'?'':cbH(bst(b),'cyc-block',b.id))+frog+'<span class="rz" aria-hidden="true"></span><div>'+(cl[b.id]?'! ':'')+(b.rid?'↻ ':'')+esc(b.title)+(notesOf(b).length?' ✎':'')+'</div>'+(b.n>1?'<div class="sm">'+slotLab(b.s)+'–'+slotLab(b.s+b.n)+(b.kind==='fixed'?', impegno fisso':'')+'</div>':'')+'</div>';
@@ -2719,6 +2752,7 @@ document.addEventListener('click',function(e){
     case 'day-prev':if(ui.mode==='oggi')break;st.date=addDays(st.date,-1);break;
     case 'day-next':if(ui.mode==='oggi')break;st.date=addDays(st.date,1);break;
     case 'day-today':st.date=isoOf(new Date());break;
+    case 'pday':st.date=t.getAttribute('data-d');break;
     case 'cyc-item':if(i)i.st=cyc(i.st);break;
     case 'tog-item':if(i)i.st=i.st==='d'?'':'d';break;
     case 'tog-block':var bt=d.blocks.filter(function(x){return x.id===id})[0];if(bt)setBst(bt,bst(bt)==='d'?'':'d');break;
