@@ -2688,7 +2688,7 @@ function renderOggi(d){
     h+='<div class="ocard"><div class="olab" style="display:flex;gap:6px;align-items:center;font:600 15px/1 var(--body);color:var(--muted)">'+FROG+'<span>Rana di oggi</span></div><div class="sub" style="padding-top:4px;font-size:12px">Quale Top è la più difficile? Fai quella per prima.</div><div style="display:flex;flex-direction:column;gap:6px;padding-top:10px">'+
       AK.map(function(a){var v=d.tops[a],i=v&&v!=='empty'?item(v):null;return i?'<button type="button" class="obtn" style="background:var(--bg);text-align:left;padding:0 16px;font-size:15px;display:flex;align-items:center;gap:8px" data-act="frog" data-a="'+a+'"><span class="dot '+a+'" style="width:10px;height:10px"></span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(i.text)+'</span></button>':''}).join('')+'</div></div>';
   }
-  h+=prepCard(isToday,nowMin);
+  var pcH=prepCard(isToday,nowMin);h+=pcH;
   var loose=isToday?todayLoose(d):[];
   if(loose.length)h+='<div class="ora"><div class="olab">Da programmare oggi</div><div class="ttl">'+(loose.length===1?'1 voce':loose.length+' voci')+' senza orario</div><div class="oleft">'+loose.slice(0,3).map(function(i){return esc(i.text)}).join(' · ')+(loose.length>3?' …':'')+'</div><div class="row2"><button class="obtn p" data-act="fill-day">Metti in fila da adesso</button><button class="obtn" data-act="mode" data-m="plan">Pianifica</button></div></div>';
   /* Ora */
@@ -2739,6 +2739,7 @@ function renderOggi(d){
   }else{
     h+='<div class="osh"><b>Orario</b><span>Libere '+hm(s.left)+'</span></div>'+(rows.length?'<div class="olist">'+rows.map(oRow).join('')+'</div>':'<div class="ocard sub">Nessun blocco.</div>');
   }
+  if(finH&&pcH)h=h.split(pcH).join('');
   h+=finH;
   var colSt='display:flex;flex-direction:column;gap:12px;min-width:0';
   document.getElementById('oggi').innerHTML=window.innerWidth>=1000?
