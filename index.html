@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-09-0110">
+<meta name="tb-build" content="2026-11-09-0135">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -1334,6 +1334,7 @@ function rollOver(){
 }
 function norm(){
   if(!st.rec)st.rec={};
+  Object.keys(st.days).forEach(function(k){var dy=st.days[k];if(!dy||!dy.blocks)return;dy.blocks.forEach(function(b){b.s=+b.s;b.n=+b.n;if(!isFinite(b.s)||b.s<0)b.s=0;if(!isFinite(b.n)||b.n<1/6)b.n=1;if(b.s+b.n>NSLOT)b.s=Math.max(0,NSLOT-b.n)})});
   if(!ui.sheet)st.dump.forEach(function(i){if(i.sub&&!i.sub.length){delete i.sub;delete i.stS}});
   Object.keys(st.days).forEach(function(k){var dy=st.days[k];if(!dy||!dy.blocks)return;dy.blocks.forEach(function(b){
     if(b.rid&&b.ref){var oi=item(b.ref);if(oi&&(oi.rid||(oi.status==='prog'&&!oi.pr&&!oi.due&&sameTitle(oi.text,b.title)))){b.st=oi.st||'';b.ref='';
@@ -2710,7 +2711,7 @@ function renderStorico(){
 }
 function renderVoci(){
   var all=quickList(),nowMs=Date.now();
-  document.getElementById('voci').innerHTML='<div class="vh2"><button type="button" class="mini" data-act="mode" data-m="oggi">‹ Oggi</button></div><h1 class="vt2">Tutte le voci<span>'+all.length+'</span></h1><section class="oquick">'+
+  document.getElementById('voci').innerHTML='<div class="vh2"><button type="button" class="mini" data-act="mode" data-m="'+(ui.vback==='plan'?'plan':'oggi')+'">‹ '+(ui.vback==='plan'?'Pianifica':'Oggi')+'</button></div><h1 class="vt2">Tutte le voci<span>'+all.length+'</span></h1><section class="oquick">'+
     (all.length?all.map(function(i){return quickRow(i,nowMs)}).join(''):'<div class="sub" style="padding:16px 0">Nessuna voce da pianificare.</div>')+(doneList().length?'<div class="oalls"><button type="button" class="mini oall" data-act="storico-open">Completate ('+doneList().length+')</button></div>':'')+'</section>';
 }
 function renderOggi(d){
@@ -3187,8 +3188,8 @@ document.addEventListener('click',function(e){
   var act=t.getAttribute('data-act'),id=t.getAttribute('data-id'),a=t.getAttribute('data-a'),d=day(),i=id?item(id):null;
   ui.msg=(act==='block-add')?ui.msg:'';ui.lsN=0;ui.ls=null;
   switch(act){
-    case 'mode':if(t.getAttribute('data-m')==='oggi')ui.oggiNav=0;if(t.getAttribute('data-m')==='mese'&&t.closest('.tabs')){st.date=isoOf(new Date());ui.scrollTop=1}if(t.getAttribute('data-m')==='sett'&&t.closest('.tabs')){ui.wsel='';st.date=isoOf(new Date());ui.scrollToday=1}if(t.getAttribute('data-m')==='oggi'&&ui.mode==='oggi'&&t.closest('.tabs')){st.date=isoOf(new Date());setTimeout(centerNext,40);toast('Oggi')}ui.mode=t.getAttribute('data-m');if(ui.mode==='plan')ui.snap=true;if(ui.mode==='voci')setTimeout(function(){window.scrollTo(0,0)},0);break;
-    case 'dump-toggle':ui.dumpOpen=!ui.dumpOpen;break;
+    case 'mode':if(t.getAttribute('data-m')==='voci')ui.vback=ui.mode==='plan'?'plan':'oggi';if(t.getAttribute('data-m')==='oggi')ui.oggiNav=0;if(t.getAttribute('data-m')==='mese'&&t.closest('.tabs')){st.date=isoOf(new Date());ui.scrollTop=1}if(t.getAttribute('data-m')==='sett'&&t.closest('.tabs')){ui.wsel='';st.date=isoOf(new Date());ui.scrollToday=1}if(t.getAttribute('data-m')==='oggi'&&ui.mode==='oggi'&&t.closest('.tabs')){st.date=isoOf(new Date());setTimeout(centerNext,40);toast('Oggi')}ui.mode=t.getAttribute('data-m');if(ui.mode==='plan')ui.snap=true;if(ui.mode==='voci')setTimeout(function(){window.scrollTo(0,0)},0);break;
+    case 'dump-toggle':ui.vback=ui.mode==='plan'?'plan':'oggi';ui.mode='voci';setTimeout(function(){window.scrollTo(0,0)},0);break;
     case 'dump-tab':ui.dumpTab=t.getAttribute('data-v');ui.dumpOpen=1;break;
     case 'to-dump':ui.dumpOpen=1;ui.dumpTab='todo';ui.mode='plan';setTimeout(function(){var e=document.getElementById('dumpcard');if(e)e.scrollIntoView({behavior:'smooth',block:'start'})},80);break;
     case 'view-copy':if(ui.sheet&&ui.sheet.mode==='view'){var vcb=blkFind(ui.sheet);if(vcb){clipFrom(vcb);ui.sheet=null}}break;
