@@ -3139,7 +3139,7 @@ async function calSync(){
     Object.keys(rem.map).forEach(function(k){if(!want[k])del(rem.map[k].id)});rem.dup.forEach(del);
     n.t=jobs.length;var dn=0;
     if(jobs.length){cs.msg='';await calPool(jobs,4,function(){dn++;if(dn%5===0||dn===n.t){cs.msg=dn+'/'+n.t;calShow()}})}
-    cs.st='ok';cs.at=Date.now();cs.msg=n.t?(n.i?n.i+' nuovi':'')+(n.u?(n.i?', ':'')+n.u+' aggiornati':'')+(n.d?((n.i||n.u)?', ':'')+n.d+' tolti':''):'';
+    cs.st='ok';cs.at=Date.now();cs.nw=nw;cs.nt=Object.keys(want).filter(function(k){return want[k].start.dateTime.slice(0,10)===isoOf(new Date())}).length;cs.msg=n.t?(n.i?n.i+' nuovi':'')+(n.u?(n.i?', ':'')+n.u+' aggiornati':'')+(n.d?((n.i||n.u)?', ':'')+n.d+' tolti':''):'';
   }catch(e){cs.st='err';cs.msg=(e&&e.message)||'errore';cs.auth=!!(e&&e.code==='auth')}
   finally{cs.busy=false;calShow();if(cs.again){cs.again=false;calQueue(1500)}}
 }
@@ -3161,7 +3161,7 @@ function calShow(){
     h='<div class="eg">I blocchi dei prossimi '+CWIN+' giorni diventano eventi di un calendario «Time Box» su Google Calendar, con il colore dell\'area (Lavoro blu, Famiglia verde, Persona rosso, altro grigio) e gli avvisi che scegli. Le modifiche fatte qui si aggiornano da sole. Le modifiche fatte su Google Calendar non tornano nel Time Box.</div><div><button class="mini" data-act="cal-on">Collega Google Calendar</button></div>';
     if(cs.msg)h+='<div class="eg" style="color:var(--amber)">'+esc(cs.msg)+'</div>'}
   else{
-    var s=cs.st==='busy'?'sincronizzo…'+(cs.msg?' '+esc(cs.msg):''):cs.st==='err'?esc(cs.msg):cs.st==='ok'?'aggiornato alle '+hhmm(cs.at)+(cs.msg?' ('+esc(cs.msg)+')':''):(gcHas()?'collegato':'tocca «Accedi con Google» per riprendere');
+    var s=cs.st==='busy'?'sincronizzo…'+(cs.msg?' '+esc(cs.msg):''):cs.st==='err'?esc(cs.msg):cs.st==='ok'?'aggiornato alle '+hhmm(cs.at)+(cs.msg?' ('+esc(cs.msg)+')':'')+' · '+(cs.nw||0)+' blocchi, oggi '+(cs.nt||0):(gcHas()?'collegato':'tocca «Accedi con Google» per riprendere');
     h='<div class="eg" id="calst">Calendar: '+s+'</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+
       (cs.st==='err'&&cs.auth||!gcHas()&&cs.st!=='busy'?'<button class="mini" data-act="cal-login">Accedi con Google</button>':'')+
       '<button class="mini" data-act="cal-sync">Sincronizza ora</button><button class="mini" data-act="cal-off">Scollega</button>'+
