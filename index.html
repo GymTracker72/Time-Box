@@ -2991,7 +2991,10 @@ function dvCall(tool,input){return dv.mcp.callTool(DVS,tool,input,{cache:false})
 function dvFiles(res){var p=res&&res.payload;return p&&Array.isArray(p.files)?p.files:[]}
 /* ---- Accesso Google (solo fuori da Claude): salvataggio nella cartella nascosta dell'app nel Drive di ciascun utente ---- */
 var GCLIENT='811087105113-nl6ugd2jrb26ho0o6e42qvu04hvl2sc8.apps.googleusercontent.com';
-var GSCOPE='https://www.googleapis.com/auth/drive.appdata',GOK='timebox-gok';
+var GSCOPE='https://www.googleapis.com/auth/drive.appdata',GOK='timebox-gok',GTK='timebox-gtok';
+function gdSave(){try{localStorage.setItem(GTK,JSON.stringify({t:gd.tok,e:gd.exp}))}catch(e){}}
+function gdRead(){try{var o=JSON.parse(localStorage.getItem(GTK)||'null');if(o&&o.t&&o.e>Date.now()+60000){gd.tok=o.t;gd.exp=o.e;return true}}catch(e){}return false}
+function gdDrop(){gd.tok='';gd.exp=0;try{localStorage.removeItem(GTK)}catch(e){}}
 var gd={tok:'',exp:0,client:null,cb:null,eb:null};
 function GDon(){return !window.claude&&!!GCLIENT}
 function gdLoad(){return new Promise(function(res,rej){
@@ -3000,14 +3003,17 @@ function gdLoad(){return new Promise(function(res,rej){
   e.onload=function(){res()};e.onerror=function(){rej({code:'net',message:'non riesco a caricare l\'accesso Google: controlla la connessione.'})};document.head.appendChild(e)})}
 function gdAsk(prompt){return new Promise(function(res,rej){
   if(!gd.client)gd.client=google.accounts.oauth2.initTokenClient({client_id:GCLIENT,scope:GSCOPE,callback:function(r){gd.cb&&gd.cb(r)},error_callback:function(e){gd.eb&&gd.eb(e)}});
-  gd.cb=function(r){if(r&&r.access_token){gd.tok=r.access_token;gd.exp=Date.now()+((+r.expires_in||3600)-90)*1000;lsSet(GOK,1);res(gd.tok)}else rej({code:'auth',message:r&&r.error==='access_denied'?'accesso non consentito per questo account.':'accesso non riuscito.'})};
+  gd.cb=function(r){if(r&&r.access_token){gd.tok=r.access_token;gd.exp=Date.now()+((+r.expires_in||3600)-90)*1000;gdSave();lsSet(GOK,1);res(gd.tok)}else rej({code:'auth',message:r&&r.error==='access_denied'?'accesso non consentito per questo account.':'accesso non riuscito.'})};
   gd.eb=function(e){rej({code:'auth',message:e&&e.type==='popup_closed'?'accesso annullato.':'accesso non riuscito.'})};
   gd.client.requestAccessToken({prompt:prompt})})}
-async function gdTok(){if(gd.tok&&Date.now()<gd.exp)return gd.tok;await gdLoad();return gdAsk('')}
+async function gdTok(){if(gd.tok&&Date.now()<gd.exp)return gd.tok;if(gdRead())return gd.tok;
+  var ua=navigator.userActivation&&navigator.userActivation.isActive;
+  if(!ua)throw {code:'auth',message:'accesso scaduto.'};
+  await gdLoad();return gdAsk('')}
 async function gdFetch(url,o){
   o=o||{};var t=await gdTok();o.headers=Object.assign({},o.headers,{Authorization:'Bearer '+t});
   var r=await fetch(url,o);
-  if(r.status===401){gd.tok='';t=await gdTok();o.headers.Authorization='Bearer '+t;r=await fetch(url,o)}
+  if(r.status===401){gdDrop();t=await gdTok();o.headers.Authorization='Bearer '+t;r=await fetch(url,o)}
   if(!r.ok){var tx='';try{tx=await r.text()}catch(e){}throw {code:r.status===401||r.status===403?'auth':'http',message:'Drive ('+r.status+') '+tx.slice(0,80)}}
   return r}
 async function gdList(){
@@ -3037,7 +3043,7 @@ function gdLogin(){
 async function gdOut(){
   if(lsGet(UK)>lsGet(SK)){dv.auth=false;await dvSync();if(dv.st!=='ok'){toast('Non riesco a salvare su Drive: uscita annullata');return}}
   try{if(gd.tok&&window.google)google.accounts.oauth2.revoke(gd.tok,function(){})}catch(e){}
-  [KEY,UK,SK,FK,GOK,KEY+'.quote','timebox-wkv','timebox-pwk','timebox-parea','timebox-pbusy'].forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});
+  [KEY,UK,SK,FK,GOK,GTK,KEY+'.quote','timebox-wkv','timebox-pwk','timebox-parea','timebox-pbusy'].forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});
   location.reload()}
 async function dvFolder(){
   if(dv.folder)return dv.folder;
