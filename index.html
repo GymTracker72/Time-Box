@@ -2990,7 +2990,7 @@ function dvErr(e){
 function dvCall(tool,input){return dv.mcp.callTool(DVS,tool,input,{cache:false})}
 function dvFiles(res){var p=res&&res.payload;return p&&Array.isArray(p.files)?p.files:[]}
 /* ---- Accesso Google (solo fuori da Claude): salvataggio nella cartella nascosta dell'app nel Drive di ciascun utente ---- */
-var GCLIENT='';
+var GCLIENT='811087105113-nl6ugd2jrb26ho0o6e42qvu04hvl2sc8.apps.googleusercontent.com';
 var GSCOPE='https://www.googleapis.com/auth/drive.appdata',GOK='timebox-gok';
 var gd={tok:'',exp:0,client:null,cb:null,eb:null};
 function GDon(){return !window.claude&&!!GCLIENT}
