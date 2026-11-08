@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="tb-build" content="2026-11-08-2350">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -778,6 +779,12 @@ body.m-voci .top>div:first-child,body.m-voci .datebox,body.m-voci #stats,body.m-
 .ant{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.anm{border:0;background:var(--surface);color:var(--ink);border-radius:18px;padding:11px 14px;height:56px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;font:600 16px/1 var(--body);cursor:pointer;text-align:left}.anm.cur{background:var(--ink);color:var(--surface);font-weight:700}.anm.fut{opacity:.45}.anm .dd{display:flex;gap:5px}.anm .dd i{width:8px;height:8px;border-radius:50%;display:block}
 .gpcur{display:flex;flex-direction:column;gap:8px;background:var(--bg);border-radius:18px;padding:12px 14px}.gpcur .t{font:600 18px/1.25 var(--body)}.gpcur .input{border:0;border-radius:12px;background:var(--surface)}.gprow{display:flex;gap:8px;align-items:center}.gprow .input{flex:1;min-width:0}
 @keyframes blkp{0%,100%{box-shadow:0 0 0 0 rgba(255,59,48,0)}30%{box-shadow:0 0 0 5px rgba(255,59,48,.55)}}.blk.pulse{animation:blkp 1.1s ease-in-out 2;z-index:5}
+.blk.fixed,.blk.fixed.L,.blk.fixed.F,.blk.fixed.P{--c:var(--muted);background:var(--surface);color:var(--ink);font-size:15px;font-weight:600;line-height:1.2;padding-left:14px;border-radius:10px;box-shadow:inset 4px 0 0 var(--c),0 1px 3px rgba(0,0,0,.10)}
+.blk.fixed.L{--c:var(--blue)}.blk.fixed.F{--c:var(--green)}.blk.fixed.P{--c:var(--red)}
+.blk.fixed>div:not(.sm){color:color-mix(in srgb,var(--c) 72%,var(--ink))}
+.blk.fixed .sm{font-size:12.5px;font-weight:400;color:var(--muted);opacity:1;margin-top:1px}
+.blk.fixed.clash,.blk.fixed.L.clash,.blk.fixed.F.clash,.blk.fixed.P.clash{box-shadow:inset 4px 0 0 var(--c),inset 0 0 0 2px var(--amber)}
+.blk.fixed .rz::after{opacity:.18}
 /* Oggi: impostazione essenziale */
 .ohead .dvdot{width:14px;height:14px;margin:0 6px 12px 0;align-self:flex-end}
 body.m-oggi .top>div:first-child,body.m-mese .top>div:first-child,body.m-sett.w2on .top>div:first-child{display:none!important}
@@ -2915,7 +2922,7 @@ function renderSched(d){
     var cls='blk '+(b.kind==='fixed'?'fixed '+(b.area||''):isTop?'top '+b.area:'flex '+(b.area||''))+(cl[b.id]?' clash':'')+(fi&&b.ref===fi.id?' fg':'');
     var style='top:'+(b.s*ROWH+1)+'px;height:'+(b.n*ROWH-2)+'px;left:calc('+(L.c*100/L.n)+'% + 2px);width:calc('+(100/L.n)+'% - 4px);';
     var frog=fi&&b.ref===fi.id?'<span class="fr" style="color:#1f2a28">'+FROG+'</span>':'';
-    return '<div class="'+cls+'" style="'+style+'" data-act="view-block" data-id="'+b.id+'" role="button" tabindex="0" aria-label="Apri '+esc(b.title)+'">'+(b.kind==='fixed'?'':cbH(bst(b),'cyc-block',b.id))+frog+'<span class="rz" aria-hidden="true"></span><div>'+(cl[b.id]?'! ':'')+(b.rid?'↻ ':'')+esc(b.title)+(notesOf(b).length?' ✎':'')+'</div>'+(b.n>1?'<div class="sm">'+slotLab(b.s)+'–'+slotLab(b.s+b.n)+(b.kind==='fixed'?', impegno fisso':'')+'</div>':'')+'</div>';
+    return '<div class="'+cls+'" style="'+style+'" data-act="view-block" data-id="'+b.id+'" role="button" tabindex="0" aria-label="Apri '+esc(b.title)+'">'+(b.kind==='fixed'?'':cbH(bst(b),'cyc-block',b.id))+frog+'<span class="rz" aria-hidden="true"></span><div>'+(cl[b.id]?'! ':'')+(b.rid?'↻ ':'')+esc(b.title)+(notesOf(b).length?' ✎':'')+'</div>'+(b.n>1?'<div class="sm">'+slotLab(b.s)+'–'+slotLab(b.s+b.n)+''+'</div>':'')+'</div>';
   }).join('')+'</div>';
   var tn=new Date(),tm=tn.getHours()*60+tn.getMinutes();
   if(tm>=S0&&tm<=S0+NSLOT*30)h+='<div class="nowline" id="nowline" style="top:'+((tm-S0)/30*ROWH)+'px"><span class="nt">'+pad(tn.getHours())+':'+pad(tn.getMinutes())+'</span><i></i></div>';
@@ -3987,6 +3994,27 @@ document.addEventListener('focusout',function(e){if(e.target&&e.target.id==='ogg
 })();
 
 
+
+/* Aggiornamento automatico: confronta la versione online con quella in uso */
+(function(){
+  if(!/^https?:/.test(location.protocol))return;
+  var mine=(document.querySelector('meta[name="tb-build"]')||{}).content;
+  if(!mine)return;
+  var busy=false;
+  function check(){
+    if(busy||!navigator.onLine)return;busy=true;
+    fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){
+      var m=t.match(/name="tb-build" content="([^"]+)"/);
+      if(m&&m[1]!==mine){
+        var open=document.querySelector('.sheet,.ov');
+        if(!open)location.reload();
+      }
+    }).catch(function(){}).then(function(){busy=false});
+  }
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)check()});
+  window.addEventListener('pageshow',check);
+  setTimeout(check,2000);
+})();
 </script>
 
 </body></html>
