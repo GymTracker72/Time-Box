@@ -909,7 +909,7 @@ function render(){
   document.body.classList.toggle('m-oggi',ui.mode==='oggi');
   clipBar();norm();var d=day(),s=stats(d),dt=parse(st.date);
   document.getElementById('date').value=st.date;
-  document.querySelector('.top h1').innerHTML='TIMEBOX<br class="hbr"> '+({sett:'WEEKLY',mese:'MONTHLY',anno:'YEARLY'}[ui.mode]||'DAILY');
+  document.querySelector('.top h1').innerHTML='TIMEBOX<br class="hbr"> '+(ui.mode==='stampa'?'PRINT':({sett:'WEEKLY',mese:'MONTHLY',anno:'YEARLY'}[ui.mode]||'DAILY'));
   document.getElementById('dlab').textContent=DOW[dt.getDay()].slice(0,3).toLowerCase()+' '+dt.getDate()+' '+MON[dt.getMonth()].slice(0,3).toLowerCase()+' '+dt.getFullYear();
   document.getElementById('dlab').classList.toggle('today',st.date===isoOf(new Date()));
   var dbl=document.getElementById('dblab');dbl.textContent=document.getElementById('dlab').textContent;dbl.classList.toggle('today',st.date===isoOf(new Date()));document.getElementById('dbtoday').hidden=st.date===isoOf(new Date());dayBar();
@@ -931,7 +931,7 @@ function render(){
   ['oggi','sett','mese','anno','obj','stampa','voci','storico'].forEach(function(k){document.getElementById(k).hidden=M!==k});
   ['overload','footd'].forEach(function(k){document.getElementById(k).hidden=M!=='plan'});
   document.getElementById('plancols').hidden=M!=='plan';
-  var nd=M==='sett'||M==='mese'||M==='anno';document.querySelector('.datebox').hidden=nd;document.getElementById('stats').hidden=M!=='plan';
+  var nd=M==='sett'||M==='mese'||M==='anno'||(M==='stampa'&&printScope()!=='day');document.querySelector('.datebox').hidden=nd;document.getElementById('stats').hidden=M!=='plan';
   [].forEach.call(document.querySelectorAll('.tabs button'),function(b){b.classList.toggle('on',b.getAttribute('data-m')===M)});
   renderSheet();calShow();
   if(M==='oggi')renderOggi(d);if(M==='sett')renderSett();if(M==='mese')renderMese();if(M==='anno')renderAnno();if(M==='stampa')renderStampa();if(M==='voci')renderVoci();if(M==='storico')renderStorico();if(M==='obj')renderObj();
@@ -939,7 +939,7 @@ function render(){
   document.getElementById('bmsg').innerHTML=ui.msg?'<div class="note">'+esc(ui.msg)+'</div>':'';
   if(M==='plan')fitBlocks();
   if(M==='plan'&&ui.snap){ui.snap=false;setTimeout(snapSched,40)}
-  if(ui.scrollToday){ui.scrollToday=0;var te=document.querySelector('#sett .wday.today');if(te)try{te.scrollIntoView({block:'center'})}catch(e){}}if(ui.scrollDay){var sd=ui.scrollDay;ui.scrollDay=0;var te2=document.querySelector('#sett .wday[data-d="'+sd+'"]');if(te2)try{te2.scrollIntoView({block:'center'})}catch(e){}}
+  if(ui.scrollToday){ui.scrollToday=0;var te=document.querySelector('#sett .wday.today');if(te)try{te.scrollIntoView({block:'center'})}catch(e){}}if(ui.scrollTop){ui.scrollTop=0;try{window.scrollTo(0,0)}catch(e){}}if(ui.scrollDay){var sd=ui.scrollDay;ui.scrollDay=0;var te2=document.querySelector('#sett .wday[data-d="'+sd+'"]');if(te2)try{te2.scrollIntoView({block:'center'})}catch(e){}}
   if(ui.focusSub){ui.focusSub=0;var fe=document.getElementById('subnew');if(fe){var bg0=fe.closest('.sheet-bg');if(bg0)bg0.classList.add('kbtop');try{fe.focus({preventScroll:true})}catch(e){}subTop()}}
   var pm=ui.pm;ui.pm=M;
   if(M==='oggi'&&pm!==undefined&&pm!=='oggi')setTimeout(centerNext,40);
@@ -2095,10 +2095,11 @@ function pzSet(z,cx,cy){
 function renderStampa(){
   var W=Math.min(window.innerWidth,1200)-32,a4=printCols()||ui.pview!=='pages',k=Math.min(1,a4?W/1125:W/559);
   var pages=printPages();var N=pages.length;
-  var h='<div class="pnote card"><div class="in" style="display:flex;flex-direction:column;gap:8px"><b>Anteprima '+(printCols()?'A4':'A5')+': '+printLabel()+'</b><div class="sub" style="font-size:12px;line-height:1.4">'+(printCols()?'Un foglio A4 orizzontale, da stampare intero senza tagliare. ':pages.length+' fogli A5 su '+Math.ceil(pages.length/2)+' A4 orizzontali, due per foglio: sotto vedi ogni A4 com\'esce, da tagliare a metà lungo la linea tratteggiata al centro. ')+'Questa pagina non può aprire da sola la finestra di stampa: in Safari tocca Condividi e poi Stampa, scegli carta A4, orientamento orizzontale, scala 100%. Per cambiare periodo usa la data in alto.</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+[['day','Giorno'],['sett','Settimana'],['mese','Mese'],['anno','Anno']].map(function(o){return '<button class="mini'+(printScope()===o[0]?' on':'')+'" data-act="pscope" data-s="'+o[0]+'" style="'+(printScope()===o[0]?'background:var(--ink);color:var(--surface)':'')+'">'+o[1]+'</button>'}).join('')+'</div>'+(printScope()==='sett'?'<div style="display:flex;gap:6px;flex-wrap:wrap">'+[['cols','A4 a colonne'],['agenda','A4 per agenda A5'],['list','A5 per giorno']].map(function(o){var on=wkPrintMode()===o[0];return '<button class="mini" data-act="pwk" data-v="'+o[0]+'" style="'+(on?'background:var(--ink);color:var(--surface)':'')+'">'+o[1]+'</button>'}).join('')+'</div>':'')+'<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span class="sub" style="font-size:12px">Aree</span>'+[['L','Lavoro'],['F','Famiglia'],['P','Persona'],['','Senza area']].map(function(o){var on=pAreas().indexOf(o[0])>=0;return '<button class="mini" data-act="parea" data-v="'+o[0]+'" aria-pressed="'+on+'" style="'+(on?'background:var(--ink);color:var(--surface)':'')+'">'+o[1]+'</button>'}).join('')+(pFiltered()?'<button class="mini" data-act="pbusy" aria-pressed="'+pBusy()+'" style="'+(pBusy()?'background:var(--ink);color:var(--surface)':'')+'">Mostra occupato</button>':'')+'</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+(printCols()?'':'<button class="btn sec" data-act="pview">'+(a4?'Ingrandisci le pagine':'Mostra il foglio A4')+'</button>')+'<button class="btn" id="pdfbtn" data-act="pdf-dl">Scarica PDF</button><button class="btn sec" data-act="print-close">Chiudi anteprima</button></div></div></div><div class="pgs" style="display:flex;flex-direction:column;gap:14px;align-items:flex-start">';
+  var sc0=printScope(),pn={sett:['wk-prev','wk-next'],mese:['mo-prev','mo-next'],anno:['yr-prev','yr-next']}[sc0];
+  var h='<div class="pnote card"><div class="in" style="display:flex;flex-direction:column;gap:8px">'+(pn?'<div style="display:flex;gap:8px;align-items:center"><button class="nav" data-act="'+pn[0]+'" aria-label="Periodo precedente">‹</button><b style="flex:1;text-align:center">'+esc(printLabel())+'</b><button class="nav" data-act="'+pn[1]+'" aria-label="Periodo successivo">›</button></div>':'<b>'+esc(printLabel())+'</b>')+'<div class="sub" style="font-size:12px;line-height:1.4">'+(printCols()?'A4 orizzontale, un foglio.':pages.length+' fogli A5, due per A4 orizzontale.')+' <details style="display:inline"><summary style="display:inline;cursor:pointer;text-decoration:underline">Come stampare</summary> Safari: Condividi, Stampa, carta A4, orizzontale, scala 100%.'+(printCols()?'':' Taglia a metà sulla linea tratteggiata.')+(sc0==='day'?' Cambia giorno con la data in alto.':'')+'</details></div><div style="display:flex;gap:6px;flex-wrap:wrap">'+[['day','Giorno'],['sett','Settimana'],['mese','Mese'],['anno','Anno']].map(function(o){return '<button class="mini'+(printScope()===o[0]?' on':'')+'" data-act="pscope" data-s="'+o[0]+'" style="'+(printScope()===o[0]?'background:var(--ink);color:var(--surface)':'')+'">'+o[1]+'</button>'}).join('')+'</div>'+(printScope()==='sett'?'<div style="display:flex;gap:6px;flex-wrap:wrap">'+[['cols','A4 a colonne'],['agenda','A4 per agenda A5'],['list','A5 per giorno']].map(function(o){var on=wkPrintMode()===o[0];return '<button class="mini" data-act="pwk" data-v="'+o[0]+'" style="'+(on?'background:var(--ink);color:var(--surface)':'')+'">'+o[1]+'</button>'}).join('')+'</div>':'')+'<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span class="sub" style="font-size:12px">Aree</span>'+[['L','Lavoro'],['F','Famiglia'],['P','Persona'],['','Senza area']].map(function(o){var on=pAreas().indexOf(o[0])>=0;return '<button class="mini" data-act="parea" data-v="'+o[0]+'" aria-pressed="'+on+'" style="'+(on?'background:var(--ink);color:var(--surface)':'')+'">'+o[1]+'</button>'}).join('')+(pFiltered()?'<button class="mini" data-act="pbusy" aria-pressed="'+pBusy()+'" style="'+(pBusy()?'background:var(--ink);color:var(--surface)':'')+'">Mostra occupato</button>':'')+'</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+(printCols()?'':'<button class="btn sec" data-act="pview">'+(a4?'Ingrandisci le pagine':'Mostra il foglio A4')+'</button>')+'<button class="btn" id="pdfbtn" data-act="pdf-dl">Scarica PDF</button><button class="btn sec" data-act="print-close">Chiudi anteprima</button></div></div></div><div class="pgs" style="display:flex;flex-direction:column;gap:14px;align-items:flex-start">';
   var pw=function(p){return '<div class="pgw" style="width:'+(559*k)+'px;height:'+(794*k)+'px"><div style="transform:scale('+k+');transform-origin:0 0;width:559px;height:794px">'+p+'</div></div>'};
   var pz0=ui.pz||1;
-  h+='<div class="pzbar"><button class="mini" data-act="pz" data-v="-" aria-label="Riduci">−</button><b id="pzv">'+Math.round(pz0*100)+'%</b><button class="mini" data-act="pz" data-v="+" aria-label="Ingrandisci">+</button><span class="sub">oppure pizzica l\'anteprima, doppio tocco per ingrandire</span></div><div id="pzbox"><div id="pzin" style="zoom:'+pz0+'">';
+  h+='<div class="pzbar"><button class="mini" data-act="pz" data-v="-" aria-label="Riduci">−</button><b id="pzv">'+Math.round(pz0*100)+'%</b><button class="mini" data-act="pz" data-v="+" aria-label="Ingrandisci">+</button></div><div id="pzbox"><div id="pzin" style="zoom:'+pz0+'">';
   if(printCols())h+='<div class="ps a4" style="width:'+(1118*k+2)+'px;height:'+(794*k+2)+'px"><div class="pgw w4p" style="width:'+(1118*k)+'px;height:'+(794*k)+'px"><div style="transform:scale('+k+');transform-origin:0 0;width:1118px;height:794px">'+pages[0]+'</div></div></div>';
   else for(var q=0;q<pages.length;q+=2)h+='<div class="ps'+(a4?' a4':'')+'"'+(a4?' style="width:'+(1118*k+2)+'px;height:'+(794*k+2)+'px"':'')+'><i class="tk t"></i><i class="tk b"></i>'+pw(pages[q])+(pages[q+1]?pw(pages[q+1]):'')+'</div>';
   h+='</div></div></div>';
@@ -2565,14 +2566,14 @@ document.addEventListener('click',function(e){
   var act=t.getAttribute('data-act'),id=t.getAttribute('data-id'),a=t.getAttribute('data-a'),d=day(),i=id?item(id):null;
   ui.msg=(act==='block-add')?ui.msg:'';
   switch(act){
-    case 'mode':if(t.getAttribute('data-m')==='oggi')ui.oggiNav=0;if(t.getAttribute('data-m')==='mese'&&t.closest('.tabs'))st.date=isoOf(new Date());if(t.getAttribute('data-m')==='sett'&&t.closest('.tabs')){st.date=isoOf(new Date());ui.scrollToday=1}if(t.getAttribute('data-m')==='oggi'&&ui.mode==='oggi'&&t.closest('.tabs')){st.date=isoOf(new Date());setTimeout(centerNext,40);toast('Oggi')}ui.mode=t.getAttribute('data-m');if(ui.mode==='plan')ui.snap=true;if(ui.mode==='voci')setTimeout(function(){window.scrollTo(0,0)},0);break;
+    case 'mode':if(t.getAttribute('data-m')==='oggi')ui.oggiNav=0;if(t.getAttribute('data-m')==='mese'&&t.closest('.tabs')){st.date=isoOf(new Date());ui.scrollTop=1}if(t.getAttribute('data-m')==='sett'&&t.closest('.tabs')){st.date=isoOf(new Date());ui.scrollToday=1}if(t.getAttribute('data-m')==='oggi'&&ui.mode==='oggi'&&t.closest('.tabs')){st.date=isoOf(new Date());setTimeout(centerNext,40);toast('Oggi')}ui.mode=t.getAttribute('data-m');if(ui.mode==='plan')ui.snap=true;if(ui.mode==='voci')setTimeout(function(){window.scrollTo(0,0)},0);break;
     case 'to-dump':ui.mode='plan';setTimeout(function(){var e=document.getElementById('dumpcard');if(e)e.scrollIntoView({behavior:'smooth',block:'start'})},80);break;
     case 'view-copy':if(ui.sheet&&ui.sheet.mode==='view'){var vcb=blkFind(ui.sheet);if(vcb){clipFrom(vcb);ui.sheet=null}}break;
     case 'blk-copy':if(ui.sheet&&ui.sheet.mode==='blk'){var bcb=blkFind(ui.sheet);if(bcb){clipFrom(bcb);ui.sheet=null}}break;
     case 'clip-x':ui.clip=null;break;
     case 'goto':if(ui.clip&&ui.mode==='mese'){pasteAt(t.getAttribute('data-d'),ui.clip.s);break}st.date=t.getAttribute('data-d');ui.mode='plan';ui.snap=true;break;
     case 'goto-week':if(ui.clip&&ui.mode==='mese'){pasteAt(t.getAttribute('data-d'),ui.clip.s);break}st.date=t.getAttribute('data-d');ui.mode='sett';ui.scrollDay=st.date;break;
-    case 'goto-month':st.date=t.getAttribute('data-d');ui.mode='mese';break;
+    case 'goto-month':st.date=t.getAttribute('data-d');ui.mode='mese';ui.scrollTop=1;break;
     case 'yr-prev':st.date=isoOf(new Date(+st.date.slice(0,4)-1,+st.date.slice(5,7)-1,1));break;
     case 'yr-next':st.date=isoOf(new Date(+st.date.slice(0,4)+1,+st.date.slice(5,7)-1,1));break;
     case 'wk-prev':st.date=addDays(st.date,-7);break;
@@ -3152,7 +3153,7 @@ async function calDelete(){
   catch(e){cs.st='err';cs.msg=(e&&e.message)||'errore';cs.auth=!!(e&&e.code==='auth');calShow()}}
 function calShow(){
   var d=document.getElementById('cald'),b=document.getElementById('calbox');if(!d||!b)return;
-  if(!GDon()){d.hidden=true;return}d.hidden=false;
+  if(!GDon()||ui.mode!=='plan'){d.hidden=true;return}d.hidden=false;
   var on=calOn(),c=calCfg(),h='';
   var chips=function(k){return '<div class="alrow">'+ALV.map(function(m){var o=c[k].indexOf(m)>=0;return '<button type="button" class="alc'+(o?' on':'')+'" data-act="cal-def" data-k="'+k+'" data-m="'+m+'" aria-pressed="'+o+'">'+alLab(m)+'</button>'}).join('')+'</div>'};
   if(!on){
@@ -3361,5 +3362,4 @@ document.addEventListener('focusout',function(e){if(e.target&&e.target.id==='ogg
 
 </script>
 
-</body>
-</html>
+</body></html>
