@@ -11,7 +11,7 @@
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@800;900&family=Hind:wght@400;500;600&display=swap">
 <style>
-/* Layout: due colonne come il foglio stampato (Top, rana, liste a sinistra; orario e Brain Dump a destra); su telefono una colonna sola. */
+/* Layout: due colonne come il foglio stampato (Top, rana, liste a sinistra; orario e Svuota la mente a destra); su telefono una colonna sola. */
 :root{
   --bg:#f3f5f5; --surface:#ffffff; --ink:#1f2a28; --muted:#5c6366; --line:#1f2a28; --soft:#d3dad8; --soft2:#eef1f1;
   --grey:#5c6366; --blue:#2f6188; --green:#2e6a3d; --red:#c0443c; --amber:#b45309; --amber-bg:#fdf3e6;
@@ -639,6 +639,14 @@ body.m-plan #schedcard .sched{margin:0}
 .ed .mini.red{color:#D8483B}
 .bs .bsc input[type=date]{max-width:none!important;min-width:150px;text-align:right}
 .ed .qplace .mini{text-decoration:none;color:var(--blue)}
+
+.bsl{padding:0 14px}
+.bsr{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:50px;border:0;border-bottom:1px solid var(--soft);background:transparent;color:var(--ink);font:400 16px/1.2 var(--body);padding:0;text-align:left;cursor:pointer}
+.bsl>.bsr:last-child{border-bottom:0}
+.bsr i{font-style:normal;color:var(--muted);font-size:20px}
+.bsr i.sw{width:46px;height:28px;border-radius:14px;background:#d3d7d6;position:relative;flex:none;font-size:0}
+.bsr i.sw::after{content:"";position:absolute;left:2px;top:2px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
+.bsr i.sw.on{background:var(--green)}.bsr i.sw.on::after{left:20px}
 /* Oggi: impostazione essenziale */
 .ohead .dvdot{width:14px;height:14px;margin:0 6px 12px 0;align-self:flex-end}
 body.m-oggi .top>div:first-child,body.m-sett.w2on .top>div:first-child{display:none!important}
@@ -1126,7 +1134,7 @@ function startSeries(sh,date,blk,it){
   st.rec[id]=mkSer(id,sh,date,repEnd(sh),t);
   blk.rid=id;extendSeries();
 }
-/* a inizio giornata le voci non fatte, rimaste solo su giorni passati, tornano nel Brain Dump */
+/* a inizio giornata le voci non fatte, rimaste solo su giorni passati, tornano in Svuota la mente */
 function rollOver(){
   var today=isoOf(new Date());if(ui.rollDay===today)return;ui.rollDay=today;
   var fut={},past={},frogs={};
@@ -1545,7 +1553,7 @@ function editorHtml(i,sh){
   var ar=['L','F','P'].map(function(a){return '<button type="button" class="'+(i.area===a?'on':'')+'" data-act="ed-area" data-id="'+i.id+'" data-v="'+a+'">'+AREAS[a]+'</button>'}).join('');
   var pr=['A','B','C','D','E'].map(function(p){return '<button type="button" class="'+(i.pr===p?'on':'')+'" data-act="ed-pr" data-id="'+i.id+'" data-v="'+p+'">'+p+'<small>'+PRW[p]+'</small></button>'}).join('');
   var sm='';
-  if(routed)sm='<div class="sub" style="padding-bottom:6px">Ora è: <b>'+(ESITO[i.status]||i.status)+'</b></div><button class="mini" data-act="ed-back" data-id="'+i.id+'">Rimetti nel Brain Dump</button>';
+  if(routed)sm='<div class="sub" style="padding-bottom:6px">Ora è: <b>'+(ESITO[i.status]||i.status)+'</b></div><button class="mini" data-act="ed-back" data-id="'+i.id+'">Rimetti in Svuota la mente</button>';
   else{
     if(i.pr==='D')sm+='<button class="mini" data-act="ed-deleg" data-id="'+i.id+'">Delega…</button>';
     if(i.pr==='E')sm+='<button class="mini" data-act="ed-drop" data-id="'+i.id+'">Elimina</button>';
@@ -1563,7 +1571,7 @@ function editorHtml(i,sh){
   return '<div class="sheet-bg" data-act="sheet-bg"><div class="sheet prep bs ed" role="dialog" aria-label="Modifica voce">'+
     '<input class="bst" data-chg="edit" data-f="text" placeholder="Titolo" aria-label="Titolo" value="'+esc(i.text)+'">'+
     '<div class="chips edc">'+ar+'</div>'+
-    '<div><div class="chips edc edp">'+pr+'</div><div class="sub" style="padding:6px 4px 0">'+(i.pr==='A'?'A = Top priority: va nelle Top 3 della sua area e può diventare la rana.':'Solo la A è una Top priority: va nelle Top 3 della sua area.')+'</div></div>'+
+    '<div><div class="chips edc edp">'+pr+'</div><div class="sub" style="padding:6px 4px 0">'+({A:'A · Top priority: va nelle Top 3 della sua area e può diventare la rana.',B:'B · Minore: da fare, ma non va nelle Top 3.',C:'C · Nessuna urgenza: resta in lista.',D:'D · Da delegare: la passi a qualcuno.',E:'E · Da eliminare.'}[i.pr]||'Scegli la priorità. Solo la A va nelle Top 3 della sua area.')+'</div></div>'+
     (i.sub?subHtml(i):subBtn(i))+notesHtml(i)+
     '<div class="bsc"><label><span class="lbl">Scadenza</span><span style="display:flex;align-items:center;gap:8px"><input type="date" data-chg="edit" data-f="due" value="'+esc(i.due)+'">'+(i.due?'<button class="mini" data-act="ed-clear-due" data-id="'+i.id+'" type="button">Togli</button>':'')+'</span></label></div>'+
     (sm?'<div class="sm2 edsm">'+sm+'</div>':'')+
@@ -1653,7 +1661,7 @@ function prepHtml(sh){
       '<div class="pfoot"><button class="btn sec" data-act="sheet-close" type="button">Chiudi</button><button class="btn" data-act="prep-next" type="button">Avanti</button></div>';
   }else if(sh.step===1){
     h='<div class="ph">La rana di '+lab+'</div><div class="pst">La cosa più importante, quella che rimanderesti. Andrà per prima, al mattino.</div>'+
-      (c.length?'<div class="plist">'+c.map(function(i){return prepRow(i,'prep-frog')}).join('')+'</div>':'<div class="ocard sub">Nessuna voce aperta nel Brain Dump.</div>')+
+      (c.length?'<div class="plist">'+c.map(function(i){return prepRow(i,'prep-frog')}).join('')+'</div>':'<div class="ocard sub">Nessuna voce aperta in Svuota la mente.</div>')+
       '<div class="pfoot"><button class="btn sec" data-act="sheet-close" type="button">Chiudi</button></div>';
   }else{
     var fr=item(sh.frog),used={};if(fr&&(fr.area||sh.area))used[fr.area||sh.area]=fr.id;c.forEach(function(i){if(sh.sel[i.id]&&i.pr==='A'&&i.area&&!used[i.area])used[i.area]=i.id});
@@ -1748,10 +1756,10 @@ function capAdd(raw){
   st.dump.push(i);
   if(!p.date&&p.s<0){if(p.hit)toast('«'+i.text+'»'+(p.due?' entro '+ddmm(p.due):'')+(p.area?' · '+AREAS[p.area]:'')+(p.pr?' · '+p.pr:''));return}
   var date=p.date||td,n=p.n||1,s0=p.s>=0?p.s:qFree(date,n,qStart(date),i.id);
-  if(s0<0){toast('Nel Brain Dump: nessuno spazio libero il '+ddmm(date));return}
+  if(s0<0){toast('In Svuota la mente: nessuno spazio libero il '+ddmm(date));return}
   if(s0+n>NSLOT)n=NSLOT-s0;
   var err=scheduleItem(i,date,s0,n,'flex');
-  if(err){toast('Nel Brain Dump. '+err);return}
+  if(err){toast('In Svuota la mente. '+err);return}
   ui.undo=snap;ui.qid=i.id;
   toastAct('«'+i.text+'» '+qWhen(date,s0),'<button type="button" class="sec" data-act="q-edit" data-id="'+i.id+'">Modifica</button><button type="button" data-act="q-undo">Annulla</button>');
 }
@@ -1841,9 +1849,9 @@ function blkHtml(sh,b){
     '<label><span class="lbl">Durata</span><select data-chg="sheet" data-f="n">'+durs+'</select></label>'+
     '<label><span class="lbl">Tipo</span><select data-chg="sheet" data-f="kind"><option value="flex"'+(sh.kind==='flex'?' selected':'')+'>Flessibile</option><option value="fixed"'+(sh.kind==='fixed'?' selected':'')+'>Fisso</option></select></label></div>'+repHtml(sh)+'</div>'+
     (b.rid&&st.rec[b.rid]?'<div class="sub">Fa parte di una serie: '+esc(repLabel(st.rec[b.rid],sh.date))+'.</div>':'')+alHtml(sh)+
-    (it?frogBtn(sh,it,sh.from):'')+
     (sh.err?'<div class="note" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+
-    (it&&it.sub?subHtml(it,'<button class="mini" data-act="blk-item" data-id="'+it.id+'" type="button">Priorità, area e scadenza…</button>'):(it?'<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="mini" data-act="blk-item" data-id="'+it.id+'" type="button">Priorità, area e scadenza…</button>'+subBtn(it)+'</div>':''))+
+    (it&&it.sub?subHtml(it,''):'')+
+    (it?'<div class="bsc bsl">'+frogRow(sh,it,sh.from)+'<button type="button" class="bsr" data-act="blk-item" data-id="'+it.id+'"><span>Priorità, area e scadenza</span><i>›</i></button>'+(it.sub?'':'<button type="button" class="bsr" data-act="sub-new" data-id="'+it.id+'"><span>Sottoelenco</span><i>+</i></button>')+'</div>':'')+
     notesHtml(noteOwner(sh))+
     '<button class="btn" data-act="sheet-ok" type="button">Salva</button><div class="bsf"><button class="mini" data-act="sheet-close" type="button">Annulla</button><button class="mini" data-act="blk-copy" type="button">Copia</button><button class="mini red" data-act="blk-del" type="button">Togli dal piano</button></div></div></div>';
 }
@@ -1999,6 +2007,11 @@ function frogOn(sh,i,date){
   if(sh.frog===true||sh.frog===false)return sh.frog;
   var d=st.days[date];return !!(d&&i.area&&d.frog===i.area&&d.tops[i.area]===i.id);
 }
+function frogRow(sh,i,date){
+  if(!i||i.pr!=='A'||!i.area)return '';
+  var on=frogOn(sh,i,date),dz=st.days[date],cu=dz&&dz.tops[i.area],ot=cu&&cu!=='empty'&&cu!==i.id?item(cu):null,warn=ot&&(sh.frog===true)?'<div class="sub" style="padding:0 0 8px">Prende il posto di «'+esc(ot.text)+'» come Top '+AREAS[i.area]+' di quel giorno.</div>':'';
+  return '<button type="button" class="bsr frg'+(on?' on':'')+'" data-act="sheet-frog" aria-pressed="'+on+'"><span style="display:flex;align-items:center;gap:8px">'+FROG+'Rana di oggi</span><i class="sw'+(on?' on':'')+'"></i></button>'+warn;
+}
 function frogBtn(sh,i,date){
   if(!i||i.pr!=='A'||!i.area)return '';
   var on=frogOn(sh,i,date),dz=st.days[date],cu=dz&&dz.tops[i.area],ot=cu&&cu!=='empty'&&cu!==i.id?item(cu):null,warn=ot&&(sh.frog===true)?'<div class="sub" style="padding-top:4px">Prende il posto di «'+esc(ot.text)+'» come Top '+AREAS[i.area]+' di quel giorno.</div>':'';
@@ -2108,14 +2121,14 @@ function pgBack(d,x,open,n,N){
     '<div class="ln"><span class="fl" style="width:104px">Slitta</span></div><div class="ln"><span class="fl" style="width:104px">Scarta</span></div>';
   return '<div class="pg" style="display:flex;flex-direction:column;gap:8px">'+
     '<div style="display:flex;align-items:baseline;justify-content:space-between;flex:none;height:20px"><div style="font-family:Archivo,sans-serif;font-weight:900;font-size:19px;line-height:1;color:#5c6366">TIMEBOX DAILY</div><div style="font-size:10px;color:#5c6366;font-weight:500">'+DOW[dt.getDay()]+' '+dt.getDate()+' '+MON[dt.getMonth()]+' '+dt.getFullYear()+' · Foglio '+n+'/'+N+'</div></div>'+
-    '<div class="box" style="padding-bottom:6px"><div class="bt">Brain Dump</div><div style="padding:1px 10px 0"><div style="display:flex;align-items:center;font-size:8px;color:#5c6366;text-transform:uppercase;letter-spacing:.06em;padding:4px 0 2px"><span style="flex:1;padding-left:2px">Voce</span><span style="width:30px;text-align:center">Area</span><span style="width:34px;text-align:center">Pr.</span><span style="width:40px;text-align:center">Scad.</span><span style="width:88px">Esito</span></div>'+rows+
+    '<div class="box" style="padding-bottom:6px"><div class="bt">Svuota la mente</div><div style="padding:1px 10px 0"><div style="display:flex;align-items:center;font-size:8px;color:#5c6366;text-transform:uppercase;letter-spacing:.06em;padding:4px 0 2px"><span style="flex:1;padding-left:2px">Voce</span><span style="width:30px;text-align:center">Area</span><span style="width:34px;text-align:center">Pr.</span><span style="width:40px;text-align:center">Scad.</span><span style="width:88px">Esito</span></div>'+rows+
     '<div style="display:flex;justify-content:space-between;font-size:8px;color:#5c6366;padding-top:4px"><span>A Top priority · B minore · C nessuna · D delega · E elimina</span>'+(open.length>BDN?'<span style="font-weight:600">Altre '+(open.length-BDN)+' voci sul foglio di continuazione</span>':'')+'</div></div></div>'+
     '<div class="box" style="padding-bottom:6px"><div class="bt">Delega</div><div style="padding:1px 10px 0"><div style="display:flex;gap:6px;font-size:8px;color:#5c6366;text-transform:uppercase;letter-spacing:.06em;padding:4px 2px 0"><span style="flex:1">Voce</span><span style="width:90px">A chi</span><span style="width:48px">Scad.</span></div>'+dl+'</div></div>'+
     '<div class="box" style="padding-bottom:6px;flex:1"><div class="bt">Revisione serale</div><div style="padding:1px 10px 0">'+rv+'</div></div></div>';
 }
 function pgCont(items,start,x,n,N){
   var rows='';for(var i=0;i<24;i++)rows+=pgRow(items[i]||null,start+i);
-  return '<div class="pg" style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:baseline;justify-content:space-between;flex:none;height:20px"><div style="font-family:Archivo,sans-serif;font-weight:900;font-size:19px;line-height:1;color:#5c6366">TIMEBOX · BRAIN DUMP, CONTINUA</div><div style="font-size:10px;color:#5c6366;font-weight:500">'+ddmm(x)+'/'+x.slice(0,4)+' · Foglio '+n+'/'+N+'</div></div><div class="box" style="padding-bottom:6px;flex:1"><div class="bt">Brain Dump</div><div style="padding:1px 10px 0"><div style="display:flex;align-items:center;font-size:8px;color:#5c6366;text-transform:uppercase;letter-spacing:.06em;padding:4px 0 2px"><span style="width:20px">N</span><span style="flex:1;padding-left:2px">Voce</span><span style="width:30px;text-align:center">Area</span><span style="width:34px;text-align:center">Pr.</span><span style="width:40px;text-align:center">Scad.</span><span style="width:88px">Esito</span></div>'+rows+'</div></div></div>';
+  return '<div class="pg" style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:baseline;justify-content:space-between;flex:none;height:20px"><div style="font-family:Archivo,sans-serif;font-weight:900;font-size:19px;line-height:1;color:#5c6366">TIMEBOX · BRAIN DUMP, CONTINUA</div><div style="font-size:10px;color:#5c6366;font-weight:500">'+ddmm(x)+'/'+x.slice(0,4)+' · Foglio '+n+'/'+N+'</div></div><div class="box" style="padding-bottom:6px;flex:1"><div class="bt">Svuota la mente</div><div style="padding:1px 10px 0"><div style="display:flex;align-items:center;font-size:8px;color:#5c6366;text-transform:uppercase;letter-spacing:.06em;padding:4px 0 2px"><span style="width:20px">N</span><span style="flex:1;padding-left:2px">Voce</span><span style="width:30px;text-align:center">Area</span><span style="width:34px;text-align:center">Pr.</span><span style="width:40px;text-align:center">Scad.</span><span style="width:88px">Esito</span></div>'+rows+'</div></div></div>';
 }
 function stampaPages(d,open){
   var N=2+Math.ceil(Math.max(0,open.length-BDN)/24),pages=[pgFront(d,st.date,1,N),pgBack(d,st.date,open,2,N)];
@@ -2670,7 +2683,7 @@ function renderProg(d){
   if(!document.getElementById('prog'))return;
   var h=d.prog.map(function(id){var i=item(id);if(!i)return '';
     var blk=d.blocks.some(function(b){return b.ref===id});if(blk)return '';
-    return '<div class="row">'+cbH(i.st,'cyc-item',i.id)+(i.area?'<span class="dot '+i.area+'"></span>':'<span style="width:9px"></span>')+'<span class="t">'+esc(i.text)+' <span class="sub">'+esc(pr(i))+'</span></span>'+(blk?'<button class="mini" data-act="sched-from" data-id="'+id+'">Sposta</button>':'<button class="mini" data-act="quick-place" data-id="'+id+'">Programma</button>')+'<button class="mini" data-act="prog-back" data-id="'+id+'" aria-label="Rimetti nel Brain Dump">×</button></div>';
+    return '<div class="row">'+cbH(i.st,'cyc-item',i.id)+(i.area?'<span class="dot '+i.area+'"></span>':'<span style="width:9px"></span>')+'<span class="t">'+esc(i.text)+' <span class="sub">'+esc(pr(i))+'</span></span>'+(blk?'<button class="mini" data-act="sched-from" data-id="'+id+'">Sposta</button>':'<button class="mini" data-act="quick-place" data-id="'+id+'">Programma</button>')+'<button class="mini" data-act="prog-back" data-id="'+id+'" aria-label="Rimetti in Svuota la mente">×</button></div>';
   }).join('');
   h+='<form class="pick" id="progform" style="padding-top:8px" autocomplete="off"><input class="input" id="prognew" placeholder="Nuova voce" style="flex:2;min-width:120px" aria-label="Nuova voce da programmare"><select id="progarea" style="flex:1;border:1px solid var(--line);background:var(--surface);padding:4px" aria-label="Area">'+areaOpts('L')+'</select><button class="mini" type="submit">Aggiungi</button></form>';
   document.getElementById('prog').innerHTML=h;
@@ -2681,7 +2694,7 @@ function renderDeleg(d){
     return '<div class="row" style="flex-wrap:wrap;gap:6px"><span class="t" style="flex-basis:100%">'+esc(i.text)+(x.wait?' <span class="sub">in attesa di qualcosa</span>':'')+'</span>'+
       '<input class="input" style="flex:1;min-width:110px" list="whos" data-chg="deleg" data-f="who" data-id="'+x.id+'" value="'+esc(x.who)+'" placeholder="A chi" aria-label="A chi">'+
       '<input class="input" type="date" style="width:150px" data-chg="deleg" data-f="due" data-id="'+x.id+'" value="'+esc(x.due)+'" aria-label="Controllo entro">'+
-      '<button class="mini" data-act="deleg-back" data-id="'+x.id+'" aria-label="Rimetti nel Brain Dump">×</button></div>';
+      '<button class="mini" data-act="deleg-back" data-id="'+x.id+'" aria-label="Rimetti in Svuota la mente">×</button></div>';
   }).join('')||'<div class="sub">Nessuna voce delegata.</div>';
   h+='<datalist id="whos">'+whoList().map(function(w){return '<option value="'+esc(w)+'">'}).join('')+'</datalist>';
   document.getElementById('deleg').innerHTML=h;
@@ -3082,7 +3095,7 @@ document.addEventListener('click',function(e){
     case 'ed-area':if(i)i.area=i.area===t.getAttribute('data-v')?'':t.getAttribute('data-v');break;
     case 'ed-pr':if(i){var pv2=t.getAttribute('data-v');i.pr=i.pr===pv2?'':pv2;if(i.pr==='D'&&(i.status==='open'||i.status==='prog'))ui.sheet=openDeleg(i)}break;
     case 'ed-clear-due':if(i)i.due='';break;
-    case 'ed-top':case 'ed-prog':case 'ed-drop':case 'ed-back':if(i){var er=smista(i,act);if(er)ui.sheet.err=er;else{ui.sheet=null;toast('«'+i.text+'» '+({'ed-top':'in Top '+(i.area?AREAS[i.area]:''),'ed-prog':'in Da programmare','ed-drop':'eliminata','ed-back':'rimessa nel Brain Dump'}[act]))}}break;
+    case 'ed-top':case 'ed-prog':case 'ed-drop':case 'ed-back':if(i){var er=smista(i,act);if(er)ui.sheet.err=er;else{ui.sheet=null;toast('«'+i.text+'» '+({'ed-top':'in Top '+(i.area?AREAS[i.area]:''),'ed-prog':'in Da programmare','ed-drop':'eliminata','ed-back':'rimessa in Svuota la mente'}[act]))}}break;
     case 'ed-deleg':if(i)ui.sheet=openDeleg(i);break;
     case 'ed-sched':if(i)ui.sheet=openSheet(i);break;
     case 'ed-del':if(ui.sheet)ui.sheet.confirm=true;break;
@@ -3293,7 +3306,7 @@ document.addEventListener('click',function(e){
   document.addEventListener('pointercancel',end,true);
 })();
 
-/* ---- trascinare una voce del Brain Dump sullo schedule ---- */
+/* ---- trascinare una voce di Svuota la mente sullo schedule ---- */
 (function(){
   var dd=null,sup=0,lastY=0,lastX=0,raf=0,mk=null;
   document.addEventListener('click',function(e){if(Date.now()-sup<450){e.stopPropagation();e.preventDefault()}},true);
