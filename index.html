@@ -3287,7 +3287,12 @@ else if(dv.on)setTimeout(dvSync,700);else if(fk0===null&&window.claude)setTimeou
 calShow();
 /* permesso Google scaduto (dura circa un'ora): il browser non permette di riaprire l'accesso da solo,
    serve un gesto. Al primo tocco in qualunque punto rinnovo Drive e Calendar e riparto. */
-var rnw={busy:0,fail:0};
+var rnw={busy:0,fail:0,cl:null,cb:null,eb:null};
+function bothAsk(){return new Promise(function(res,rej){
+  if(!rnw.cl)rnw.cl=google.accounts.oauth2.initTokenClient({client_id:GCLIENT,scope:GSCOPE+' '+CSCOPE,callback:function(r){rnw.cb&&rnw.cb(r)},error_callback:function(e){rnw.eb&&rnw.eb(e)}});
+  rnw.cb=function(r){if(r&&r.access_token){var ex=Date.now()+((+r.expires_in||3600)-90)*1000;gd.tok=gc.tok=r.access_token;gd.exp=gc.exp=ex;gdSave();gcSave();lsSet(GOK,1);res()}else rej({code:'auth',message:'accesso non riuscito.'})};
+  rnw.eb=function(e){rej({code:'auth',message:e&&e.type==='popup_closed'?'accesso annullato.':'accesso non riuscito.'})};
+  rnw.cl.requestAccessToken({prompt:''})})}
 function needGd(){return GDon()&&dv.on&&!(gd.tok&&Date.now()<gd.exp)&&!gdRead()}
 function needGc(){return GDon()&&calOn()&&!gcHas()}
 function renewTap(){
@@ -3295,9 +3300,9 @@ function renewTap(){
   if(!needGd()&&!needGc())return;
   if(Date.now()-rnw.fail<60000)return;
   rnw.busy=1;
-  var p=needGd()?gdAsk('').then(function(){dv.auth=false;dv.st='busy';dvShow();dvSync()}):Promise.resolve();
-  p.then(function(){if(needGc())return gcAsk('').then(function(){cs.auth=false;calSync()})})
-   .catch(function(e){rnw.fail=Date.now();if(needGd()){dv.st='err';dv.msg=dvErr(e);dv.auth=true;dvShow()}else{cs.st='err';cs.auth=true;cs.msg=(e&&e.message)||'accesso non riuscito.';calShow()}})
+  /* un solo permesso con entrambi gli ambiti: due finestre di seguito verrebbero bloccate dal browser */
+  var p=(needGc()?bothAsk():gdAsk('')).then(function(){dv.auth=false;cs.auth=false;if(dv.on){dv.st='busy';dvShow();dvSync()}if(calOn())calQueue(300)});
+  p.catch(function(e){rnw.fail=Date.now();if(needGd()){dv.st='err';dv.msg=dvErr(e);dv.auth=true;dvShow()}else{cs.st='err';cs.auth=true;cs.msg=(e&&e.message)||'accesso non riuscito.';calShow()}})
    .then(function(){rnw.busy=0})}
 document.addEventListener('click',renewTap,true);
 if(GDon()&&lsGet(GOK)&&needGd())setTimeout(function(){if(needGd())toast('Tocca lo schermo per riprendere la sincronizzazione')},1500);
