@@ -623,6 +623,22 @@ body.m-plan #schedcard .sched{margin:0}
 .bs .wdb{border-radius:50%!important;border:0!important;background:var(--surface);width:38px;height:38px;padding:0}.bs .wdb.on{background:var(--ink);color:var(--bg)}
 .bs .alc{border:0!important;background:var(--bg)}.bs .alc.on{background:var(--ink);color:var(--bg)}
 .w2mr{border:0;background:transparent;color:var(--blue);font:600 14px/1 var(--body);padding:6px 0 2px}
+
+.ed .edc{gap:2px;background:var(--soft);border-radius:22px;padding:3px}
+.ed .edc button{height:40px;border:0!important;border-radius:19px;background:transparent;color:var(--muted);font-weight:600}
+.ed .edc button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.ed .edp button small{display:none}
+.ed .edp button{font-size:16px}
+.ed .edsm{background:var(--bg);border-radius:16px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ed .bsc .mini{border:0;background:transparent;color:var(--blue);font:600 14px/1 var(--body);padding:6px 0}
+.ed .bsc .frogsw{border:0;background:var(--surface);border-radius:20px}
+.ed .qplace{display:flex;flex-direction:column;gap:8px}
+.ed .subr .subc{border-radius:50%}
+.ed .sublist{background:var(--bg);border-radius:16px;padding:8px 12px}
+.ed .mini{border:0;background:transparent;color:var(--blue);font:600 15px/1.2 var(--body);padding:8px 2px}
+.ed .mini.red{color:#D8483B}
+.bs .bsc input[type=date]{max-width:none!important;min-width:150px;text-align:right}
+.ed .qplace .mini{text-decoration:none;color:var(--blue)}
 /* Oggi: impostazione essenziale */
 .ohead .dvdot{width:14px;height:14px;margin:0 6px 12px 0;align-self:flex-end}
 body.m-oggi .top>div:first-child,body.m-sett.w2on .top>div:first-child{display:none!important}
@@ -1538,22 +1554,22 @@ function editorHtml(i,sh){
   var schedBlock='';
   if((!i.pr||i.pr==='A'||i.pr==='B'||i.pr==='C')&&(i.status==='open'||i.status==='prog'||i.status==='top')){
     if(!sh.ex&&!sh.manual){
-      schedBlock='<div class="qplace" style="border-top:1px solid var(--line);padding-top:10px"><span class="lbl">Programma in calendario</span>'+(sh.err?'<div class="note" style="margin:0">'+esc(sh.err)+'</div>':'')+'<button class="btn" data-act="quick-place" data-id="'+i.id+'" type="button">Programma nel primo spazio libero</button><button class="mini" data-act="sheet-manual" type="button">Scegli tu data e ora</button></div>';
+      schedBlock='<div class="qplace"><span class="lbl">Programma in calendario</span>'+(sh.err?'<div class="note" style="margin:0">'+esc(sh.err)+'</div>':'')+'<button class="btn" data-act="quick-place" data-id="'+i.id+'" type="button">Programma nel primo spazio libero</button><button class="mini" data-act="sheet-manual" type="button">Scegli tu data e ora</button></div>';
     }else{
     var sf=schedFields(sh,i);
-    schedBlock='<div style="border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:10px"><span class="lbl">Programma in calendario</span>'+sf.html+'<button class="btn" data-act="sheet-ok" type="button"'+(sf.blocked?' disabled':'')+'>Programma in calendario</button></div>';
+    schedBlock='<div style="display:flex;flex-direction:column;gap:10px"><span class="lbl">Programma in calendario</span><div class="bsc">'+sf.html+'</div><button class="btn" data-act="sheet-ok" type="button"'+(sf.blocked?' disabled':'')+'>Programma in calendario</button></div>';
     }
   }
-  return '<div class="sheet-bg" data-act="sheet-bg"><div class="sheet" role="dialog" aria-label="Modifica voce">'+
-    '<label><span class="lbl">Titolo</span><input data-chg="edit" data-f="text" value="'+esc(i.text)+'"></label>'+
-    '<div><span class="lbl">Area</span><div class="chips" style="padding-top:4px">'+ar+'</div></div>'+
-    '<div><span class="lbl">Priorità</span><div class="chips" style="padding-top:4px">'+pr+'</div><div class="sub" style="padding-top:5px">'+(i.pr==='A'?'A = Top priority: va nelle Top 3 della sua area e può diventare la rana.':'Solo la A è una Top priority: va nelle Top 3 della sua area.')+'</div></div>'+
+  return '<div class="sheet-bg" data-act="sheet-bg"><div class="sheet prep bs ed" role="dialog" aria-label="Modifica voce">'+
+    '<input class="bst" data-chg="edit" data-f="text" placeholder="Titolo" aria-label="Titolo" value="'+esc(i.text)+'">'+
+    '<div class="chips edc">'+ar+'</div>'+
+    '<div><div class="chips edc edp">'+pr+'</div><div class="sub" style="padding:6px 4px 0">'+(i.pr==='A'?'A = Top priority: va nelle Top 3 della sua area e può diventare la rana.':'Solo la A è una Top priority: va nelle Top 3 della sua area.')+'</div></div>'+
     (i.sub?subHtml(i):subBtn(i))+notesHtml(i)+
-    '<div style="display:flex;gap:8px;align-items:flex-end"><label style="flex:1"><span class="lbl">Scadenza</span><input type="date" data-chg="edit" data-f="due" value="'+esc(i.due)+'"></label>'+(i.due?'<button class="mini" data-act="ed-clear-due" data-id="'+i.id+'" type="button">Togli data</button>':'')+'</div>'+
-    (sm?'<div><span class="lbl">Smista</span><div class="sm2" style="padding-top:4px">'+sm+'</div></div>':'')+
+    '<div class="bsc"><label><span class="lbl">Scadenza</span><span style="display:flex;align-items:center;gap:8px"><input type="date" data-chg="edit" data-f="due" value="'+esc(i.due)+'">'+(i.due?'<button class="mini" data-act="ed-clear-due" data-id="'+i.id+'" type="button">Togli</button>':'')+'</span></label></div>'+
+    (sm?'<div class="sm2 edsm">'+sm+'</div>':'')+
     schedBlock+
     (sh.err&&!schedBlock?'<div class="note" style="margin:0">'+esc(sh.err)+'</div>':'')+
-    '<div style="display:flex;gap:8px;justify-content:space-between;align-items:center">'+(sh.confirm?'<button class="btn sec" style="color:var(--red);border-color:var(--red)" data-act="ed-del2" data-id="'+i.id+'" type="button">Conferma: cancella</button>':'<button class="mini" data-act="ed-del" data-id="'+i.id+'" type="button">Cancella voce</button>')+'<button class="btn" data-act="sheet-close" type="button">Chiudi</button></div></div></div>';
+    '<button class="btn" data-act="sheet-close" type="button">Fatto</button><div class="bsf" style="justify-content:center">'+(sh.confirm?'<button class="mini red" data-act="ed-del2" data-id="'+i.id+'" type="button">Conferma: cancella</button>':'<button class="mini red" data-act="ed-del" data-id="'+i.id+'" type="button">Elimina voce</button>')+'</div></div></div>';
 }
 function removeEverywhere(id){Object.keys(st.days).forEach(function(k){removeFromDay(st.days[k],id)})}
 function scheduleItem(i,date,s,n,kind,repl){
