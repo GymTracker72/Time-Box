@@ -418,7 +418,10 @@ button,select,input{touch-action:manipulation}
 body.m-oggi .top>div:first-child{display:none!important}
 .ohead{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;padding:6px 2px 4px}
 .odow{font:600 13px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.odate{font:800 44px/1 var(--head);letter-spacing:-.02em;margin-top:4px}
+.ohl{flex:1;min-width:0}.odowr{display:flex;align-items:center;justify-content:space-between;min-height:30px}
+.otd{border:0;background:transparent;color:var(--blue);font:700 16px/1 var(--body);padding:6px 0 6px 14px;min-height:30px}
+.odate{font:800 44px/1 var(--head);letter-spacing:-.02em;margin-top:2px;white-space:nowrap}
+@media (max-width:380px){.odate{font-size:11.5vw}}
 .o3n{gap:0}.o3n .o3h{margin:6px 2px 6px}
 .q3r{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--soft);background:transparent;color:var(--ink);padding:10px 2px;min-height:52px;font:inherit}
 .q3r:last-child{border-bottom:0}
@@ -2185,7 +2188,7 @@ function renderOggi(d){
     var recAll=quickList();
   /* Top compatte */
   var dtH=parse(st.date);
-  h+='<div class="ohead"><div><div class="odow">'+DOW[dtH.getDay()]+'</div><div class="odate">'+dtH.getDate()+' '+MON[dtH.getMonth()]+(dtH.getFullYear()!==now.getFullYear()?' '+dtH.getFullYear():'')+'</div></div>'+(isToday?'':'<button type="button" class="mini" data-act="day-today">Oggi</button>')+'<button type="button" id="dvdot2" class="dvdot" data-act="dv-dot" aria-label="Sincronizzazione con Drive"></button></div>';
+  h+='<div class="ohead"><div class="ohl"><div class="odowr"><span class="odow">'+DOW[dtH.getDay()]+'</span>'+(isToday?'':'<button type="button" class="otd" data-act="day-today" aria-label="Torna a oggi">'+(st.date>isoOf(now)?'‹ Oggi':'Oggi ›')+'</button>')+'</div><div class="odate">'+dtH.getDate()+' '+MON[dtH.getMonth()]+(dtH.getFullYear()!==now.getFullYear()?' '+dtH.getFullYear():'')+'</div></div><button type="button" id="dvdot2" class="dvdot" data-act="dv-dot" aria-label="Sincronizzazione con Drive"></button></div>';
   h+='<section class="o3 o3n"><h2 class="o3h">Top 3 priority</h2>'+AK.slice().sort(function(a,b){return (d.frog===b?1:0)-(d.frog===a?1:0)}).map(function(a){var v=d.tops[a],isF=d.frog===a;
     if(v&&v!=='empty'){var i=item(v);if(!i)return '';topsTot++;if(i.st==='d')topsDone++;
       return '<button class="q3r '+a+(i.st==='d'?' done':'')+'" data-act="tog-item" data-id="'+i.id+'" aria-label="'+AREAS[a]+': '+esc(i.text)+(isF?', la rana di oggi':'')+', tocca per cambiare stato">'+ringSvg(i.st,a)+'<span class="q3t">'+esc(i.text)+'</span>'+(isF?'<span class="q3s" role="img" aria-label="La rana di oggi">'+FROG+'</span>':'')+'<span class="q3a">'+AREAS[a]+'</span></button>'}
