@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-09-0020">
+<meta name="tb-build" content="2026-11-09-0030">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -1887,7 +1887,7 @@ function prepCard(isToday,nowMin){
   if(isToday&&nowMin<17*60)return '';
   if(!isToday&&st.date<=td)return '';
   var lab=isToday?'domani':'questa giornata',dtd=st.days[td];
-  return '<div class="ora"><div class="olab" style="display:flex;gap:6px;align-items:center">'+FROG+'<span>'+(has?'Rana scelta: '+esc(item(dT.tops[dT.frog]).text):'Cinque minuti')+'</span></div><div class="ttl">'+(isToday&&!(dtd&&dtd.closed)?'Chiudi e prepara domani':'Prepara '+lab)+'</div><div class="oleft">'+(has?'Puoi rivedere la fila quando vuoi.':'Scegli la rana e mettila in fila dal mattino, con le A dopo.')+'</div><div class="row2"><button class="obtn p" data-act="prep-open">'+(has?'Rivedi':'Inizia')+'</button></div></div>';
+  return '<div class="ora"><div class="olab" style="display:flex;gap:6px;align-items:center">'+FROG+'<span>'+(has?'Rana scelta: '+esc(item(dT.tops[dT.frog]).text):'Cinque minuti')+'</span></div><div class="ttl">'+(isToday&&!(dtd&&dtd.closed)?'Chiudi e prepara domani':'Prepara '+lab)+'</div><div class="oleft">'+(has?'Puoi cambiare la rana e l\'ordine delle voci quando vuoi.':'Scegli la rana, la voce più pesante, e mettila per prima al mattino. Le A vengono dopo.')+'</div><div class="row2"><button class="obtn p" data-act="prep-open">'+(has?'Rivedi':'Inizia')+'</button></div></div>';
 }
 
 /* ---- Cattura intelligente: «domani alle 15 1h Chiamare Rossi #lavoro !B», «entro venerdì» ---- */
