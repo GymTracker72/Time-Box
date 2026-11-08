@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-08-2358">
+<meta name="tb-build" content="2026-11-09-0001">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -460,7 +460,7 @@ button,select,input{touch-action:manipulation}
 .odate.tdy{color:var(--ink)!important}
 .w2n.tdy{background:#ff3b30;color:#fff;font-weight:700}
 .cell.today .n{background:#ff3b30!important;color:#fff!important;border:0!important;font-weight:700}
-#phead{padding:calc(14px + env(safe-area-inset-top,0px)) 2px 6px}
+#phead{padding:calc(14px + env(safe-area-inset-top,0px)) 2px 0}
 #phead[hidden]{display:none}
 .pstrip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px 4px;text-align:center;margin-top:12px}
 .pstrip button{border:0;background:transparent;color:inherit;font:inherit;padding:0;min-height:36px;cursor:pointer}
@@ -496,7 +496,7 @@ body.m-plan .datebox.card{border:0;background:transparent;box-shadow:none;paddin
   .wrap{padding-bottom:128px}
 }
 /* Pianifica minimale */
-.plline{display:flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--muted);font:400 14px/1.2 var(--body);padding:10px 2px 4px;min-height:40px}
+.plline{display:flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--muted);font:400 14px/1.2 var(--body);padding:6px 2px 0;min-height:28px}
 .plline i{font-style:normal;color:var(--soft)}.plline .w{color:var(--amber);font-weight:600}.plline u{text-decoration:none;font-size:18px;line-height:1;color:var(--muted)}
 body.m-plan #stats,body.m-plan .datebox{display:none!important}
 body.m-plan #schedcard{border:0;background:transparent;box-shadow:none;padding:0}
@@ -790,6 +790,8 @@ body.m-plan #daybar .nav:not(#dbtoday){display:none}
 body.m-plan #daybar b{flex:1;text-align:left;min-width:0;font:600 17px var(--body);letter-spacing:-.2px;padding-left:6px}
 body.m-plan #daybar b.today{color:var(--red)}
 body.m-plan #daybar #dbtoday{border:0;background:color-mix(in srgb,var(--ink) 8%,transparent);border-radius:999px;padding:5px 12px;font:600 13px var(--body);min-height:0}
+body.m-plan .top{display:none}
+body.m-plan #overload:empty{display:none}
 /* Oggi: impostazione essenziale */
 .ohead .dvdot{width:14px;height:14px;margin:0 6px 12px 0;align-self:flex-end}
 body.m-oggi .top>div:first-child,body.m-mese .top>div:first-child,body.m-sett.w2on .top>div:first-child{display:none!important}
