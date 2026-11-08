@@ -3098,14 +3098,15 @@ function calHash(s){var h=5381;for(var i=0;i<s.length;i++)h=((h<<5)+h+s.charCode
 function calHM(s){var m=S0+30*s;return pad(Math.floor(m/60))+':'+pad(m%60)+':00'}
 function calWant(){
   var c=calCfg(),tz=calTz(),today=isoOf(new Date()),to=addDays(today,CWIN),out={};
-  Object.keys(st.days).forEach(function(k){if(k<today||k>to)return;((st.days[k]||{}).blocks||[]).forEach(function(b){
+  Object.keys(st.days).sort().forEach(function(k){if(k<today||k>to)return;((st.days[k]||{}).blocks||[]).forEach(function(b){
     if(!b||!b.id||!(b.n>0)||b.s<0||b.s+b.n>NSLOT)return;
+    var key=out[b.id]?b.id+'@'+k:b.id;
     var it=b.ref&&item(b.ref),title=((it?it.text:b.title)||'Senza titolo'),a=calAls(b,c),ar=calAreaOf(b),clr={L:'9',F:'10',P:'11'}[ar]||'8';
     var ds='Time Box'+(ar?' · '+AREAS[ar]:'')+(b.kind==='fixed'?' · fisso':'');
     var ev={summary:title,description:ds,start:{dateTime:k+'T'+calHM(b.s),timeZone:tz},end:{dateTime:k+'T'+calHM(b.s+b.n),timeZone:tz},colorId:clr,
       reminders:{useDefault:false,overrides:a.map(function(m){return {method:'popup',minutes:m}})},
-      extendedProperties:{private:{tb:b.id,h:calHash(JSON.stringify([title,k,b.s,b.n,clr,a,ds,tz]))}}};
-    out[b.id]=ev})});
+      extendedProperties:{private:{tb:key,h:calHash(JSON.stringify([title,k,b.s,b.n,clr,a,ds,tz]))}}};
+    out[key]=ev})});
   return out}
 async function calEnsure(){
   var c=calCfg();
