@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-09-0155">
+<meta name="tb-build" content="2026-11-09-0230">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -2029,8 +2029,8 @@ function viewHtml(sh,b){
     (hit.length?'<div class="note" style="margin:0">Si sovrappone a «'+hit.map(function(x){return esc(x.title)}).join('», «')+'».</div>':'')+
     (it&&it.pr==='A'&&it.area?(function(){var dz=st.days[sh.from],isT=dz&&dz.tops[it.area]===it.id,isF=isT&&dz.frog===it.area,cu=dz&&dz.tops[it.area],ot=!isT&&cu&&cu!=='empty'?item(cu):null;
       return '<div style="display:flex;flex-direction:column;gap:4px"><button type="button" class="mini frogsw'+(isF?' on':'')+'" data-act="view-frog" aria-pressed="'+isF+'" style="align-self:flex-start">'+FROG+'<span>'+(isF?'La rana di oggi (tocca per togliere)':'Imposta come rana')+'</span></button>'+(ot?'<div class="sub">Prende il posto di «'+esc(ot.text)+'» come Top '+AREAS[it.area]+'.</div>':'')+'</div>'})():'')+
-    '<div class="vbtn">'+(b.kind==='fixed'?'':'<button class="btn" data-act="view-done" type="button">'+(dn?'Riapri':'Fatto')+'</button>')+'<button class="btn'+(b.kind==='fixed'?'':' sec')+'" data-act="view-edit" type="button">Modifica</button></div>'+
-    '<div class="vbtn2"><button class="mini" data-act="view-del" type="button">Togli dal piano</button><button class="mini" data-act="view-copy" type="button">Copia</button><button class="mini" data-act="sheet-close" type="button">Chiudi</button></div></div></div>';
+    '<div class="vbtn"><button class="btn" data-act="sheet-close" type="button">Chiudi</button><button class="btn sec" data-act="view-edit" type="button">Modifica</button></div>'+
+    '<div class="vbtn2"><button class="mini" data-act="view-del" type="button">Togli dal piano</button><button class="mini" data-act="view-copy" type="button">Copia</button></div></div></div>';
   return h;
 }
 function blkFind(sh){var d=st.days[sh.from];if(!d)return null;return d.blocks.filter(function(x){return x.id===sh.bid})[0]||null}
