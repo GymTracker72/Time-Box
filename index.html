@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-08-2350">
+<meta name="tb-build" content="2026-11-08-2358">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -466,7 +466,7 @@ button,select,input{touch-action:manipulation}
 .pstrip button{border:0;background:transparent;color:inherit;font:inherit;padding:0;min-height:36px;cursor:pointer}
 body.m-plan .top>div:first-child,body.m-plan .datebox>.nav,body.m-plan .datebox .dwrap,body.m-plan .datebox .todayrow{display:none!important}
 body.m-plan .datebox.card{border:0;background:transparent;box-shadow:none;padding:4px 2px}
-body.m-plan #daybar{display:none!important}
+
 .srow{border-top:1px solid transparent}
 .srow.h{border-top:1px solid var(--soft)}
 .srow span{border-right:0}
@@ -498,7 +498,7 @@ body.m-plan #daybar{display:none!important}
 /* Pianifica minimale */
 .plline{display:flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--muted);font:400 14px/1.2 var(--body);padding:10px 2px 4px;min-height:40px}
 .plline i{font-style:normal;color:var(--soft)}.plline .w{color:var(--amber);font-weight:600}.plline u{text-decoration:none;font-size:18px;line-height:1;color:var(--muted)}
-body.m-plan #stats,body.m-plan .datebox,body.m-plan #daybar{display:none!important}
+body.m-plan #stats,body.m-plan .datebox{display:none!important}
 body.m-plan #schedcard{border:0;background:transparent;box-shadow:none;padding:0}
 body.m-plan #schedcard>h2,body.m-plan #schedcard .eg{display:none}
 body.m-plan #schedcard .sched{margin:0}
@@ -785,6 +785,11 @@ body.m-voci .top>div:first-child,body.m-voci .datebox,body.m-voci #stats,body.m-
 .blk.fixed .sm{font-size:12.5px;font-weight:400;color:var(--muted);opacity:1;margin-top:1px}
 .blk.fixed.clash,.blk.fixed.L.clash,.blk.fixed.F.clash,.blk.fixed.P.clash{box-shadow:inset 4px 0 0 var(--c),inset 0 0 0 2px var(--amber)}
 .blk.fixed .rz::after{opacity:.18}
+body.m-plan #daybar{background:color-mix(in srgb,var(--bg) 90%,transparent);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid color-mix(in srgb,var(--ink) 12%,transparent);padding-bottom:8px;justify-content:space-between;gap:0}
+body.m-plan #daybar .nav:not(#dbtoday){display:none}
+body.m-plan #daybar b{flex:1;text-align:left;min-width:0;font:600 17px var(--body);letter-spacing:-.2px;padding-left:6px}
+body.m-plan #daybar b.today{color:var(--red)}
+body.m-plan #daybar #dbtoday{border:0;background:color-mix(in srgb,var(--ink) 8%,transparent);border-radius:999px;padding:5px 12px;font:600 13px var(--body);min-height:0}
 /* Oggi: impostazione essenziale */
 .ohead .dvdot{width:14px;height:14px;margin:0 6px 12px 0;align-self:flex-end}
 body.m-oggi .top>div:first-child,body.m-mese .top>div:first-child,body.m-sett.w2on .top>div:first-child{display:none!important}
@@ -1321,7 +1326,7 @@ function norm(){
   st.dump.forEach(function(i){if(i.pr&&i.pr.length>1)i.pr=i.pr.charAt(0);if(i.st==='d'){if(!i.doneAt)i.doneAt=Date.now()}else if(i.doneAt)delete i.doneAt})}
 var PRW={A:'Top',B:'minore',C:'nessuna',D:'delega',E:'elimina'};
 var PRM={A:'conseguenze rilevanti',B:'conseguenze minori',C:'nessuna conseguenza',D:'da delegare',E:'da eliminare','':'da classificare'};
-function dayBar(){var b=document.getElementById('daybar'),bx=document.querySelector('.datebox');if(!b||!bx)return;var r=bx.getBoundingClientRect();b.classList.toggle('on',ui.mode==='plan'&&r.bottom<0)}
+function dayBar(){var b=document.getElementById('daybar'),bx=document.getElementById('phead');if(!b||!bx)return;var r=bx.getBoundingClientRect();b.classList.toggle('on',ui.mode==='plan'&&r.bottom<8)}
 window.addEventListener('scroll',dayBar,{passive:true});
 function renderPHead(){
   var el=document.getElementById('phead');if(!el)return;
@@ -1342,7 +1347,7 @@ function render(){
   document.querySelector('.top h1').innerHTML='TIMEBOX<br class="hbr"> '+(ui.mode==='stampa'?'PRINT':({sett:'WEEKLY',mese:'MONTHLY',anno:'YEARLY'}[ui.mode]||'DAILY'));
   document.getElementById('dlab').textContent=DOW[dt.getDay()].slice(0,3).toLowerCase()+' '+dt.getDate()+' '+MON[dt.getMonth()].slice(0,3).toLowerCase()+' '+dt.getFullYear();
   document.getElementById('dlab').classList.toggle('today',st.date===isoOf(new Date()));
-  var dbl=document.getElementById('dblab');dbl.textContent=document.getElementById('dlab').textContent;dbl.classList.toggle('today',st.date===isoOf(new Date()));document.getElementById('dbtoday').hidden=st.date===isoOf(new Date());dayBar();
+  var dbl=document.getElementById('dblab');dbl.textContent=DOW[dt.getDay()]+' '+dt.getDate()+' '+MON[dt.getMonth()];dbl.classList.toggle('today',st.date===isoOf(new Date()));document.getElementById('dbtoday').hidden=st.date===isoOf(new Date());dayBar();
   document.getElementById('hrs').outerHTML=hrsRow(st.date,st.date).replace('class="hrs"','class="hrs" id="hrs"');
   var tb=document.querySelector('[data-act=day-today]'),tdy=isoOf(new Date());
   tb.classList.toggle('goto',st.date!==tdy);tb.hidden=st.date===tdy;if(tb.parentNode&&tb.parentNode.classList.contains('todayrow'))tb.parentNode.hidden=tb.hidden;
