@@ -76,7 +76,7 @@ button{cursor:pointer}
 .wcn{position:absolute;left:0;right:0;height:0;border-top:2px solid var(--red);z-index:4;pointer-events:none}
 .hrs.blk2{justify-content:flex-start;padding:2px 0 8px}
 .todayrow{flex:0 0 100%;display:flex;justify-content:center}.todayrow:has(button[hidden]){display:none}
-.todayrow .nav.goto{font-size:18px;padding:11px 30px;min-height:48px}
+.todayrow .nav.goto{font-size:17px;padding:9px 26px;min-height:44px}
 .datebox input[type=date]{background:transparent;border:1px solid var(--line);padding:4px 6px;font-weight:600;font-size:15px}
 .nav{border:1px solid var(--line);background:transparent;padding:4px 9px}
 .dwrap{position:relative;flex:1;min-width:0;display:flex}
@@ -98,7 +98,7 @@ button{cursor:pointer}
 .sheet .subadd input{height:38px;padding:6px 8px;flex:1}
 .subbtns{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
 .btn.sm{padding:8px 12px;font-size:15px}
-.nav.goto{background:var(--blue);color:var(--bg);border-color:var(--blue);font-weight:800}
+.nav.goto{background:transparent!important;color:var(--blue)!important;border:1.5px solid var(--blue)!important;border-radius:999px!important;font-weight:700;padding:6px 18px;min-height:36px;width:auto!important;height:auto}
 .dwrap .dlab.today{background:var(--blue);color:var(--bg);border-color:var(--blue);font-weight:800;font-size:18px;letter-spacing:.2px}
 .dwrap .dlab{flex:1;border:1px solid var(--line);padding:4px 6px;font-weight:800;font-size:18px;letter-spacing:.2px;text-align:center;white-space:nowrap}
 .datebox .dwrap input[type=date]{position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;border:0;padding:0;min-width:0;flex:none}
@@ -792,8 +792,21 @@ body.m-voci .top:not(.blk)>div:first-child,body.m-voci .datebox,body.m-voci #sta
 .mod.mac.today .n{width:24px;height:24px;justify-content:center}
 .mdc{display:flex;align-items:center;gap:6px;background:var(--bg);border-radius:7px;padding:3px 6px;font:600 12px/1.25 var(--body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .mdc i{width:7px;height:7px;border-radius:50%;flex:none}.mdc.late{background:color-mix(in srgb,var(--red) 14%,var(--surface));color:var(--red)}.mdc.dn{color:var(--muted);text-decoration:line-through}
-.mo.momac{max-width:1200px}.mo.momac .mog{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.mo.momac .w2m{max-width:620px}
+.mo.momac{max-width:1200px}.mo.momac .w2m{max-width:620px}
 @media screen{.cb{border-radius:50%!important}.cb.p,.blk.top .cb.p,.wcb.top .cb.p{background:transparent!important}.mock.pt{background:transparent!important}.cb.d::before{line-height:normal!important;display:flex;align-items:center;justify-content:center}}
+.mo .mos{display:none}
+.mo .mog{background:var(--surface);border-radius:18px;gap:0;padding:0 16px}
+.mo .mogc{background:transparent;border-radius:0;padding:11px 0;gap:12px;align-items:center;min-height:0}
+.mo .mogc+.mogc{border-top:1px solid var(--soft2)}
+.mo .mogc .mock{width:20px;height:20px;border-width:2px;margin-top:0}
+.mo .mogc .mock.dn::after{left:5px;top:1px;width:5px;height:10px;border-width:0 2px 2px 0}
+.mo .mogt{font:600 16px/1.25 var(--body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mo .mogc.emp .mogt{font-weight:500!important;font-size:15px}
+.mo .mogf,.mo .mogm{display:none}
+.mo.momac .mog{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 20px}.mo.momac .mogc+.mogc{border-top:0}
+.mog1{display:flex;align-items:center;gap:12px;width:100%;border:0;background:var(--surface);border-radius:18px;padding:0 16px;min-height:52px;font:500 16px/1.2 var(--body);color:var(--ink);cursor:pointer;text-align:left}
+.mog1 .m1d{display:flex;gap:4px}.mog1 .m1d i{width:8px;height:8px;border-radius:50%}.mog1 .m1t{flex:1}.mog1 u{text-decoration:none;color:var(--muted);font-size:20px}
+.tbver{font:400 11px/1.3 var(--body);color:var(--muted);text-align:center;padding:18px 0 4px;opacity:.7}
 .mdm{font:600 11px/1 var(--body);color:var(--muted);padding-left:4px}
 .modl .row{display:flex;align-items:center;gap:10px;min-height:38px;font:400 15px/1.3 var(--body)}
 .modl .row+.row{border-top:1px solid var(--soft2)}
@@ -1564,11 +1577,11 @@ function weekShort(m){
   return 'Sett. '+n+' \u00b7 '+a.getDate()+(a.getMonth()===z.getMonth()?'':' '+mn(a))+'\u2013'+z.getDate()+' '+mn(z);
 }
 function curP(key){var t=isoOf(new Date());return key==='w'?mondayOf(st.date)===mondayOf(t):key==='m'?st.date.slice(0,7)===t.slice(0,7):st.date.slice(0,4)===t.slice(0,4)}
-function oggiBtn(key){
+function oggiBtn(key){if(key)return '';
   var t=isoOf(new Date()),a,b;
   if(key==='w'){a=mondayOf(st.date);b=mondayOf(t)}else if(key==='m'){a=st.date.slice(0,7);b=t.slice(0,7)}else{a=st.date.slice(0,4);b=t.slice(0,4)}
   if(a===b)return '';
-  return '<button class="nav goto" data-act="day-today" aria-label="Torna a oggi">'+(a<b?'Oggi <span class="arr">\u2192</span>':'<span class="arr">\u2190</span> Oggi')+'</button>';
+  return '<button class="nav goto" data-act="day-today" aria-label="Torna a oggi">'+'Oggi'+'</button>';
 }
 (function(){var rt=0,lw=window.innerWidth;window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){var w=window.innerWidth,cross=(lw<700)!==(w<700);lw=w;if((ui.mode==='sett'||ui.mode==='mese')&&typeof render==='function')render()},200)})})();
 document.addEventListener('click',function(e){
@@ -1770,6 +1783,8 @@ function moRow(e,showD){
   var ds=showD?parse(e.d).getDate()+' '+MON[+e.d.slice(5,7)-1].slice(0,3)+' · ':'';
   return '<button type="button" class="mdr"'+(e.i?' data-act="edit-item" data-id="'+e.i.id+'"':' data-act="gpick" data-lv="O" data-a="'+e.a+'"')+'><i style="background:'+(AC[e.a]||'var(--muted)')+'"></i><span><b>'+esc(e.t)+'</b><small class="'+w.c.trim()+'">'+ds+esc(w.t)+'</small></span></button>';
 }
+var TBVER='9 nov 2026 · 12:40';
+function mog1(lv){return '<button type="button" class="mog1" data-act="gpick" data-lv="'+lv+'" data-a="L"><span class="m1d"><i style="background:var(--blue)"></i><i style="background:var(--green)"></i><i style="background:var(--red)"></i></span><span class="m1t">Scegli le 3 priorità '+(lv==='O'?'del mese':'dell\'anno')+'</span><u>›</u></button>'}
 function renderMese(){
   var y=st.date.slice(0,4),mo=st.date.slice(5,7),ym=y+'-'+mo,first=ym+'-01',today=isoOf(new Date());
   var ld=parse(first);ld=new Date(ld.getFullYear(),ld.getMonth()+1,0);var lastIso=isoOf(ld);
@@ -1780,7 +1795,7 @@ function renderMese(){
   var weeks=[];for(var w=mondayOf(first);w<=lastIso;w=addDays(w,7))weeks.push(w);
   var og=goalsFor('O',ym).filter(function(g){return g.text}),dsh=function(x){return parse(x).getDate()+' '+MON[+x.slice(5,7)-1].slice(0,3)};
   var h='<div class="mohd"><div><div class="moy">'+y+'</div><div class="mot">'+MON[+mo-1].charAt(0).toUpperCase()+MON[+mo-1].slice(1)+'</div></div><div class="mohr"><button class="nav monav" data-act="mo-prev" aria-label="Mese precedente">‹</button><button class="nav monav" data-act="mo-next" aria-label="Mese successivo">›</button>'+oggiBtn('m')+'<button type="button" class="prbtn" data-act="print-open" aria-label="Stampa" title="Stampa"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V3.5h10V9"/><path d="M7 17.5H5.5A1.5 1.5 0 0 1 4 16v-5.5A1.5 1.5 0 0 1 5.5 9h13a1.5 1.5 0 0 1 1.5 1.5V16a1.5 1.5 0 0 1-1.5 1.5H17"/><rect x="7" y="14" width="10" height="6.5" rx="1"/></svg></button></div></div><div class="mos">Le tre cose che contano questo mese</div>';
-  h+='<div class="mog">'+AK.map(function(a){
+  if(!og.length)h+=mog1('O');else h+='<div class="mog">'+AK.map(function(a){
     var g=og.filter(function(x){return x.area===a})[0],c=AC[a];
     if(!g)return '<div class="mogc emp" data-act="gpick" data-lv="O" data-a="'+a+'"><span class="mock" style="border-color:'+c+';border-style:dashed"></span><div class="mogb"><div class="mogt" style="color:var(--muted);font-weight:500">Scegli l\'obiettivo di '+AREAS[a]+'</div></div></div>';
     var seg=weeks.map(function(w){var r=goalsFor('R',w).filter(function(x){return x.up===g.id});var dn=r.some(function(x){return x.st==='d'}),pp=r.some(function(x){return x.st==='p'});return '<i style="'+(dn?'background:'+c:pp?'background:'+c+';opacity:.45':'')+'"></i>'}).join('');
@@ -1822,7 +1837,7 @@ function renderAnno(){
   var dsh=function(x){return parse(x).getDate()+' '+MON[+x.slice(5,7)-1].slice(0,3)};
   var mOf=function(m){return st.goals.filter(function(o){return o.lv==='O'&&o.per===y+'-'+pad(m)&&o.text})};
   var h='<div class="mohd"><div><div class="moy">Time Box</div><div class="mot">'+y+'</div></div><div class="mohr"><button class="nav monav" data-act="yr-prev" aria-label="Anno precedente">‹</button><button class="nav monav" data-act="yr-next" aria-label="Anno successivo">›</button>'+oggiBtn('y')+'<button type="button" class="prbtn" data-act="print-open" aria-label="Stampa" title="Stampa"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V3.5h10V9"/><path d="M7 17.5H5.5A1.5 1.5 0 0 1 4 16v-5.5A1.5 1.5 0 0 1 5.5 9h13a1.5 1.5 0 0 1 1.5 1.5V16a1.5 1.5 0 0 1-1.5 1.5H17"/><rect x="7" y="14" width="10" height="6.5" rx="1"/></svg></button></div></div><div class="mos">Le tre cose che contano quest\'anno</div>';
-  h+='<div class="mog">'+AK.map(function(a){
+  if(!tg.length)h+=mog1('T');else h+='<div class="mog">'+AK.map(function(a){
     var g=tg.filter(function(x){return x.area===a})[0],c=AC[a];
     if(!g)return '<div class="mogc emp" data-act="gpick" data-lv="T" data-a="'+a+'"><span class="mock" style="border-color:'+c+';border-style:dashed"></span><div class="mogb"><div class="mogt" style="color:var(--muted);font-weight:500">Scegli l\'obiettivo di '+AREAS[a]+'</div></div></div>';
     var seg='';for(var m=1;m<=12;m++){var os=mOf(m).filter(function(o){return o.up===g.id});var dn=os.some(function(o){return o.st==='d'}),pp=os.some(function(o){return o.st==='p'});seg+='<i style="'+(dn?'background:'+c:pp?'background:'+c+';opacity:.45':'')+'"></i>'}
@@ -2911,8 +2926,8 @@ function renderOggi(d){
   h+=finH;
   var colSt='display:flex;flex-direction:column;gap:12px;min-width:0';
   document.getElementById('oggi').innerHTML=window.innerWidth>=1000?
-    '<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start'+(isToday?';padding-bottom:42vh':'')+'"><div style="'+colSt+'">'+h.slice(0,cut)+'</div><div style="'+colSt+'">'+h.slice(cut)+'</div></div>':
-    '<div style="display:flex;flex-direction:column;gap:12px;max-width:640px'+(isToday?';padding-bottom:42vh':'')+'">'+h+'</div>';
+    '<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start'+(isToday?';padding-bottom:42vh':'')+'"><div style="'+colSt+'">'+h.slice(0,cut)+'</div><div style="'+colSt+'">'+h.slice(cut)+'<div class="tbver">Versione '+TBVER+'</div></div></div>':
+    '<div style="display:flex;flex-direction:column;gap:12px;max-width:640px'+(isToday?';padding-bottom:42vh':'')+'">'+h+'<div class="tbver">Versione '+TBVER+'</div></div>';
   dvShow();
 }
 function renderOverload(d,s){
@@ -3310,7 +3325,7 @@ document.addEventListener('click',function(e){
   var act=t.getAttribute('data-act'),id=t.getAttribute('data-id'),a=t.getAttribute('data-a'),d=day(),i=id?item(id):null;
   ui.msg=(act==='block-add')?ui.msg:'';ui.lsN=0;ui.ls=null;
   switch(act){
-    case 'mode':if(t.getAttribute('data-m')==='voci')ui.vback=ui.mode==='plan'?'plan':'oggi';if(t.getAttribute('data-m')==='oggi')ui.oggiNav=0;if(t.getAttribute('data-m')==='mese'&&t.closest('.tabs')){st.date=isoOf(new Date());ui.scrollTop=1}if(t.getAttribute('data-m')==='sett'&&t.closest('.tabs')){ui.wsel='';st.date=isoOf(new Date());ui.scrollToday=1}if(t.getAttribute('data-m')==='oggi'&&ui.mode==='oggi'&&t.closest('.tabs')){st.date=isoOf(new Date());setTimeout(centerNext,40);toast('Oggi')}ui.mode=t.getAttribute('data-m');if(ui.mode==='plan')ui.snap=true;if(ui.mode==='voci')setTimeout(function(){window.scrollTo(0,0)},0);break;
+    case 'mode':if(t.getAttribute('data-m')==='voci')ui.vback=ui.mode==='plan'?'plan':'oggi';if(t.getAttribute('data-m')==='oggi')ui.oggiNav=0;if(t.getAttribute('data-m')==='mese'&&t.closest('.tabs')){st.date=isoOf(new Date());ui.msel='';ui.scrollTop=1}if(t.getAttribute('data-m')==='anno'&&t.closest('.tabs')){st.date=isoOf(new Date());ui.scrollTop=1}if(t.getAttribute('data-m')==='plan'&&ui.mode==='plan'&&t.closest('.tabs')){st.date=isoOf(new Date());toast('Oggi')}if(t.getAttribute('data-m')==='sett'&&t.closest('.tabs')){ui.wsel='';st.date=isoOf(new Date());ui.scrollToday=1}if(t.getAttribute('data-m')==='oggi'&&ui.mode==='oggi'&&t.closest('.tabs')){st.date=isoOf(new Date());setTimeout(centerNext,40);toast('Oggi')}ui.mode=t.getAttribute('data-m');if(ui.mode==='plan')ui.snap=true;if(ui.mode==='voci')setTimeout(function(){window.scrollTo(0,0)},0);break;
     case 'dump-toggle':ui.vback=ui.mode==='plan'?'plan':'oggi';ui.mode='voci';setTimeout(function(){window.scrollTo(0,0)},0);break;
     case 'dump-tab':ui.dumpTab=t.getAttribute('data-v');ui.dumpOpen=1;break;
     case 'to-dump':ui.dumpOpen=1;ui.dumpTab='todo';ui.mode='plan';setTimeout(function(){var e=document.getElementById('dumpcard');if(e)e.scrollIntoView({behavior:'smooth',block:'start'})},80);break;
