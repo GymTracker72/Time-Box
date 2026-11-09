@@ -1,3 +1,4 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <!doctype html>
 <html lang="it">
 <head>
@@ -93,7 +94,7 @@ button{cursor:pointer}
 .subt{flex:1;min-width:0;font-size:15px;line-height:1.2}.subt.done{text-decoration:line-through;color:var(--muted)}
 .subx{border:0;background:transparent;font-size:20px;line-height:1;padding:4px 8px;color:var(--muted)}
 .subadd{display:flex;gap:6px;margin:6px 0 4px;padding:0}.subwrap{scroll-margin-top:10px}
-.sheet-bg.kbtop{align-items:flex-start!important;padding-top:max(8px,env(safe-area-inset-top,0px))}.sheet-bg.kbtop .sheet{max-height:52vh}
+.sheet-bg.kbtop{align-items:flex-start!important;padding-top:max(8px,env(safe-area-inset-top,0px))}.sheet-bg.kbtop .sheet{max-height:52vh;border-radius:20px}
 .sheet .subadd input{height:38px;padding:6px 8px;flex:1}
 .subbtns{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
 .btn.sm{padding:8px 12px;font-size:15px}
@@ -590,7 +591,7 @@ body.m-plan #schedcard .sched{margin:0}
 
 /* Voce dello schedule: scheda semplice */
 .sheet.bs{gap:14px}
-.bs .bst{font:800 26px/1.15 var(--body)!important;border:0!important;background:transparent!important;padding:4px 0;width:100%;box-shadow:none!important;letter-spacing:-.01em;border-radius:0}
+.bs .bst{font:800 26px/1.15 var(--body)!important;border:0!important;background:transparent!important;padding:4px 0;width:100%;box-shadow:none!important;letter-spacing:-.01em;border-radius:0;resize:none;overflow:hidden;display:block;min-height:0;white-space:pre-wrap;word-break:break-word}
 .bs .bsc{background:var(--bg);border-radius:16px;padding:0 14px;display:flex;flex-direction:column}
 .bs .bsc .g{display:flex;flex-direction:column;gap:0}
 .bs .bsc label{display:flex!important;flex-direction:row!important;text-align:left;align-items:center;justify-content:space-between;gap:12px;min-height:50px;border-bottom:1px solid var(--soft)}
@@ -607,6 +608,8 @@ body.m-plan #schedcard .sched{margin:0}
 .bs .al,.bs .frogsw{border-radius:16px}
 .bsf{display:flex;justify-content:space-between;align-items:center}
 .bs .mini.red{color:#D8483B}
+.sublist:empty{display:none}
+.bsf2{justify-content:space-between!important;padding:0 6px}.bsf2 .mini{border:0;background:transparent;font:600 16px/1.2 var(--body);padding:8px 4px}.bsf2 .mini:not(.red){color:var(--blue)}
 
 /* Voce dello schedule: scheda di lettura */
 .vcard{border:0!important;border-radius:26px;box-shadow:0 14px 44px rgba(0,0,0,.22);padding:22px 20px 12px;gap:6px}
@@ -636,6 +639,8 @@ body.m-plan #schedcard .sched{margin:0}
 .ed .qplace{display:flex;flex-direction:column;gap:8px}
 .ed .subr .subc{border-radius:50%}
 .ed .sublist{background:var(--bg);border-radius:16px;padding:8px 12px}
+.sheet .subadd input#subnew{height:44px;border:0!important;background:var(--bg);border-radius:12px;padding:8px 14px;font-size:16px;box-shadow:none!important}.sheet .subadd input#subnew:focus{outline:0;box-shadow:inset 0 0 0 2px var(--blue)!important}
+.sublist .subr:last-child{border-bottom:0}
 .ed .mini{border:0;background:transparent;color:var(--blue);font:600 15px/1.2 var(--body);padding:8px 2px}
 .ed .mini.red{color:#D8483B}
 .bs .bsc input[type=date]{max-width:none!important;min-width:150px;text-align:right}
@@ -1195,7 +1200,7 @@ function frogItem(d){return d.frog&&d.tops[d.frog]&&d.tops[d.frog]!=='empty'?ite
 /* ---- render ---- */
 function cbH(s,act,id){return '<button class="cb '+(s||'')+'" data-act="'+act+'" data-id="'+esc(id)+'" aria-label="Stato: '+(s==='d'?'fatto':s==='p'?'parziale':'da fare')+'"></button>'}
 function areaRow(chg,sel,dis){
-  return '<label class="arow'+(dis?' dis':'')+'"><span class="aic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12.2V5.5a2 2 0 0 1 2-2h6.7a2 2 0 0 1 1.4.6l6.8 6.8a2 2 0 0 1 0 2.8l-6.7 6.7a2 2 0 0 1-2.8 0l-6.8-6.8a2 2 0 0 1-.6-1.4z"/><circle cx="8.3" cy="8.3" r="1.3" fill="#fff" stroke="none"/></svg></span><span class="an">Area</span><span class="av"><i class="ad '+(sel||'')+'"></i>'+(sel?AREAS[sel]:'Nessuna')+'</span><svg class="achv" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9.5l5-5 5 5M7 14.5l5 5 5-5"/></svg><select data-chg="'+chg+'" data-f="area"'+(dis?' disabled':'')+' aria-label="Area">'+areaOpts(sel,true)+'</select></label>'}
+  return '<label class="arow'+(dis?' dis':'')+'"><span class="an">Area</span><span class="av"><i class="ad '+(sel||'')+'"></i>'+(sel?AREAS[sel]:'Nessuna')+'</span><svg class="achv" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9.5l5-5 5 5M7 14.5l5 5 5-5"/></svg><select data-chg="'+chg+'" data-f="area"'+(dis?' disabled':'')+' aria-label="Area">'+areaOpts(sel,true)+'</select></label>'}
 function selRow(label,chg,f,opts,val,dis){
   return '<label class="arow'+(dis?' dis':'')+'"><span class="an">'+label+'</span><span class="av">'+val+'</span><svg class="achv" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9.5l5-5 5 5M7 14.5l5 5 5-5"/></svg><select data-chg="'+chg+'" data-f="'+f+'"'+(dis?' disabled':'')+' aria-label="'+label+'">'+opts+'</select></label>'}
 function priRow(i){
@@ -1451,7 +1456,7 @@ function render(){
   document.getElementById('plancols').hidden=M!=='plan';
   var nd=M==='oggi'||M==='sett'||M==='mese'||M==='anno'||(M==='stampa'&&printScope()!=='day');document.querySelector('.datebox').hidden=nd;document.getElementById('stats').hidden=M!=='plan';
   [].forEach.call(document.querySelectorAll('.tabs button'),function(b){b.classList.toggle('on',b.getAttribute('data-m')===M)});
-  renderSheet();calShow();
+  renderSheet();fitTitles();calShow();
   if(M==='oggi')renderOggi(d);if(M==='sett')renderSett();if(M==='mese')renderMese();if(M==='anno')renderAnno();if(M==='stampa')renderStampa();if(M==='voci')renderVoci();if(M==='storico')renderStorico();if(M==='obj')renderObj();
   if(ui.scroll){ui.scroll=false;try{document.getElementById('bf').scrollIntoView({block:'center'})}catch(e){}}
   document.getElementById('bmsg').innerHTML=ui.msg?'<div class="note">'+esc(ui.msg)+'</div>':'';
@@ -1825,7 +1830,7 @@ function editorHtml(i,sh){
     }
   }
   return '<div class="sheet-bg" data-act="sheet-bg"><div class="sheet prep bs ed" role="dialog" aria-label="Modifica voce">'+
-    '<input class="bst" data-chg="edit" data-f="text" placeholder="Titolo" aria-label="Titolo" value="'+esc(i.text)+'">'+
+    '<textarea class="bst" rows="1" data-chg="edit" data-f="text" placeholder="Titolo" aria-label="Titolo">'+esc(i.text)+'</textarea>'+
     itemChips(i)+
     (i.sub?subHtml(i):subBtn(i))+notesHtml(i)+
     '<div class="bsc"><label><span class="lbl">Scadenza</span><span style="display:flex;align-items:center;gap:8px"><input type="date" data-chg="edit" data-f="due" value="'+esc(i.due)+'">'+(i.due?'<button class="mini" data-act="ed-clear-due" data-id="'+i.id+'" type="button">Togli</button>':'')+'</span></label></div>'+
@@ -2091,10 +2096,10 @@ document.addEventListener('input',mk,true);document.addEventListener('change',mk
 function jbHead(sh,b,newMode){
   var s0=b?bst(b):'',dirty=newMode||sh.dirty;
   return '<div class="shd'+(dirty?' dirty':'')+'"><button type="button" class="shl c" data-act="sheet-close">Chiudi</button><button type="button" class="shl a" data-act="sheet-close">Annulla</button>'+
-    (b?'<button type="button" class="shr ring '+(s0||'')+'" data-act="cyc-block" data-id="'+b.id+'" aria-label="Stato: '+(s0==='d'?'fatto':s0==='p'?'parziale':'da fare')+'"></button>':'')+
+    
     '<button type="button" class="shs" data-act="sheet-ok">'+(newMode?'Aggiungi':'Salva')+'</button></div>'}
 function jbTitle(titleVal,ph,chg,notesBlock){
-  return '<div class="tcard"><input class="bst" data-chg="'+chg+'" data-f="title" placeholder="'+ph+'" aria-label="Titolo" value="'+esc(titleVal)+'" autocomplete="off">'+notesBlock+'</div>'}
+  return '<div class="tcard"><textarea class="bst" rows="1" data-chg="'+chg+'" data-f="title" placeholder="'+ph+'" aria-label="Titolo" autocomplete="off">'+esc(titleVal)+'</textarea>'+notesBlock+'</div>'}
 function blkHtml(sh,b){
   if(sh.ask){
     var one=sh.ask==='save'&&sh.date!==sh.from;
@@ -2127,7 +2132,7 @@ function blkHtml(sh,b){
     (it?'<div class="bsc bsl">'+frogRow(sh,it,sh.from)+'</div>':'')+
     '<div class="bsc"><div class="g"><label><span class="lbl">Tipo</span><select data-chg="sheet" data-f="kind"><option value="flex"'+(sh.kind==='flex'?' selected':'')+'>Flessibile</option><option value="fixed"'+(sh.kind==='fixed'?' selected':'')+'>Fisso</option></select></label></div>'+repHtml(sh)+'</div>'+
     (b.rid&&st.rec[b.rid]?'<div class="sub">Fa parte di una serie: '+esc(repLabel(st.rec[b.rid],sh.date))+'.</div>':'')+
-    '<button type="button" class="arow dang" data-act="blk-del">Togli dal piano</button><div class="bsf" style="justify-content:center"><button class="mini" data-act="blk-copy" type="button">Copia</button>'+(it?(sh.confirm?'<button class="mini red" data-act="ed-del2" data-id="'+it.id+'" type="button">Conferma: cancella</button>':'<button class="mini red" data-act="ed-del" data-id="'+it.id+'" type="button">Elimina voce</button>'):'')+'</div></div></div>';
+    '<button type="button" class="arow dang" data-act="blk-del">Togli dal piano</button><div class="bsf bsf2"><button class="mini" data-act="blk-copy" type="button">Copia</button>'+(it?(sh.confirm?'<button class="mini red" data-act="ed-del2" data-id="'+it.id+'" type="button">Conferma: cancella</button>':'<button class="mini red" data-act="ed-del" data-id="'+it.id+'" type="button">Elimina voce</button>'):'')+'</div></div></div>';
 }
 function blkDelScope(v){
   var sh=ui.sheet,b=sh&&blkFind(sh);if(!b){ui.sheet=null;return}
@@ -2197,7 +2202,7 @@ function notesHtml(o){
   var ns=o.notes||[];
   return '<div class="notes"><span class="lbl">Note'+(ns.length?' · '+ns.length:'')+'</span>'+
     ns.map(function(n){return '<div class="nt"><div class="ntm"><span>'+esc(noteWhen(n.c))+'</span><button type="button" class="subx" data-act="note-del" data-n="'+n.id+'" aria-label="Elimina la nota">×</button></div><div class="ntx">'+esc(n.x)+'</div></div>'}).join('')+
-    '<textarea id="notenew" rows="2" placeholder="Aggiungi una nota, per esempio l\'esito del sopralluogo" aria-label="Nuova nota"></textarea>'+
+    '<textarea id="notenew" rows="2" placeholder="Aggiungi una nota" aria-label="Nuova nota"></textarea>'+
     '<button class="btn sec sm" data-act="note-add" type="button" style="align-self:flex-end">Aggiungi nota</button></div>';
 }
 function subBtn(it){return it&&!it.sub?'<button class="mini" data-act="sub-new" data-id="'+it.id+'" type="button" style="align-self:flex-start">＋ Sottoelenco</button>':''}
@@ -2206,7 +2211,7 @@ function subHtml(it,extra){
   if(!it||!it.sub)return '';
   var rows=it.sub.map(function(x){return '<div class="subr"><button type="button" class="subc'+(x.st==='d'?' on':'')+'" data-act="sub-tog" data-id="'+it.id+'" data-s="'+x.id+'" aria-label="'+esc(x.text)+'"></button><span class="subt'+(x.st==='d'?' done':'')+'">'+esc(x.text)+'</span><button type="button" class="subx" data-act="sub-del" data-id="'+it.id+'" data-s="'+x.id+'" aria-label="Togli «'+esc(x.text)+'»">×</button></div>'}).join('');
   return '<div class="subwrap"><span class="lbl">Lista · '+subDone(it)+'/'+it.sub.length+'</span>'+
-    '<div class="subadd"><input class="input" id="subnew" placeholder="Aggiungi una voce" aria-label="Aggiungi una voce alla lista" autocomplete="off"><button class="btn sec sm" data-act="sub-add" data-id="'+it.id+'" type="button">Aggiungi</button></div>'+
+    '<div class="subadd"><input class="input" id="subnew" placeholder="Nuova voce, poi Invio" aria-label="Aggiungi una voce alla lista" autocomplete="off" enterkeyhint="enter"><button class="sub-hid" data-act="sub-add" data-id="'+it.id+'" type="button" hidden aria-hidden="true" tabindex="-1"></button></div>'+
     '<div class="sublist">'+rows+'</div>'+
     '<div class="subbtns"><button class="mini" data-act="grp-split" data-id="'+it.id+'" type="button">Separa le voci</button>'+(extra||'')+'</div></div>';
 }
@@ -3483,10 +3488,24 @@ document.addEventListener('click',function(e){if(e.target&&e.target.id==='date')
 ['focusin','focusout','input','change'].forEach(function(ev){document.addEventListener(ev,function(e){if(e.target&&e.target.type==='date')lastDateTs=Date.now()},true)});
 document.addEventListener('input',function(e){var t=e.target;if(t.getAttribute&&t.getAttribute('data-chg')==='bf'&&t.getAttribute('data-f')==='title')ui.bf.title=t.value});
 /* sottovoci: con la tastiera aperta la scheda si aggancia in alto e il campo va in cima, così non finisce sotto la tastiera */
-function subTop(){var f=document.getElementById('subnew');if(!f||document.activeElement!==f)return;var bg=f.closest('.sheet-bg'),sh=f.closest('.sheet'),w=f.closest('.subwrap');if(!bg||!sh)return;
-  bg.classList.add('kbtop');if(w)sh.scrollTop=Math.max(0,w.offsetTop-sh.offsetTop-6);try{window.scrollTo(0,window.scrollY)}catch(x){}}
+function subTop(){var f=document.getElementById('subnew');if(!f||document.activeElement!==f)return;var bg=f.closest('.sheet-bg'),sh=f.closest('.sheet');if(!bg||!sh)return;
+  bg.classList.add('kbtop');var vv=window.visualViewport,vh=vv?vv.height:window.innerHeight,vt=vv?vv.offsetTop:0;
+  bg.style.top=vt+'px';bg.style.bottom='auto';bg.style.height=vh+'px';sh.style.maxHeight=Math.max(200,vh-16)+'px';
+  var hd=sh.querySelector('.shd'),hh=hd?hd.getBoundingClientRect().height:0;
+  var w=f.closest('.subwrap')||f;sh.scrollTop+=w.getBoundingClientRect().top-sh.getBoundingClientRect().top-hh-8}
+function subReset(){var bg=document.querySelector('.sheet-bg.kbtop');if(!bg)return;bg.classList.remove('kbtop');bg.style.top='';bg.style.bottom='';bg.style.height='';var sh=bg.querySelector('.sheet');if(sh)sh.style.maxHeight=''}
+if(window.visualViewport){var subVV=function(){var f=document.getElementById('subnew');if(f&&document.activeElement===f)subTop()};window.visualViewport.addEventListener('resize',subVV);window.visualViewport.addEventListener('scroll',subVV)}
+/* titolo della scheda: il carattere si riduce per stare su una riga, poi va a capo */
+var fitCv;function fitTitle(t){if(!t||!t.clientWidth)return;var cs=getComputedStyle(t),w=t.clientWidth-2,v=t.value||t.placeholder||'';
+  fitCv=fitCv||document.createElement('canvas');var cx=fitCv.getContext('2d'),px=26;
+  for(;px>18;px--){cx.font='800 '+px+'px '+cs.fontFamily;if(cx.measureText(v).width<=w)break}
+  t.style.setProperty('font-size',px+'px','important');t.style.height='auto';t.style.height=t.scrollHeight+'px'}
+function fitTitles(){[].forEach.call(document.querySelectorAll('textarea.bst'),fitTitle)}
+document.addEventListener('input',function(e){if(e.target&&e.target.classList&&e.target.classList.contains('bst'))fitTitle(e.target)});
+document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target&&e.target.classList&&e.target.classList.contains('bst')){e.preventDefault();e.target.blur()}},true);
+window.addEventListener('resize',fitTitles);
 document.addEventListener('focusin',function(e){if(e.target&&e.target.id==='subnew'){subTop();setTimeout(subTop,60);setTimeout(subTop,350)}});
-document.addEventListener('focusout',function(e){if(e.target&&e.target.id==='subnew'){setTimeout(function(){var f=document.getElementById('subnew');if(f&&document.activeElement===f)return;var bg=document.querySelector('.sheet-bg.kbtop');if(bg)bg.classList.remove('kbtop')},250)}});
+document.addEventListener('focusout',function(e){if(e.target&&e.target.id==='subnew'){setTimeout(function(){var f=document.getElementById('subnew');if(f&&document.activeElement===f)return;subReset()},250)}});
 document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target&&e.target.id==='subnew'){e.preventDefault();var sb=document.querySelector('[data-act=sub-add]');if(sb)sb.click();return}
   if(e.key==='Escape'&&ui.sheet){ui.sheet=null;render()}
   if((e.key==='Enter'||e.key===' ')&&e.target&&e.target.classList&&e.target.classList.contains('blk')){e.preventDefault();e.target.click()}});
@@ -4268,4 +4287,5 @@ window.__tbui=function(){return ui};
 
 </script>
 
+</body></html>
 </body></html>
