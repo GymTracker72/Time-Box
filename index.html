@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-09-0320">
+<meta name="tb-build" content="2026-11-09-0715">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -356,7 +356,7 @@ button,select,input{touch-action:manipulation}
 @media (max-width:700px){
   input,select,textarea{font-size:16px!important}
   h1{font-size:26px}.hbr{display:none}
-  .top>div:first-child{width:100%}
+  .top:not(.blk)>div:first-child{width:100%}
   .datebox{flex-wrap:wrap;width:100%}.dwrap .dlab{font-size:18px;padding:11px 6px}
   .stats{width:100%}
   .tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1.2px solid var(--line);padding-bottom:max(env(safe-area-inset-bottom,0px),22px)}
@@ -464,7 +464,7 @@ button,select,input{touch-action:manipulation}
 #phead[hidden]{display:none}
 .pstrip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px 4px;text-align:center;margin-top:12px}
 .pstrip button{border:0;background:transparent;color:inherit;font:inherit;padding:0;min-height:36px;cursor:pointer}
-body.m-plan .top>div:first-child,body.m-plan .datebox>.nav,body.m-plan .datebox .dwrap,body.m-plan .datebox .todayrow{display:none!important}
+body.m-plan .top:not(.blk)>div:first-child,body.m-plan .datebox>.nav,body.m-plan .datebox .dwrap,body.m-plan .datebox .todayrow{display:none!important}
 body.m-plan .datebox.card{border:0;background:transparent;box-shadow:none;padding:4px 2px}
 
 .srow{border-top:1px solid transparent}
@@ -650,7 +650,7 @@ body.m-plan #schedcard .sched{margin:0}
 .bsr i.sw.on{background:var(--green)}.bsr i.sw.on::after{left:20px}
 
 /* Tutte le voci e Completate: pagine semplici */
-body.m-voci .top>div:first-child,body.m-voci .datebox,body.m-voci #stats,body.m-voci #daybar{display:none!important}
+body.m-voci .top:not(.blk)>div:first-child,body.m-voci .datebox,body.m-voci #stats,body.m-voci #daybar{display:none!important}
 .vh2{display:flex;margin:6px 0 0}
 .vh2 .mini,.oalls .oall{border:0!important;background:transparent!important;color:var(--blue);font:600 16px/1 var(--body);padding:8px 0;border-radius:0}
 .vt2{color:var(--ink)!important;display:flex;align-items:baseline;justify-content:space-between;margin:2px 0 12px;font:800 36px/1.05 var(--head);letter-spacing:-.02em}
@@ -790,7 +790,7 @@ body.m-plan #daybar .nav:not(#dbtoday){display:none}
 body.m-plan #daybar b{flex:1;text-align:left;min-width:0;font:600 17px var(--body);letter-spacing:-.2px;padding-left:6px}
 body.m-plan #daybar b.today{color:var(--red)}
 body.m-plan #daybar #dbtoday{border:0;background:color-mix(in srgb,var(--ink) 8%,transparent);border-radius:999px;padding:5px 12px;font:600 13px var(--body);min-height:0}
-body.m-plan .top{display:none}
+body.m-plan .top:not(.blk){display:none}
 body.m-plan #overload:empty{display:none}
 .w2 .wcb.hascb{padding-left:25px}
 .w2 .wcb .cb{left:5px;top:5px;width:15px;height:15px}
@@ -812,7 +812,7 @@ body.m-plan #overload:empty{display:none}
 .wkg .mogt{font-size:16px}
 /* Oggi: impostazione essenziale */
 .ohead .dvdot{width:14px;height:14px;margin:0 6px 12px 0;align-self:flex-end}
-body.m-oggi .top>div:first-child,body.m-mese .top>div:first-child,body.m-sett.w2on .top>div:first-child{display:none!important}
+body.m-oggi .top:not(.blk)>div:first-child,body.m-mese .top:not(.blk)>div:first-child,body.m-sett.w2on .top:not(.blk)>div:first-child{display:none!important}
 .ohead{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;padding:6px 2px 4px}
 .odow{font:600 13px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .ohl{flex:1;min-width:0}.odowr{display:flex;align-items:center;justify-content:space-between;min-height:30px}
@@ -905,7 +905,7 @@ body.m-oggi .datebox .nav:not([data-act=day-today]),body.m-oggi #daybar .nav,bod
 @media print{
   @page{size:297mm 210mm;margin:0}
   html,body{background:#fff!important;padding:0!important;margin:0!important}
-  .top,.tabs,.eg,#toast,#sheet,.pnote{display:none!important}
+  .top:not(.blk),.tabs,.eg,#toast,#sheet,.pnote{display:none!important}
   .wrap{max-width:none;gap:0}
   .pgs{gap:0!important;display:block!important}
   .ps{display:flex!important;flex-wrap:nowrap!important;gap:0!important;width:297mm;height:210mm;position:relative;overflow:hidden;page-break-after:always;break-after:page}
