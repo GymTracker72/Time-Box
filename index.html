@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-09-0745">
+<meta name="tb-build" content="2026-11-09-0815">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -3810,7 +3810,7 @@ async function calSync(){
 /* ---- import da Google Calendar: eventi in sola lettura, mostrati in Pianifica ---- */
 var EXK='timebox-ext',ex={by:{},cals:[],at:0,busy:false,msg:''};
 try{var _e=JSON.parse(localStorage.getItem(EXK)||'null');if(_e&&_e.by){ex.by=_e.by;ex.cals=_e.cals||[];ex.at=_e.at||0}}catch(e){}
-function impCfg(){var c=st.cal||{},i=c.imp||{};return {on:i.on===1,ids:Array.isArray(i.ids)?i.ids:[]}}
+function impCfg(){var c=st.cal||{},i=c.imp||{};return {on:i.on!==0,ids:Array.isArray(i.ids)?i.ids:[]}}
 function impSet(o){if(!st.cal)st.cal={};var c=impCfg();st.cal.imp={on:('on' in o?o.on:c.on)?1:0,ids:'ids' in o?o.ids:c.ids};save()}
 function extKey(d){var k=null;Object.keys(st.days).some(function(x){if(st.days[x]===d){k=x;return true}});return k}
 function extOf(d){var k=extKey(d);if(!k||!impCfg().on)return [];return ex.by[k]||[]}
@@ -3834,8 +3834,8 @@ async function impRun(){
   ex.busy=true;ex.msg='';
   try{
     var rl=await gcFetch('/users/me/calendarList?minAccessRole=reader&maxResults=250'),lj=await rl.json(),own=calCfg().id;
-    ex.cals=(lj.items||[]).filter(function(x){return x.id!==own&&!(x.summary==='Time Box'&&/Time Box/.test(x.description||''))}).map(function(x){return {id:x.id,name:x.summaryOverride||x.summary||x.id,primary:!!x.primary}});
-    var ids=c.ids;if(!ids.length){var pr=ex.cals.filter(function(x){return x.primary})[0];ids=pr?[pr.id]:[]}
+    ex.cals=(lj.items||[]).filter(function(x){return x.id!==own&&x.accessRole!=='freeBusyReader'&&!/#(holiday|contacts|weather|weeknum)@|@(holiday|group\.v)\.calendar\.google\.com$/.test(x.id)&&!(x.summary==='Time Box'&&/Time Box/.test(x.description||''))}).map(function(x){return {id:x.id,name:x.summaryOverride||x.summary||x.id,primary:!!x.primary}});
+    var ids=c.ids.length?c.ids:ex.cals.map(function(x){return x.id});
     var from=new Date();from.setHours(0,0,0,0);var te=new Date(from);te.setDate(te.getDate()+CWIN+1);
     var by={},n=0;
     for(var q=0;q<ids.length;q++){
@@ -3849,17 +3849,16 @@ async function impRun(){
         pt=j.nextPageToken||''}while(pt)}
     Object.keys(by).forEach(function(k){by[k].sort(function(a,b){return a.s-b.s})});
     ex.by=by;ex.at=Date.now();ex.msg=n+(n===1?' evento':' eventi');extSave()
-  }catch(e){ex.msg=(e&&e.status===403)?'permesso di lettura mancante: tocca «Importa» e concedi l\'accesso ai calendari.':((e&&e.message)||'errore')}
+  }catch(e){if(e&&(e.status===403||e.status===401)){ex.msg='serve il permesso di lettura dei calendari: tocca lo schermo e concedilo.';gcDrop();setTimeout(function(){toast('Tocca lo schermo per concedere l\'accesso ai calendari')},300)}else ex.msg=(e&&e.message)||'errore'}
   finally{ex.busy=false;calShow();extRender()}}
 function impTog(){
   var c=impCfg();
   if(c.on){impSet({on:false});ex.msg='';calShow();extRender();return}
-  if(!(window.google&&google.accounts&&google.accounts.oauth2)){toast('Carico l\'accesso Google, riprova tra un attimo');gdLoad().catch(function(){});return}
-  gcDrop();
-  gcAsk('consent').then(function(){impSet({on:true});calShow();impRun()}).catch(function(e){ex.msg=(e&&e.message)||'accesso non riuscito.';calShow()})}
+  impSet({on:true});calShow();impRun()}
 function impCal(id){
-  var c=impCfg(),ids=c.ids.length?c.ids.slice():(ex.cals.filter(function(x){return x.primary}).map(function(x){return x.id})),i=ids.indexOf(id);
-  if(i>=0)ids.splice(i,1);else ids.push(id);impSet({ids:ids.length?ids:['']});if(!ids.length)impSet({ids:[]});calShow();impRun()}
+  var c=impCfg(),ids=c.ids.length?c.ids.slice():ex.cals.map(function(x){return x.id}),i=ids.indexOf(id);
+  if(i>=0){if(ids.length<2){toast('Lascia almeno un calendario');return}ids.splice(i,1)}else ids.push(id);
+  impSet({ids:ids.length===ex.cals.length?[]:ids});calShow();impRun()}
 setInterval(function(){if(!document.hidden&&impCfg().on&&Date.now()-ex.at>300000)impRun()},60000);
 document.addEventListener('visibilitychange',function(){if(!document.hidden&&impCfg().on&&Date.now()-ex.at>120000)setTimeout(impRun,800)});
 function calLogin(then){
@@ -3892,9 +3891,9 @@ function calShow(){
   if(h!==cs.last){cs.last=h;b.innerHTML=h}
 }
 function impHtml(){
-  var c=impCfg(),h='<div class="lbl" style="margin-top:6px">Importa da Google Calendar</div><div class="eg">I tuoi eventi compaiono in Pianifica come blocchi grigi di sola lettura (prossimi '+CWIN+' giorni, senza i giorni interi). Le modifiche si fanno su Google Calendar.</div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="mini" data-act="imp-tog">'+(c.on?'Smetti di importare':'Importa i miei eventi')+'</button></div>';
+  var c=impCfg(),h='<div class="lbl" style="margin-top:6px">Importa da Google Calendar</div><div class="eg">L\'import è automatico: gli eventi dei tuoi calendari compaiono in Pianifica come blocchi grigi di sola lettura (prossimi '+CWIN+' giorni, senza i giorni interi) e si aggiornano da soli. Le modifiche si fanno su Google Calendar.</div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="mini" data-act="imp-tog">'+(c.on?'Sospendi l\'import':'Riattiva l\'import')+'</button></div>';
   if(c.on){
-    var ids=c.ids.length?c.ids:ex.cals.filter(function(x){return x.primary}).map(function(x){return x.id});
+    var ids=c.ids.length?c.ids:ex.cals.map(function(x){return x.id});
     h+='<div class="alrow">'+ex.cals.map(function(x){var o=ids.indexOf(x.id)>=0;return '<button type="button" class="alc'+(o?' on':'')+'" data-act="imp-cal" data-id="'+esc(x.id)+'" aria-pressed="'+o+'">'+esc(x.name)+'</button>'}).join('')+'</div>';
     h+='<div class="eg">'+(ex.busy?'importo\u2026':(ex.msg?esc(ex.msg):'')+(ex.at?' \u00b7 aggiornato alle '+hhmm(ex.at):''))+'</div>'}
   else if(ex.msg)h+='<div class="eg" style="color:var(--amber)">'+esc(ex.msg)+'</div>';
@@ -4013,7 +4012,7 @@ render();
 dvShow();
 if(GDon()){gdLoad().catch(function(){});if(!lsGet(GOK)){dv.on=false;gateShow()}else{dv.on=true;setTimeout(dvSync,700)}}
 else if(dv.on)setTimeout(dvSync,700);else if(fk0===null&&window.claude)setTimeout(dvOn,900);
-calShow();
+calShow();setTimeout(function(){if(impCfg().on&&gcHas())impRun()},1800);
 /* permesso Google scaduto (dura circa un'ora): il browser non permette di riaprire l'accesso da solo,
    serve un gesto. Al primo tocco in qualunque punto rinnovo Drive e Calendar e riparto. */
 var rnw={busy:0,fail:0,cl:null,cb:null,eb:null};
