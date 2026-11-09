@@ -847,11 +847,15 @@ body.m-plan #overload:empty{display:none}
 .whs b{display:block;height:44px;line-height:44px;text-align:center;scroll-snap-align:center;font:400 21px/44px var(--body);color:var(--muted)}
 .whs b.on{color:var(--ink);font-weight:600}
 .whs div.on{color:var(--ink);font-weight:600}
-.wkg{display:flex;flex-direction:column;gap:6px;margin:12px 0 10px}
-.wkg .mogc{padding:10px 14px;border-radius:18px;gap:12px;align-items:center}
-.wkg .mock{width:24px;height:24px;margin-top:0;border-width:2.2px}
-.wkg .mock.dn::after{left:7px;top:3px;width:6px;height:11px}
-.wkg .mogt{font-size:16px}
+.wkg{display:flex;flex-direction:column;gap:0;margin:12px 0 10px;background:var(--surface);border-radius:18px;padding:0 16px}
+.wkg .mogc{background:transparent;border-radius:0;padding:11px 0;gap:12px;align-items:center;min-height:0}
+.wkg .mogc+.mogc{border-top:1px solid var(--soft2)}
+.wkg .mock{width:20px;height:20px;margin-top:0;border-width:2px}
+.wkg .mock.dn::after{left:5px;top:1px;width:5px;height:10px;border-width:0 2px 2px 0}
+.wkg .mogt{font:600 16px/1.25 var(--body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wkg .mogc.emp .mogt{font-weight:500!important;font-size:15px}
+#sett .mog1{margin:12px 0 10px}
+@media (hover:hover) and (pointer:fine) and (min-width:900px){.wkg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 20px}.wkg .mogc+.mogc{border-top:0}}
 /* eventi importati da Google Calendar: sola lettura */
 .blk.ext{background:var(--surface);color:var(--ink);border:0;font-weight:600;padding-left:14px;border-radius:10px;box-shadow:inset 4px 0 0 #9aa3a6,0 1px 3px rgba(0,0,0,.10);cursor:default;opacity:.92}
 .blk.ext .sm{font-weight:400;color:var(--muted)}
@@ -1684,12 +1688,12 @@ function renderSettNew(){
   var wn=(periodLabel('R',m).match(/(\d+)/)||[])[1]||'';
   var nd=0;days.forEach(function(x){nd+=dues(x).length});
   var cap=Math.max(st.hours*60,1),cur=mondayOf(today);
-  var ob=cur===m?'':(m<cur?'<button type="button" class="w2o" data-act="day-today" aria-label="Torna a oggi">Oggi ›</button>':'<button type="button" class="w2o" data-act="day-today" aria-label="Torna a oggi">‹ Oggi</button>');
+  var ob=true?'':(m<cur?'<button type="button" class="w2o" data-act="day-today" aria-label="Torna a oggi">Oggi ›</button>':'<button type="button" class="w2o" data-act="day-today" aria-label="Torna a oggi">‹ Oggi</button>');
   var h='<div class="w2h"><span class="w2k">Settimana '+wn+(nd?' · '+nd+(nd===1?' scadenza':' scadenze'):'')+'</span><span style="display:flex;align-items:center;gap:4px">'+'<button type="button" class="prbtn" data-act="print-open" aria-label="Stampa" title="Stampa"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V3.5h10V9"/><path d="M7 17.5H5.5A1.5 1.5 0 0 1 4 16v-5.5A1.5 1.5 0 0 1 5.5 9h13a1.5 1.5 0 0 1 1.5 1.5V16a1.5 1.5 0 0 1-1.5 1.5H17"/><rect x="7" y="14" width="10" height="6.5" rx="1"/></svg></button>'+(wide?'<button class="nav" data-act="wk-prev" aria-label="Settimana precedente"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><button class="nav" data-act="wk-next" aria-label="Settimana successiva"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>':'')+ob+'</span></div>';
   h+='<h1 class="w2t">'+title+'</h1>';
   (function(){
     var AC={L:'var(--blue)',F:'var(--green)',P:'var(--red)'},rg=goalsFor('R',m).filter(function(g){return g.text});
-    h+='<div class="wkg">'+AK.map(function(a){
+    if(!rg.length)h+=mog1('R');else h+='<div class="wkg">'+AK.map(function(a){
       var g=rg.filter(function(x){return x.area===a})[0],c=AC[a];
       if(!g)return '<div class="mogc emp" data-act="gpick" data-lv="R" data-a="'+a+'"><span class="mock" style="border-color:'+c+';border-style:dashed"></span><div class="mogb"><div class="mogt" style="color:var(--muted);font-weight:500">Scegli la priorità di '+AREAS[a]+'</div></div></div>';
       return '<div class="mogc" data-act="gpick" data-lv="R" data-a="'+a+'"><button type="button" class="mock'+(g.st==='d'?' dn':g.st==='p'?' pt':'')+'" data-act="cyc-goal" data-id="'+esc(g.id)+'" aria-label="Stato: '+(g.st==='d'?'fatto':'da fare')+'" style="border-color:'+c+';--c:'+c+'"></button><div class="mogb"><div class="mogt">'+esc(g.text)+'</div></div></div>'}).join('')+'</div>';
@@ -1787,8 +1791,8 @@ function moRow(e,showD){
   var ds=showD?parse(e.d).getDate()+' '+MON[+e.d.slice(5,7)-1].slice(0,3)+' · ':'';
   return '<button type="button" class="mdr"'+(e.i?' data-act="edit-item" data-id="'+e.i.id+'"':' data-act="gpick" data-lv="O" data-a="'+e.a+'"')+'><i style="background:'+(AC[e.a]||'var(--muted)')+'"></i><span><b>'+esc(e.t)+'</b><small class="'+w.c.trim()+'">'+ds+esc(w.t)+'</small></span></button>';
 }
-var TBVER='9 nov 2026 · 14:55';
-function mog1(lv){return '<button type="button" class="mog1" data-act="gpick" data-lv="'+lv+'" data-a="L"><span class="m1d"><i style="background:var(--blue)"></i><i style="background:var(--green)"></i><i style="background:var(--red)"></i></span><span class="m1t">Scegli le 3 priorità '+(lv==='O'?'del mese':'dell\'anno')+'</span><u>›</u></button>'}
+var TBVER='9 nov 2026 · 15:30';
+function mog1(lv){return '<button type="button" class="mog1" data-act="gpick" data-lv="'+lv+'" data-a="L"><span class="m1d"><i style="background:var(--blue)"></i><i style="background:var(--green)"></i><i style="background:var(--red)"></i></span><span class="m1t">Scegli le 3 priorità '+(lv==='O'?'del mese':lv==='R'?'della settimana':'dell\'anno')+'</span><u>›</u></button>'}
 function renderMese(){
   var y=st.date.slice(0,4),mo=st.date.slice(5,7),ym=y+'-'+mo,first=ym+'-01',today=isoOf(new Date());
   var ld=parse(first);ld=new Date(ld.getFullYear(),ld.getMonth()+1,0);var lastIso=isoOf(ld);
