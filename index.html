@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-09-0815">
+<meta name="tb-build" content="2026-11-09-0830">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -813,6 +813,19 @@ body.m-plan #overload:empty{display:none}
 /* eventi importati da Google Calendar: sola lettura */
 .blk.ext{background:var(--surface);color:var(--ink);border:0;font-weight:600;padding-left:14px;border-radius:10px;box-shadow:inset 4px 0 0 #9aa3a6,0 1px 3px rgba(0,0,0,.10);cursor:default;opacity:.92}
 .blk.ext .sm{font-weight:400;color:var(--muted)}
+/* riga Area stile Calendario Apple */
+.arow{position:relative;display:flex;align-items:center;gap:14px;background:var(--surface);border-radius:16px;padding:0 16px;min-height:52px;margin:0}
+.arow .aic{width:30px;height:30px;border-radius:8px;background:#8e8e93;display:flex;align-items:center;justify-content:center;flex:none}
+.arow .an{font:500 17px/1.2 var(--body);color:var(--ink)}
+.arow .av{margin-left:auto;display:flex;align-items:center;gap:8px;font:500 17px/1.2 var(--body);color:var(--muted)}
+.arow .ad{width:14px;height:14px;border-radius:50%;background:#c7c7cc;flex:none}
+.arow .ad.L{background:var(--blue)}.arow .ad.F{background:var(--green)}.arow .ad.P{background:var(--red)}
+.arow .achv{color:var(--muted);flex:none;margin-left:-6px}
+.arow select{position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:16px;border:0;background:transparent;cursor:pointer}
+.arow.dis{opacity:.55}
+.sheet label.arow,label.arow{display:flex!important;flex-direction:row!important;align-items:center!important;gap:14px!important;padding:0 16px!important;min-height:52px;text-align:left}
+.arow>span{display:flex!important;align-items:center;text-align:left}
+.arow .an{flex:1 1 auto}.arow .av{flex:none;margin-left:auto}
 /* Oggi: impostazione essenziale */
 .ohead .dvdot{width:14px;height:14px;margin:0 6px 12px 0;align-self:flex-end}
 body.m-oggi .top:not(.blk)>div:first-child,body.m-mese .top:not(.blk)>div:first-child,body.m-sett.w2on .top:not(.blk)>div:first-child{display:none!important}
@@ -1151,7 +1164,9 @@ function frogItem(d){return d.frog&&d.tops[d.frog]&&d.tops[d.frog]!=='empty'?ite
 
 /* ---- render ---- */
 function cbH(s,act,id){return '<button class="cb '+(s||'')+'" data-act="'+act+'" data-id="'+esc(id)+'" aria-label="Stato: '+(s==='d'?'fatto':s==='p'?'parziale':'da fare')+'"></button>'}
-function areaOpts(sel,blank){return (blank?'<option value="">–</option>':'')+AK.map(function(a){return '<option value="'+a+'"'+(sel===a?' selected':'')+'>'+AREAS[a]+'</option>'}).join('')}
+function areaRow(chg,sel,dis){
+  return '<label class="arow'+(dis?' dis':'')+'"><span class="aic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12.2V5.5a2 2 0 0 1 2-2h6.7a2 2 0 0 1 1.4.6l6.8 6.8a2 2 0 0 1 0 2.8l-6.7 6.7a2 2 0 0 1-2.8 0l-6.8-6.8a2 2 0 0 1-.6-1.4z"/><circle cx="8.3" cy="8.3" r="1.3" fill="#fff" stroke="none"/></svg></span><span class="an">Area</span><span class="av"><i class="ad '+(sel||'')+'"></i>'+(sel?AREAS[sel]:'Nessuna')+'</span><svg class="achv" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9.5l5-5 5 5M7 14.5l5 5 5-5"/></svg><select data-chg="'+chg+'" data-f="area"'+(dis?' disabled':'')+' aria-label="Area">'+areaOpts(sel,true)+'</select></label>'}
+function areaOpts(sel,blank){return (blank?'<option value="">Nessuna</option>':'')+AK.map(function(a){return '<option value="'+a+'"'+(sel===a?' selected':'')+'>'+AREAS[a]+'</option>'}).join('')}
 function pr(i){return i.pr||''}
 
 function sameTitle(a,b){return String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase()}
@@ -1755,7 +1770,7 @@ function smista(i,act){
 function itemChips(i){
   var ar=['L','F','P'].map(function(a){return '<button type="button" class="'+(i.area===a?'on':'')+'" data-act="ed-area" data-id="'+i.id+'" data-v="'+a+'">'+AREAS[a]+'</button>'}).join('');
   var pr=['A','B','C','D','E'].map(function(p){return '<button type="button" class="'+(i.pr===p?'on':'')+'" data-act="ed-pr" data-id="'+i.id+'" data-v="'+p+'">'+p+'<small>'+PRW[p]+'</small></button>'}).join('');
-  return '<div class="chips edc">'+ar+'</div><div><div class="chips edc edp">'+pr+'</div><div class="sub" style="padding:6px 4px 0">'+({A:'A · Top priority: va nelle Top 3 della sua area e può diventare la rana.',B:'B · Minore: da fare, ma non va nelle Top 3.',C:'C · Nessuna urgenza: resta in lista.',D:'D · Da delegare: la passi a qualcuno.',E:'E · Da eliminare.'}[i.pr]||'Scegli la priorità. Solo la A va nelle Top 3 della sua area.')+'</div></div>';
+  return areaRow('edit',i.area)+'<div><div class="chips edc edp">'+pr+'</div><div class="sub" style="padding:6px 4px 0">'+({A:'A · Top priority: va nelle Top 3 della sua area e può diventare la rana.',B:'B · Minore: da fare, ma non va nelle Top 3.',C:'C · Nessuna urgenza: resta in lista.',D:'D · Da delegare: la passi a qualcuno.',E:'E · Da eliminare.'}[i.pr]||'Scegli la priorità. Solo la A va nelle Top 3 della sua area.')+'</div></div>';
 }
 function editorHtml(i,sh){
   var routed=i.status!=='open'&&i.status!=='prog'&&i.status!=='top';
@@ -2055,7 +2070,7 @@ function blkHtml(sh,b){
   else if(hit.length)note='Si sovrappone a «'+hit.map(function(x){return x.title}).join('», «')+'»: sarà segnalato in ambra.';
   var starts='';for(var k=0;k<NSLOT;k++)starts+='<option value="'+k+'"'+(+sh.s===k?' selected':'')+'>'+slotLab(k)+'</option>';
   var durs='';for(var n=1;n<=10;n++)durs+='<option value="'+n+'"'+(+sh.n===n?' selected':'')+'>'+hm(n*30)+'</option>';
-  var areaF=it?'':'<label><span class="lbl">Area</span><select data-chg="sheet" data-f="area">'+areaOpts(sh.area,true)+'</select></label>';
+  var areaF=it?'':areaRow('sheet',sh.area);
   return '<div class="sheet-bg" data-act="sheet-bg"><div class="sheet prep bs'+(it?' ed':'')+'" role="dialog" aria-label="Modifica voce dello schedule">'+
     '<input class="bst" data-chg="sheet" data-f="title" placeholder="Titolo" aria-label="Titolo" value="'+esc(sh.title)+'">'+
     '<div class="bsc">'+areaF+'<div class="g"><label><span class="lbl">Data</span><input type="date" data-chg="sheet" data-f="date" value="'+esc(sh.date)+'"></label>'+
@@ -2161,7 +2176,7 @@ function groupHtml(sh){
     '<span class="lbl">Raggruppa '+its.length+' voci</span>'+
     '<div class="sub" style="line-height:1.45">'+its.map(function(x){return esc(x.text)}).join(' · ')+'</div>'+
     '<label><span class="lbl">Nome del gruppo</span><input data-chg="sheet" data-f="name" value="'+esc(sh.name)+'" placeholder="Per esempio: Spesa" autocomplete="off"></label>'+
-    '<div class="g"><label><span class="lbl">Area</span><select data-chg="sheet" data-f="area">'+areaOpts(sh.area,true)+'</select></label>'+
+    '<div class="g">'+areaRow('sheet',sh.area)+''+
     '<label><span class="lbl">Priorità</span><select data-chg="sheet" data-f="pr">'+po+'</select></label></div>'+
     '<div class="sub">Le voci diventano le righe di una lista dentro una sola voce. Priorità e scadenza valgono per tutto il gruppo.</div>'+
     (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':'')+
@@ -3038,7 +3053,7 @@ function renderBf(d){
   document.getElementById('bf').innerHTML=
     '<label><span class="lbl">Da</span><select data-chg="bf" data-f="src">'+src.join('')+'</select></label>'+
     '<label><span class="lbl">Titolo</span><input data-chg="bf" data-f="title" value="'+esc(f.src?(item(f.src)||{}).text||'':f.title)+'"'+(f.src?' disabled':'')+'></label>'+
-    '<label><span class="lbl">Area</span><select data-chg="bf" data-f="area"'+(f.src?' disabled':'')+'>'+areaOpts(f.src?(item(f.src)||{}).area:f.area,true)+'</select></label>'+
+    areaRow('bf',f.src?(item(f.src)||{}).area:f.area,!!f.src)+
     '<label><span class="lbl">Inizio</span><select data-chg="bf" data-f="s">'+starts+'</select></label>'+
     '<label><span class="lbl">Durata</span><select data-chg="bf" data-f="n">'+durs+'</select></label>'+
     '<label><span class="lbl">Tipo</span><select data-chg="bf" data-f="kind"><option value="flex"'+(f.kind==='flex'?' selected':'')+'>Flessibile</option><option value="fixed"'+(f.kind==='fixed'?' selected':'')+'>Fisso</option></select></label>'+
@@ -3400,7 +3415,7 @@ document.addEventListener('change',function(e){
   var f=t.getAttribute('data-f'),id=t.getAttribute('data-id'),d=day(),v=t.value;
   if(c==='date'){if(v)st.date=v}
   else if(c==='hours'){var h=parseFloat(v);if(h>=4&&h<=18)st.hours=h}
-  else if(c==='edit'){var ebk=ui.sheet&&ui.sheet.bid?blkFind(ui.sheet):null,ei=item(ui.sheet&&(ui.sheet.id||(ebk&&ebk.ref)));if(ei){if(f==='text'){if(v.trim())ei.text=v.trim()}else ei[f]=v}return}
+  else if(c==='edit'){var ebk=ui.sheet&&ui.sheet.bid?blkFind(ui.sheet):null,ei=item(ui.sheet&&(ui.sheet.id||(ebk&&ebk.ref)));if(ei){if(f==='text'){if(v.trim())ei.text=v.trim()}else if(f==='area'){ei.area=v;save();render();return}else ei[f]=v}return}
   else if(c==='sheet'){ui.sheet[f]=v;ui.sheet.err='';if(f==='src'){ui.sheet.frog=undefined;ui.sheet.tedit=false}if(f==='title')ui.sheet.tedit=true;if(f==='rep'||f==='rfq')repInit(ui.sheet);if(f==='who'||f==='title'||f==='rcount'||f==='name'||f==='riv'||f==='res')return;if(t.type==='date'){lastDateTs=Date.now();setTimeout(render,350);return}}
   else if(c==='deleg'){var dx=d.deleg.filter(function(x){return x.id===id})[0];if(dx)dx[f]=v}
   else if(c==='rana'){d.rana[f]=v;if(ui.sheet&&ui.sheet.mode==='rana'&&f!=='goal'){save();return}}
@@ -3451,7 +3466,7 @@ function newHtml(sh){
   var src='<option value="">Voce libera</option>'+newCands(sh.date).map(function(i){return '<option value="'+i.id+'"'+(sh.src===i.id?' selected':'')+'>'+esc(i.pr||'?')+' · '+esc(i.text)+'</option>'}).join('');
   var starts='';for(var k=0;k<NSLOT;k++)starts+='<option value="'+k+'"'+(+sh.s===k?' selected':'')+'>'+slotLab(k)+'</option>';
   var durs='';for(var n=1;n<=10;n++)durs+='<option value="'+n+'"'+(+sh.n===n?' selected':'')+'>'+hm(n*30)+'</option>';
-  var areaR=it?'':'<label><span class="lbl">Area</span><select data-chg="sheet" data-f="area">'+areaOpts(sh.area,true)+'</select></label>';
+  var areaR=it?'':areaRow('sheet',sh.area);
   var prR=(it||sh.kind!=='flex'||sh.rep)?'':'<label><span class="lbl">Priorità</span><select data-chg="sheet" data-f="pr"><option value=""'+(!sh.pr?' selected':'')+'>Da classificare</option><option value="A"'+(sh.pr==='A'?' selected':'')+'>A · Top priority</option><option value="B"'+(sh.pr==='B'?' selected':'')+'>B · minore</option><option value="C"'+(sh.pr==='C'?' selected':'')+'>C · nessuna</option></select></label>';
   return '<div class="sheet-bg" data-act="sheet-bg"><div class="sheet prep bs" role="dialog" aria-label="Nuovo blocco">'+
     '<div class="ph" style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Nuovo blocco · '+ddmm(sh.date)+'</div>'+
