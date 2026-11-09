@@ -793,6 +793,7 @@ body.m-voci .top:not(.blk)>div:first-child,body.m-voci .datebox,body.m-voci #sta
 .mdc{display:flex;align-items:center;gap:6px;background:var(--bg);border-radius:7px;padding:3px 6px;font:600 12px/1.25 var(--body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .mdc i{width:7px;height:7px;border-radius:50%;flex:none}.mdc.late{background:color-mix(in srgb,var(--red) 14%,var(--surface));color:var(--red)}.mdc.dn{color:var(--muted);text-decoration:line-through}
 .mo.momac{max-width:1200px}.mo.momac .mog{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.mo.momac .w2m{max-width:620px}
+@media screen{.cb{border-radius:50%!important}.cb.p,.blk.top .cb.p,.wcb.top .cb.p{background:transparent!important}.mock.pt{background:transparent!important}.cb.d::before{line-height:normal!important;display:flex;align-items:center;justify-content:center}}
 .mdm{font:600 11px/1 var(--body);color:var(--muted);padding-left:4px}
 .modl .row{display:flex;align-items:center;gap:10px;min-height:38px;font:400 15px/1.3 var(--body)}
 .modl .row+.row{border-top:1px solid var(--soft2)}
@@ -1172,7 +1173,7 @@ function day(d){d=d||st.date;if(!st.days[d])st.days[d]=newDay();return st.days[d
 function item(id){for(var i=0;i<st.dump.length;i++)if(st.dump[i].id===id)return st.dump[i];return null}
 function nextPr(letter){return letter}
 function nextPrOld(letter){var used={};st.dump.forEach(function(x){used[x.pr]=1});for(var n=1;n<30;n++)if(!used[letter+n])return letter+n;return letter+'1'}
-function cyc(s){return s===''?'p':s==='p'?'d':''}
+function cyc(s){return s==='d'?'':'d'}
 
 /* ---- orario ---- */
 function overlap(a,b){return a.s<b.s+b.n-1e-6&&b.s<a.s+a.n-1e-6}
@@ -1217,7 +1218,7 @@ function stats(d){
 function frogItem(d){return d.frog&&d.tops[d.frog]&&d.tops[d.frog]!=='empty'?item(d.tops[d.frog]):null}
 
 /* ---- render ---- */
-function cbH(s,act,id){return '<button class="cb '+(s||'')+'" data-act="'+act+'" data-id="'+esc(id)+'" aria-label="Stato: '+(s==='d'?'fatto':s==='p'?'parziale':'da fare')+'"></button>'}
+function cbH(s,act,id){return '<button class="cb '+(s||'')+'" data-act="'+act+'" data-id="'+esc(id)+'" aria-label="Stato: '+(s==='d'?'fatto':'da fare')+'"></button>'}
 function areaRow(chg,sel,dis){
   return '<label class="arow'+(dis?' dis':'')+'"><span class="an">Area</span><span class="av"><i class="ad '+(sel||'')+'"></i>'+(sel?AREAS[sel]:'Nessuna')+'</span><svg class="achv" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9.5l5-5 5 5M7 14.5l5 5 5-5"/></svg><select data-chg="'+chg+'" data-f="area"'+(dis?' disabled':'')+' aria-label="Area">'+areaOpts(sel,true)+'</select></label>'}
 function selRow(label,chg,f,opts,val,dis){
@@ -1648,7 +1649,7 @@ function wkCols(m){
       var cls='wcb '+(b.kind==='fixed'?'fixed ':isTop?'top ':'')+((it&&b.kind!=='fixed'?it.area:b.area)||'')+(dn?' dn':'')+(cl[b.id]?' clash':'');
       var sty='top:'+(b.s*RH+1)+'px;height:'+(b.n*RH-2)+'px;left:calc('+(L.c*100/L.n)+'% + 1px);width:calc('+(100*(L.span||1)/L.n)+'% - 2px)';
       var hc=b.kind!=='fixed';
-      return '<div role="button" tabindex="0" class="'+cls+(hc?' hascb':'')+'" style="'+sty+'" data-act="wk-view" data-d="'+x+'" data-id="'+b.id+'" aria-label="Apri '+esc(b.title)+'">'+(hc?'<button class="cb '+(bst(b)||'')+'" data-act="wk-cyc" data-d="'+x+'" data-id="'+esc(b.id)+'" aria-label="Stato: '+(bst(b)==='d'?'fatto':bst(b)==='p'?'parziale':'da fare')+'"></button>':'')+(fi&&b.ref===fi.id?'<span class="fr2">'+FROG+'</span>':'')+'<span class="tt">'+(cl[b.id]?'! ':'')+(b.rid?'↻ ':'')+esc(b.title)+'</span>'+(b.n>=2?'<span class="tm">'+slotLab(b.s)+'–'+slotLab(b.s+b.n)+'</span>':'')+'<span class="rz" aria-hidden="true"></span></div>'}).join('')+
+      return '<div role="button" tabindex="0" class="'+cls+(hc?' hascb':'')+'" style="'+sty+'" data-act="wk-view" data-d="'+x+'" data-id="'+b.id+'" aria-label="Apri '+esc(b.title)+'">'+(hc?'<button class="cb '+(bst(b)||'')+'" data-act="wk-cyc" data-d="'+x+'" data-id="'+esc(b.id)+'" aria-label="Stato: '+(bst(b)==='d'?'fatto':'da fare')+'"></button>':'')+(fi&&b.ref===fi.id?'<span class="fr2">'+FROG+'</span>':'')+'<span class="tt">'+(cl[b.id]?'! ':'')+(b.rid?'↻ ':'')+esc(b.title)+'</span>'+(b.n>=2?'<span class="tm">'+slotLab(b.s)+'–'+slotLab(b.s+b.n)+'</span>':'')+'<span class="rz" aria-hidden="true"></span></div>'}).join('')+
       (x===today&&tm>=S0&&tm<=S0+NSLOT*30?'<div class="wcn" style="top:'+((tm-S0)/30*RH)+'px"></div>':'')+'</div>'});
   return h+'</div>';
 }
@@ -1674,7 +1675,7 @@ function renderSettNew(){
     h+='<div class="wkg">'+AK.map(function(a){
       var g=rg.filter(function(x){return x.area===a})[0],c=AC[a];
       if(!g)return '<div class="mogc emp" data-act="gpick" data-lv="R" data-a="'+a+'"><span class="mock" style="border-color:'+c+';border-style:dashed"></span><div class="mogb"><div class="mogt" style="color:var(--muted);font-weight:500">Scegli la priorità di '+AREAS[a]+'</div></div></div>';
-      return '<div class="mogc" data-act="gpick" data-lv="R" data-a="'+a+'"><button type="button" class="mock'+(g.st==='d'?' dn':g.st==='p'?' pt':'')+'" data-act="cyc-goal" data-id="'+esc(g.id)+'" aria-label="Stato: '+(g.st==='d'?'fatto':g.st==='p'?'parziale':'da fare')+'" style="border-color:'+c+';--c:'+c+'"></button><div class="mogb"><div class="mogt">'+esc(g.text)+'</div></div></div>'}).join('')+'</div>';
+      return '<div class="mogc" data-act="gpick" data-lv="R" data-a="'+a+'"><button type="button" class="mock'+(g.st==='d'?' dn':g.st==='p'?' pt':'')+'" data-act="cyc-goal" data-id="'+esc(g.id)+'" aria-label="Stato: '+(g.st==='d'?'fatto':'da fare')+'" style="border-color:'+c+';--c:'+c+'"></button><div class="mogb"><div class="mogt">'+esc(g.text)+'</div></div></div>'}).join('')+'</div>';
   })();
   if(wide)h+='<div class="wseg" role="group" aria-label="Vista"><button type="button" data-act="wkv" data-v="list" class="'+(cols?'':'on')+'">Elenco</button><button type="button" data-act="wkv" data-v="cols" class="'+(cols?'on':'')+'">Colonne</button></div>';
   var info={};
@@ -1783,7 +1784,7 @@ function renderMese(){
     var g=og.filter(function(x){return x.area===a})[0],c=AC[a];
     if(!g)return '<div class="mogc emp" data-act="gpick" data-lv="O" data-a="'+a+'"><span class="mock" style="border-color:'+c+';border-style:dashed"></span><div class="mogb"><div class="mogt" style="color:var(--muted);font-weight:500">Scegli l\'obiettivo di '+AREAS[a]+'</div></div></div>';
     var seg=weeks.map(function(w){var r=goalsFor('R',w).filter(function(x){return x.up===g.id});var dn=r.some(function(x){return x.st==='d'}),pp=r.some(function(x){return x.st==='p'});return '<i style="'+(dn?'background:'+c:pp?'background:'+c+';opacity:.45':'')+'"></i>'}).join('');
-    return '<div class="mogc" data-act="gpick" data-lv="O" data-a="'+a+'"><button type="button" class="mock'+(g.st==='d'?' dn':g.st==='p'?' pt':'')+'" data-act="cyc-goal" data-id="'+esc(g.id)+'" aria-label="Stato: '+(g.st==='d'?'fatto':g.st==='p'?'parziale':'da fare')+'" style="border-color:'+c+';--c:'+c+'"></button><div class="mogb"><div class="mogt">'+esc(g.text)+'</div>'+(g.measure?'<div class="mogm">'+esc(g.measure)+'</div>':'')+'<div class="mogf"><span class="moga" style="color:'+c+'">'+AREAS[a]+(g.frog?'<b class="mofr" style="background:'+c+'">Rana</b>':'')+'</span><span class="mowk">'+seg+'</span>'+(g.due?'<span class="mogd">entro '+dsh(g.due)+'</span>':'')+'</div></div></div>'}).join('')+'</div>';
+    return '<div class="mogc" data-act="gpick" data-lv="O" data-a="'+a+'"><button type="button" class="mock'+(g.st==='d'?' dn':g.st==='p'?' pt':'')+'" data-act="cyc-goal" data-id="'+esc(g.id)+'" aria-label="Stato: '+(g.st==='d'?'fatto':'da fare')+'" style="border-color:'+c+';--c:'+c+'"></button><div class="mogb"><div class="mogt">'+esc(g.text)+'</div>'+(g.measure?'<div class="mogm">'+esc(g.measure)+'</div>':'')+'<div class="mogf"><span class="moga" style="color:'+c+'">'+AREAS[a]+(g.frog?'<b class="mofr" style="background:'+c+'">Rana</b>':'')+'</span><span class="mowk">'+seg+'</span>'+(g.due?'<span class="mogd">entro '+dsh(g.due)+'</span>':'')+'</div></div></div>'}).join('')+'</div>';
   var dm={};
   var add=function(x,a){if(!x||x.slice(0,7)!==ym&&true){}(dm[x]=dm[x]||[]);var k=a||'';if(dm[x].indexOf(k)<0)dm[x].push(k)};
   allDue.forEach(function(i){if(i.st!=='d')add(i.due,i.area)});
@@ -1825,7 +1826,7 @@ function renderAnno(){
     var g=tg.filter(function(x){return x.area===a})[0],c=AC[a];
     if(!g)return '<div class="mogc emp" data-act="gpick" data-lv="T" data-a="'+a+'"><span class="mock" style="border-color:'+c+';border-style:dashed"></span><div class="mogb"><div class="mogt" style="color:var(--muted);font-weight:500">Scegli l\'obiettivo di '+AREAS[a]+'</div></div></div>';
     var seg='';for(var m=1;m<=12;m++){var os=mOf(m).filter(function(o){return o.up===g.id});var dn=os.some(function(o){return o.st==='d'}),pp=os.some(function(o){return o.st==='p'});seg+='<i style="'+(dn?'background:'+c:pp?'background:'+c+';opacity:.45':'')+'"></i>'}
-    return '<div class="mogc" data-act="gpick" data-lv="T" data-a="'+a+'"><button type="button" class="mock'+(g.st==='d'?' dn':g.st==='p'?' pt':'')+'" data-act="cyc-goal" data-id="'+esc(g.id)+'" aria-label="Stato: '+(g.st==='d'?'fatto':g.st==='p'?'parziale':'da fare')+'" style="border-color:'+c+';--c:'+c+'"></button><div class="mogb"><div class="mogt">'+esc(g.text)+'</div>'+(g.measure?'<div class="mogm">'+esc(g.measure)+'</div>':'')+'<div class="mogf"><span class="moga" style="color:'+c+'">'+AREAS[a]+(g.frog?'<b class="mofr" style="background:'+c+'">Rana</b>':'')+'</span><span class="mowk">'+seg+'</span>'+(g.due?'<span class="mogd">'+(g.st==='d'?'':'entro ')+dsh(g.due)+'</span>':'')+'</div></div></div>'}).join('')+'</div>';
+    return '<div class="mogc" data-act="gpick" data-lv="T" data-a="'+a+'"><button type="button" class="mock'+(g.st==='d'?' dn':g.st==='p'?' pt':'')+'" data-act="cyc-goal" data-id="'+esc(g.id)+'" aria-label="Stato: '+(g.st==='d'?'fatto':'da fare')+'" style="border-color:'+c+';--c:'+c+'"></button><div class="mogb"><div class="mogt">'+esc(g.text)+'</div>'+(g.measure?'<div class="mogm">'+esc(g.measure)+'</div>':'')+'<div class="mogf"><span class="moga" style="color:'+c+'">'+AREAS[a]+(g.frog?'<b class="mofr" style="background:'+c+'">Rana</b>':'')+'</span><span class="mowk">'+seg+'</span>'+(g.due?'<span class="mogd">'+(g.st==='d'?'':'entro ')+dsh(g.due)+'</span>':'')+'</div></div></div>'}).join('')+'</div>';
   h+='<div class="ant">';
   for(var m=1;m<=12;m++){
     var cur=y===ty&&m===tm,fut=y>ty||(y===ty&&m>tm),os=mOf(m);
