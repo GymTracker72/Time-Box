@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-09-0840">
+<meta name="tb-build" content="2026-11-09-0930">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -826,6 +826,23 @@ body.m-plan #overload:empty{display:none}
 .sheet label.arow,label.arow{display:flex!important;flex-direction:row!important;align-items:center!important;gap:14px!important;padding:0 16px!important;min-height:52px;text-align:left}
 .arow>span{display:flex!important;align-items:center;text-align:left}
 .arow .an{flex:1 1 auto}.arow .av{flex:none;margin-left:auto}
+/* Top vuote: ovale con testo grigio chiarissimo, distinte dalle Top inserite */
+.o3e .o3t,#tops .o3e .o3t,.q3e .q3t{flex:0 1 auto!important;display:inline-block;padding:5px 14px;border-radius:999px;background:rgba(31,42,40,.05);color:rgba(31,42,40,.34)!important;font-weight:500!important;font-size:15px!important}
+.o3e .o3m{color:rgba(31,42,40,.34)}
+#tops .o3e .o3b{width:100%}#tops .o3e .o3a{margin-left:auto;order:2}
+.q3e .q3t{align-self:flex-start;margin-right:auto}
+/* Scheda blocco in stile Jobs: Salva in alto, righe raggruppate */
+.shd{position:sticky;top:-16px;z-index:3;background:var(--surface);margin:-16px -16px 0;padding:16px 16px 10px;display:flex;align-items:center;justify-content:space-between;min-height:44px}
+.shd .sht{font:600 17px/1.2 var(--body);color:var(--ink)}
+.shd .shl{background:none;border:0;padding:6px 2px;font:500 17px/1.2 var(--body);color:var(--blue);cursor:pointer}
+.shd .shs{background:var(--ink);color:#fff;border:0;border-radius:999px;height:36px;padding:0 20px;font:700 16px/1 var(--body);cursor:pointer}
+.arows,.arow.dang,.shd{flex:none}
+.arows{background:var(--surface);border-radius:16px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--soft)}
+.arows .arow{border-radius:0;background:transparent;margin:0}
+.arows .arow+.arow,.arows .arow+.alx{border-top:1px solid var(--soft)}
+button.arow{width:100%;border:0;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.arow.dang{justify-content:center;color:var(--red);font:600 17px/1.2 var(--body);border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--soft)}
+.arows .alx{padding:10px 16px 14px;border-top:1px solid var(--soft)}
 /* Oggi: impostazione essenziale */
 .ohead .dvdot{width:14px;height:14px;margin:0 6px 12px 0;align-self:flex-end}
 body.m-oggi .top:not(.blk)>div:first-child,body.m-mese .top:not(.blk)>div:first-child,body.m-sett.w2on .top:not(.blk)>div:first-child{display:none!important}
@@ -1166,6 +1183,11 @@ function frogItem(d){return d.frog&&d.tops[d.frog]&&d.tops[d.frog]!=='empty'?ite
 function cbH(s,act,id){return '<button class="cb '+(s||'')+'" data-act="'+act+'" data-id="'+esc(id)+'" aria-label="Stato: '+(s==='d'?'fatto':s==='p'?'parziale':'da fare')+'"></button>'}
 function areaRow(chg,sel,dis){
   return '<label class="arow'+(dis?' dis':'')+'"><span class="aic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12.2V5.5a2 2 0 0 1 2-2h6.7a2 2 0 0 1 1.4.6l6.8 6.8a2 2 0 0 1 0 2.8l-6.7 6.7a2 2 0 0 1-2.8 0l-6.8-6.8a2 2 0 0 1-.6-1.4z"/><circle cx="8.3" cy="8.3" r="1.3" fill="#fff" stroke="none"/></svg></span><span class="an">Area</span><span class="av"><i class="ad '+(sel||'')+'"></i>'+(sel?AREAS[sel]:'Nessuna')+'</span><svg class="achv" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9.5l5-5 5 5M7 14.5l5 5 5-5"/></svg><select data-chg="'+chg+'" data-f="area"'+(dis?' disabled':'')+' aria-label="Area">'+areaOpts(sel,true)+'</select></label>'}
+function selRow(label,chg,f,opts,val,dis){
+  return '<label class="arow'+(dis?' dis':'')+'"><span class="an">'+label+'</span><span class="av">'+val+'</span><svg class="achv" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9.5l5-5 5 5M7 14.5l5 5 5-5"/></svg><select data-chg="'+chg+'" data-f="'+f+'"'+(dis?' disabled':'')+' aria-label="'+label+'">'+opts+'</select></label>'}
+function priRow(i){
+  var o='<option value="">Da classificare</option>'+['A','B','C','D','E'].map(function(p){return '<option value="'+p+'"'+(i.pr===p?' selected':'')+'>'+p+' · '+({A:'Top priority',B:'Minore',C:'Nessuna urgenza',D:'Da delegare',E:'Da eliminare'}[p])+'</option>'}).join('');
+  return selRow('Priorità','edit','pr',o,i.pr?i.pr+' · '+({A:'Top',B:'minore',C:'nessuna urgenza',D:'delega',E:'elimina'}[i.pr]):'Da classificare')}
 function areaOpts(sel,blank){return (blank?'<option value="">Nessuna</option>':'')+AK.map(function(a){return '<option value="'+a+'"'+(sel===a?' selected':'')+'>'+AREAS[a]+'</option>'}).join('')}
 function pr(i){return i.pr||''}
 
@@ -1768,9 +1790,7 @@ function smista(i,act){
   return '';
 }
 function itemChips(i){
-  var ar=['L','F','P'].map(function(a){return '<button type="button" class="'+(i.area===a?'on':'')+'" data-act="ed-area" data-id="'+i.id+'" data-v="'+a+'">'+AREAS[a]+'</button>'}).join('');
-  var pr=['A','B','C','D','E'].map(function(p){return '<button type="button" class="'+(i.pr===p?'on':'')+'" data-act="ed-pr" data-id="'+i.id+'" data-v="'+p+'">'+p+'<small>'+PRW[p]+'</small></button>'}).join('');
-  return areaRow('edit',i.area)+'<div><div class="chips edc edp">'+pr+'</div><div class="sub" style="padding:6px 4px 0">'+({A:'A · Top priority: va nelle Top 3 della sua area e può diventare la rana.',B:'B · Minore: da fare, ma non va nelle Top 3.',C:'C · Nessuna urgenza: resta in lista.',D:'D · Da delegare: la passi a qualcuno.',E:'E · Da eliminare.'}[i.pr]||'Scegli la priorità. Solo la A va nelle Top 3 della sua area.')+'</div></div>';
+  return '<div class="arows">'+areaRow('edit',i.area)+priRow(i)+'</div>';
 }
 function editorHtml(i,sh){
   var routed=i.status!=='open'&&i.status!=='prog'&&i.status!=='top';
@@ -2072,8 +2092,10 @@ function blkHtml(sh,b){
   var durs='';for(var n=1;n<=10;n++)durs+='<option value="'+n+'"'+(+sh.n===n?' selected':'')+'>'+hm(n*30)+'</option>';
   var areaF=it?'':areaRow('sheet',sh.area);
   return '<div class="sheet-bg" data-act="sheet-bg"><div class="sheet prep bs'+(it?' ed':'')+'" role="dialog" aria-label="Modifica voce dello schedule">'+
+    '<div class="shd"><button type="button" class="shl" data-act="sheet-close">Annulla</button><span class="sht">Modifica</span><button type="button" class="shs" data-act="sheet-ok">Salva</button></div>'+
     '<input class="bst" data-chg="sheet" data-f="title" placeholder="Titolo" aria-label="Titolo" value="'+esc(sh.title)+'">'+
-    '<div class="bsc">'+areaF+'<div class="g"><label><span class="lbl">Data</span><input type="date" data-chg="sheet" data-f="date" value="'+esc(sh.date)+'"></label>'+
+    (areaF?'<div class="arows">'+areaF+'</div>':'')+
+    '<div class="bsc"><div class="g"><label><span class="lbl">Data</span><input type="date" data-chg="sheet" data-f="date" value="'+esc(sh.date)+'"></label>'+
     '<label><span class="lbl">Inizio</span><select data-chg="sheet" data-f="s">'+starts+'</select></label>'+
     '<label><span class="lbl">Durata</span><select data-chg="sheet" data-f="n">'+durs+'</select></label>'+
     '<label><span class="lbl">Tipo</span><select data-chg="sheet" data-f="kind"><option value="flex"'+(sh.kind==='flex'?' selected':'')+'>Flessibile</option><option value="fixed"'+(sh.kind==='fixed'?' selected':'')+'>Fisso</option></select></label></div>'+repHtml(sh)+'</div>'+
@@ -2081,7 +2103,7 @@ function blkHtml(sh,b){
     (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+
     (it?itemChips(it)+(it.sub?subHtml(it,''):subBtn(it))+'<div class="bsc bsl">'+frogRow(sh,it,sh.from)+'<label><span class="lbl">Scadenza</span><span style="display:flex;align-items:center;gap:8px"><input type="date" data-chg="edit" data-f="due" value="'+esc(it.due)+'">'+(it.due?'<button class="mini" data-act="ed-clear-due" data-id="'+it.id+'" type="button">Togli</button>':'')+'</span></label></div>':'')+
     notesHtml(noteOwner(sh))+
-    '<button class="btn" data-act="sheet-ok" type="button">Salva</button><div class="bsf"><button class="mini" data-act="sheet-close" type="button">Annulla</button><button class="mini" data-act="blk-copy" type="button">Copia</button><button class="mini red" data-act="blk-del" type="button">Togli dal piano</button>'+(it?(sh.confirm?'<button class="mini red" data-act="ed-del2" data-id="'+it.id+'" type="button">Conferma: cancella</button>':'<button class="mini red" data-act="ed-del" data-id="'+it.id+'" type="button">Elimina voce</button>'):'')+'</div></div></div>';
+    '<button type="button" class="arow dang" data-act="blk-del">Togli dal piano</button><div class="bsf" style="justify-content:center"><button class="mini" data-act="blk-copy" type="button">Copia</button>'+(it?(sh.confirm?'<button class="mini red" data-act="ed-del2" data-id="'+it.id+'" type="button">Conferma: cancella</button>':'<button class="mini red" data-act="ed-del" data-id="'+it.id+'" type="button">Elimina voce</button>'):'')+'</div></div></div>';
 }
 function blkDelScope(v){
   var sh=ui.sheet,b=sh&&blkFind(sh);if(!b){ui.sheet=null;return}
@@ -3379,6 +3401,7 @@ document.addEventListener('click',function(e){
     case 'cal-del0':cs.del=false;calShow();return;
     case 'cal-del2':calDelete();return;
     case 'cal-def':var ck=t.getAttribute('data-k'),cc=calCfg();if(!st.cal)st.cal={};st.cal.fx=cc.fx.slice();st.cal.pl=cc.pl.slice();if(ck==='fx'||ck==='pl')st.cal[ck]=alToggle(st.cal[ck],+t.getAttribute('data-m'));break;
+    case 'al-open':if(ui.sheet)ui.sheet.alOpen=!ui.sheet.alOpen;break;
     case 'al-tog':if(ui.sheet){var cur2=Array.isArray(ui.sheet.al)?ui.sheet.al:(ui.sheet.kind==='fixed'?calCfg().fx:calCfg().pl);ui.sheet.al=alToggle(cur2,+t.getAttribute('data-m'))}break;
     case 'al-def':if(ui.sheet)delete ui.sheet.al;break;
     case 'al-none':if(ui.sheet)ui.sheet.al=[];break;
@@ -3415,7 +3438,7 @@ document.addEventListener('change',function(e){
   var f=t.getAttribute('data-f'),id=t.getAttribute('data-id'),d=day(),v=t.value;
   if(c==='date'){if(v)st.date=v}
   else if(c==='hours'){var h=parseFloat(v);if(h>=4&&h<=18)st.hours=h}
-  else if(c==='edit'){var ebk=ui.sheet&&ui.sheet.bid?blkFind(ui.sheet):null,ei=item(ui.sheet&&(ui.sheet.id||(ebk&&ebk.ref)));if(ei){if(f==='text'){if(v.trim())ei.text=v.trim()}else if(f==='area'){ei.area=v;if(ei.pr==='A'&&ei.area)autoTop(ei);save();render();return}else ei[f]=v}return}
+  else if(c==='edit'){var ebk=ui.sheet&&ui.sheet.bid?blkFind(ui.sheet):null,ei=item(ui.sheet&&(ui.sheet.id||(ebk&&ebk.ref)));if(ei){if(f==='text'){if(v.trim())ei.text=v.trim()}else if(f==='area'){ei.area=v;if(ei.pr==='A'&&ei.area)autoTop(ei);save();render();return}else if(f==='pr'){ei.pr=v;if(v==='D'&&(ei.status==='open'||ei.status==='prog'))ui.sheet=openDeleg(ei);if(v==='A'&&ei.area)autoTop(ei);save();render();return}else ei[f]=v}return}
   else if(c==='sheet'){ui.sheet[f]=v;ui.sheet.err='';if(f==='src'){ui.sheet.frog=undefined;ui.sheet.tedit=false}if(f==='title')ui.sheet.tedit=true;if(f==='rep'||f==='rfq')repInit(ui.sheet);if(f==='who'||f==='title'||f==='rcount'||f==='name'||f==='riv'||f==='res')return;if(t.type==='date'){lastDateTs=Date.now();setTimeout(render,350);return}}
   else if(c==='deleg'){var dx=d.deleg.filter(function(x){return x.id===id})[0];if(dx)dx[f]=v}
   else if(c==='rana'){d.rana[f]=v;if(ui.sheet&&ui.sheet.mode==='rana'&&f!=='goal'){save();return}}
@@ -3914,12 +3937,15 @@ function impHtml(){
   else if(ex.msg)h+='<div class="eg" style="color:var(--amber)">'+esc(ex.msg)+'</div>';
   return h}
 function alHtml(sh){
-  if(!GDon())return '';var c=calCfg(),def=!Array.isArray(sh.al),cur=def?(sh.kind==='fixed'?c.fx:c.pl):sh.al;
-  return '<div class="al"><span class="lbl">Avvisi (Google Calendar)</span><div class="alrow">'+
+  if(!GDon())return '';var c=calCfg(),def=!Array.isArray(sh.al),cur=def?(sh.kind==='fixed'?c.fx:c.pl):sh.al,op=!!sh.alOpen;
+  var sum=def?'Predefiniti':(cur.length?cur.map(alLab).join(', '):'Nessuno');
+  var head='<button type="button" class="arow" data-act="al-open" aria-expanded="'+op+'"><span class="an">Avvisi</span><span class="av">'+esc(sum)+'</span><svg class="achv" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+(op?'M7 14.5l5-5 5 5':'M9.5 7l5 5-5 5')+'"/></svg></button>';
+  if(!op)return '<div class="arows al">'+head+'</div>';
+  return '<div class="arows al">'+head+'<div class="alx"><div class="alrow">'+
     '<button type="button" class="alc'+(def?' on':'')+'" data-act="al-def" aria-pressed="'+def+'">Predefiniti</button>'+
     '<button type="button" class="alc'+(!def&&!cur.length?' on':'')+'" data-act="al-none" aria-pressed="'+(!def&&!cur.length)+'">Nessuno</button>'+
     ALV.map(function(m){var o=cur.indexOf(m)>=0;return '<button type="button" class="alc'+(o&&!def?' on':'')+(o&&def?' dim':'')+'" data-act="al-tog" data-m="'+m+'" aria-pressed="'+(o&&!def)+'">'+alLab(m)+'</button>'}).join('')+'</div>'+
-    (calOn()?'':'<div class="sub">Partono quando colleghi Google Calendar, in fondo alla pagina.</div>')+'</div>'}
+    (calOn()?'':'<div class="sub">Partono quando colleghi Google Calendar, in fondo alla pagina.</div>')+'</div></div>'}
 async function dvFolder(){
   if(dv.folder)return dv.folder;
   var r=dvFiles(await dvCall('search_files',{query:"title = 'Timebox' and mimeType = 'application/vnd.google-apps.folder' and owner = 'me'",excludeContentSnippets:true,pageSize:5}));
