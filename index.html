@@ -237,7 +237,7 @@ textarea{width:100%;min-height:110px;border:1px solid var(--line);background:var
 .btn{background:var(--ink);color:var(--surface);border:0;padding:7px 14px;font-weight:600}
 .btn[disabled]{opacity:.35;cursor:not-allowed}
 #daybar{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;gap:10px;align-items:center;justify-content:center;padding:calc(6px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 6px max(12px,env(safe-area-inset-left,0px));background:var(--surface);border-bottom:1.2px solid var(--line);transform:translateY(-120%);transition:transform .15s;pointer-events:none}#daybar.on{transform:none;pointer-events:auto}#daybar b{font:700 15px var(--body);min-width:130px;text-align:center}#daybar b.today{color:var(--red)}
-.tabs{display:flex;gap:0}.tabs button{border:1.2px solid var(--line);background:transparent;padding:7px 18px;font-weight:600}.tabs button+button{border-left:0}.tabs button.on{background:var(--ink);color:var(--surface)}
+.tabs{display:flex;gap:0}@media (min-width:701px){.tabs{display:inline-flex;gap:2px;padding:4px;border-radius:999px;background:color-mix(in srgb,var(--ink) 7%,transparent);align-self:flex-start;width:max-content}}.tabs button{border:0;border-radius:999px;background:transparent;padding:8px 20px;font-weight:500;color:var(--muted);cursor:pointer;transition:background .15s,color .15s}.tabs button:hover{color:var(--ink)}.tabs button.on{background:var(--surface);color:var(--ink);font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,.12),0 0 0 .5px color-mix(in srgb,var(--ink) 10%,transparent)}
 .big{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.big:last-child{border-bottom:0}.big .cb{width:24px;height:24px;margin-top:2px}.big .tx{font-size:17px;font-weight:500}
 .otop{display:flex;gap:2px;align-items:center;background:var(--surface);border-radius:16px;padding:4px 6px}
 .otop>button,.otop>.oempty{flex:1;min-width:0;display:flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--ink);padding:0 4px;min-height:44px;font:500 12.5px/1.1 var(--body);text-align:left}
@@ -1845,7 +1845,7 @@ function scheduleItem(i,date,s,n,kind,repl){
   var d=day(date),hit=d.blocks.filter(function(b){return b.ref!==i.id&&overlap(b,{s:s,n:n})});
   if(i.pr==='A'){
     if(!i.area)return 'Scegli prima l\'area della voce.';
-    var cu=d.tops[i.area];if(cu&&cu!=='empty'&&cu!==i.id&&!repl){var oc=item(cu);return 'Il '+ddmm(date)+' la Top '+AREAS[i.area]+' è «'+(oc?oc.text:'un\'altra voce')+'». Attiva «Imposta come rana» per sostituirla.'}
+    var cu=d.tops[i.area];if(cu&&cu!=='empty'&&cu!==i.id&&!repl){var oc=item(cu);return 'Il '+ddmm(date)+' la Top '+AREAS[i.area]+' è «'+(oc?oc.text:'un\'altra voce')+'». Attiva «Rana di oggi» per sostituirla.'}
   }
   var wasFrog=!!(i.area&&d.frog===i.area&&d.tops[i.area]===i.id);
   removeEverywhere(i.id);
@@ -2280,7 +2280,7 @@ function renderSheet(){
 }
 function topNote(i,sh){
   var dz=st.days[sh.date],cu=dz&&i.area&&dz.tops[i.area],ot=cu&&cu!=='empty'&&cu!==i.id?item(cu):null,ar=i.area?AREAS[i.area]:'';
-  if(ot)return sh.frog===true?'Diventa la Top '+ar+' di quel giorno al posto di «'+ot.text+'».':'La Top '+ar+' di quel giorno è «'+ot.text+'»: attiva «Imposta come rana» per sostituirla.';
+  if(ot)return sh.frog===true?'Diventa la Top '+ar+' di quel giorno al posto di «'+ot.text+'».':'La Top '+ar+' di quel giorno è «'+ot.text+'»: attiva «Rana di oggi» per sostituirla.';
   return 'Diventa la Top '+ar+' di quel giorno.';
 }
 function isTopOn(it,date){var d=st.days[date];return !!(d&&it&&it.area&&d.tops[it.area]===it.id)}
@@ -2292,6 +2292,13 @@ function frogRow(sh,i,date){
   if(!i||i.pr!=='A'||!i.area)return '';
   var on=frogOn(sh,i,date),dz=st.days[date],cu=dz&&dz.tops[i.area],ot=cu&&cu!=='empty'&&cu!==i.id?item(cu):null,warn=ot&&(sh.frog===true)?'<div class="sub" style="padding:0 0 8px">Prende il posto di «'+esc(ot.text)+'» come Top '+AREAS[i.area]+' di quel giorno.</div>':'';
   return '<button type="button" class="bsr frg'+(on?' on':'')+'" data-act="sheet-frog" aria-pressed="'+on+'"><span style="display:flex;align-items:center;gap:8px">'+FROG+'Rana di oggi</span><i class="sw'+(on?' on':'')+'"></i></button>'+warn;
+}
+function frogNew(sh,it){
+  if(!it&&(sh.kind!=='flex'||sh.rep))return '';
+  var on=it?frogOn(sh,it,sh.date):sh.frog===true,ar=it?it.area:sh.area;
+  var dz=st.days[sh.date],cu=dz&&ar&&dz.tops[ar],ot=cu&&cu!=='empty'&&(!it||cu!==it.id)?item(cu):null;
+  var warn=on&&!ar?'<div class="sub" style="padding:0 0 8px">Scegli l\'area: la rana diventa la Top di quell\'area.</div>':on&&ot?'<div class="sub" style="padding:0 0 8px">Prende il posto di «'+esc(ot.text)+'» come Top '+AREAS[ar]+' di quel giorno.</div>':'';
+  return '<div class="bsc bsl"><button type="button" class="bsr frg'+(on?' on':'')+'" data-act="sheet-frog" aria-pressed="'+on+'"><span style="display:flex;align-items:center;gap:8px">'+FROG+'Rana di oggi</span><i class="sw'+(on?' on':'')+'"></i></button>'+warn+'</div>';
 }
 function frogBtn(sh,i,date){
   if(!i||i.pr!=='A'||!i.area)return '';
@@ -3355,7 +3362,8 @@ document.addEventListener('click',function(e){
     case 'rep-wd':if(ui.sheet){var rw=ui.sheet.rwd||[],wv=+t.getAttribute('data-d'),wi=rw.indexOf(wv);if(wi>=0){if(rw.length>1)rw.splice(wi,1)}else rw.push(wv);ui.sheet.rwd=rw}break;
     case 'blk-scope':if(ui.sheet&&ui.sheet.mode==='blk'){var scv=t.getAttribute('data-v'),sak=ui.sheet.ask;ui.sheet.ask='';if(scv!=='back'){if(sak==='del')blkDelScope(scv);else blkOk(scv)}}break;
     case 'sheet-frog':if(ui.sheet){var shf=ui.sheet,fit=shf.mode==='blk'?(function(){var fb=blkFind(shf);return fb&&fb.ref?item(fb.ref):null})():(shf.mode==='new'?(shf.src?item(shf.src):null):item(shf.id));
-      if(fit){var fdt=shf.mode==='blk'?shf.from:shf.date;shf.frog=!frogOn(shf,fit,fdt);if(isTopOn(fit,fdt))applyFrog(shf,fit,fdt)}}break;
+      if(fit){var fdt=shf.mode==='blk'?shf.from:shf.date;shf.frog=!frogOn(shf,fit,fdt);if(shf.mode!=='new'&&isTopOn(fit,fdt))applyFrog(shf,fit,fdt)}
+      else if(shf.mode==='new'){shf.frog=shf.frog!==true;if(shf.frog)shf.pr='A'}}break;
     case 'sheet-ok':var nta2=document.getElementById('notenew'),no2=nta2&&nta2.value.trim()?noteOwner(ui.sheet):null;if(no2){(no2.notes=no2.notes||[]).push({id:uid(),c:Date.now(),x:nta2.value.trim()})}if(ui.sheet&&ui.sheet.mode==='deleg')delegOk();else if(ui.sheet&&ui.sheet.mode==='blk')blkOk();else if(ui.sheet&&ui.sheet.mode==='new')newOk();else sheetOk();if(ui.sheet&&ui.sheet.err)toast(ui.sheet.err);break;
     case 'note-add':var no=noteOwner(ui.sheet),nta=document.getElementById('notenew'),ntx=nta?nta.value.trim():'';if(no&&ntx){(no.notes=no.notes||[]).push({id:uid(),c:Date.now(),x:ntx})}break;
     case 'note-del':var nd=noteOwner(ui.sheet);if(nd&&nd.notes){var nid=t.getAttribute('data-n');nd.notes=nd.notes.filter(function(x){return x.id!==nid});if(!nd.notes.length)delete nd.notes}break;
@@ -3549,7 +3557,7 @@ function newHtml(sh){
     alHtml(sh)+
     (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+
     '<div class="arows">'+areaR+prR+'</div>'+
-    frogBtn(sh,it,sh.date)+
+    frogNew(sh,it)+
     '<div class="bsc"><div class="g"><label><span class="lbl">Tipo</span><select data-chg="sheet" data-f="kind"><option value="flex"'+(sh.kind==='flex'?' selected':'')+'>Flessibile</option><option value="fixed"'+(sh.kind==='fixed'?' selected':'')+'>Fisso</option></select></label></div>'+repHtml(sh)+'</div></div></div>';
 }
 function newOk(){
@@ -3560,12 +3568,14 @@ function newOk(){
   if(s+n>NSLOT){sh.err='Il blocco finisce dopo le 23:00.';return}
   var er1=repCheck(sh,it?it.pr:'');if(er1){sh.err=er1;return}
   var err;
-  if(it){err=scheduleItem(it,sh.date,s,n,sh.kind,sh.frog===true);if(err){sh.err=err;return}applyFrog(sh,it,sh.date)}
+  if(sh.frog===true&&!(it?it.area:sh.area)){sh.err='Scegli l\'area della rana.';return}
+  if(it){var opr=it.pr;if(sh.frog===true&&it.pr!=='A')it.pr='A';err=scheduleItem(it,sh.date,s,n,sh.kind,sh.frog===true);if(err){it.pr=opr;sh.err=err;return}applyFrog(sh,it,sh.date)}
   else if(sh.kind==='flex'&&!sh.rep){
-    var ni={id:uid(),text:title,area:sh.area||'',pr:sh.pr||'',due:'',status:'open',st:'',slips:0,c:Date.now()};
+    var ni={id:uid(),text:title,area:sh.area||'',pr:sh.frog===true?'A':(sh.pr||''),due:'',status:'open',st:'',slips:0,c:Date.now()};
     if(sh.note&&sh.note.trim())ni.notes=[{id:uid(),c:Date.now(),x:sh.note.trim()}];
-    st.dump.push(ni);err=scheduleItem(ni,sh.date,s,n,'flex');
+    st.dump.push(ni);err=scheduleItem(ni,sh.date,s,n,'flex',sh.frog===true);
     if(err){st.dump.pop();sh.err=err;return}
+    if(sh.frog===true)applyFrog(sh,ni,sh.date)
   }else{
     var d=day(sh.date),nb={id:uid(),s:s,n:n,title:title,area:sh.area||'',kind:sh.kind,ref:'',st:''},hit=d.blocks.filter(function(b){return overlap(b,nb)});
     if(sh.note&&sh.note.trim())nb.notes=[{id:uid(),c:Date.now(),x:sh.note.trim()}];d.blocks.push(nb);ui.lsN=1;ui.ls={date:sh.date,ref:'',bid:nb.id};
