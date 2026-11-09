@@ -388,6 +388,7 @@ button,select,input{touch-action:manipulation}
 .ntm{display:flex;justify-content:space-between;align-items:center;font:600 11.5px/1.2 var(--body);color:var(--muted)}
 .ntm .subx{padding:2px 8px;font-size:18px}
 .ntx{font-size:15px;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere}
+textarea.ntx{display:block;width:100%;border:0!important;background:transparent!important;box-shadow:none!important;padding:2px 0!important;margin:0;resize:none;overflow:hidden;font:inherit;font-size:15px;color:var(--ink);min-height:0;border-radius:6px}.sheet .notes textarea.ntx{resize:none!important;min-height:0!important;background:transparent!important;padding:2px 0!important;border-radius:6px!important;overflow:hidden!important;font-size:15px!important;line-height:1.35!important}.sheet .notes textarea.ntx:focus{background:var(--surface)!important;padding:2px 6px!important}textarea.ntx:focus{outline:0;background:var(--surface)!important;box-shadow:0 0 0 2px var(--blue)!important;padding:2px 6px!important}
 .notes textarea{width:100%;box-sizing:border-box;padding:8px;border:1.2px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:16px;min-height:60px;resize:vertical}
 .sheet-bg.mid{align-items:center;padding:16px}
 .vcard{background:var(--surface);border:1.2px solid var(--line);border-left:8px solid var(--line);width:100%;max-width:440px;padding:20px 18px 14px;display:flex;flex-direction:column;gap:8px;max-height:88vh;overflow:auto}
@@ -2091,7 +2092,7 @@ function viewHtml(sh,b){
   return h;
 }
 function blkFind(sh){var d=st.days[sh.from];if(!d)return null;return d.blocks.filter(function(x){return x.id===sh.bid})[0]||null}
-(function(){function mk(e){var t=e.target;if(!ui.sheet||ui.sheet.dirty||ui.sheet.mode==='new')return;if(!t||!t.closest||!t.closest('.jb'))return;if(t.closest('.shd'))return;ui.sheet.dirty=true;var h=document.querySelector('.jb .shd');if(h)h.classList.add('dirty')}
+(function(){function mk(e){var t=e.target;if(!ui.sheet||ui.sheet.dirty||ui.sheet.mode==='new')return;if(!t||!t.closest||!t.closest('.jb'))return;if(t.closest('.shd')||t.closest('.notes'))return;ui.sheet.dirty=true;var h=document.querySelector('.jb .shd');if(h)h.classList.add('dirty')}
 document.addEventListener('input',mk,true);document.addEventListener('change',mk,true)})();
 function jbHead(sh,b,newMode){
   var s0=b?bst(b):'',dirty=newMode||sh.dirty;
@@ -2201,7 +2202,7 @@ function notesHtml(o){
   if(!o)return '';
   var ns=o.notes||[];
   return '<div class="notes"><span class="lbl">Note'+(ns.length?' · '+ns.length:'')+'</span>'+
-    ns.map(function(n){return '<div class="nt"><div class="ntm"><span>'+esc(noteWhen(n.c))+'</span><button type="button" class="subx" data-act="note-del" data-n="'+n.id+'" aria-label="Elimina la nota">×</button></div><div class="ntx">'+esc(n.x)+'</div></div>'}).join('')+
+    ns.map(function(n){return '<div class="nt"><div class="ntm"><span>'+esc(noteWhen(n.c))+(n.m?' · modificata':'')+'</span><button type="button" class="subx" data-act="note-del" data-n="'+n.id+'" aria-label="Elimina la nota">×</button></div><textarea class="ntx" rows="1" data-note="'+n.id+'" aria-label="Modifica la nota">'+esc(n.x)+'</textarea></div>'}).join('')+
     '<textarea id="notenew" rows="2" placeholder="Aggiungi una nota" aria-label="Nuova nota"></textarea>'+
     '<button class="btn sec sm" data-act="note-add" type="button" style="align-self:flex-end">Aggiungi nota</button></div>';
 }
@@ -3508,7 +3509,13 @@ var fitCv;function fitTitle(t){if(!t||!t.clientWidth)return;var cs=getComputedSt
   fitCv=fitCv||document.createElement('canvas');var cx=fitCv.getContext('2d'),px=26;
   for(;px>18;px--){cx.font='800 '+px+'px '+cs.fontFamily;if(cx.measureText(v).width<=w)break}
   t.style.setProperty('font-size',px+'px','important');t.style.height='auto';t.style.height=t.scrollHeight+'px'}
-function fitTitles(){[].forEach.call(document.querySelectorAll('textarea.bst'),fitTitle)}
+function fitTitles(){[].forEach.call(document.querySelectorAll('textarea.bst'),fitTitle);[].forEach.call(document.querySelectorAll('textarea.ntx'),ntxFit)}
+function ntxFit(t){t.style.height='auto';t.style.height=t.scrollHeight+'px'}
+document.addEventListener('input',function(e){if(e.target&&e.target.classList&&e.target.classList.contains('ntx'))ntxFit(e.target)});
+document.addEventListener('change',function(e){var t=e.target;if(!t||!t.classList||!t.classList.contains('ntx'))return;var o=noteOwner(ui.sheet),id=t.getAttribute('data-note');if(!o||!o.notes)return;
+  var n=o.notes.filter(function(x){return x.id===id})[0];if(!n)return;var v=t.value.trim();
+  if(!v){o.notes=o.notes.filter(function(x){return x!==n});if(!o.notes.length)delete o.notes;save();render();return}
+  if(v!==n.x){n.x=v;n.m=Date.now();save()}});
 document.addEventListener('input',function(e){if(e.target&&e.target.classList&&e.target.classList.contains('bst'))fitTitle(e.target)});
 document.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target&&e.target.classList&&e.target.classList.contains('bst')){e.preventDefault();e.target.blur()}},true);
 window.addEventListener('resize',fitTitles);
