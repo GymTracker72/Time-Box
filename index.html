@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-09-0830">
+<meta name="tb-build" content="2026-11-09-0840">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -3345,8 +3345,8 @@ document.addEventListener('click',function(e){
     case 'print-close':ui.mode=ui.pback&&ui.pback!=='stampa'?ui.pback:'oggi';break;
     case 'filter':ui.filter=t.getAttribute('data-v');break;
     case 'blk-item':case 'edit-item':if(i)ui.sheet=openItem(i);break;
-    case 'ed-area':if(i)i.area=i.area===t.getAttribute('data-v')?'':t.getAttribute('data-v');break;
-    case 'ed-pr':if(i){var pv2=t.getAttribute('data-v');i.pr=i.pr===pv2?'':pv2;if(i.pr==='D'&&(i.status==='open'||i.status==='prog'))ui.sheet=openDeleg(i)}break;
+    case 'ed-area':if(i){i.area=i.area===t.getAttribute('data-v')?'':t.getAttribute('data-v');if(i.pr==='A'&&i.area)autoTop(i)}break;
+    case 'ed-pr':if(i){var pv2=t.getAttribute('data-v');i.pr=i.pr===pv2?'':pv2;if(i.pr==='D'&&(i.status==='open'||i.status==='prog'))ui.sheet=openDeleg(i);if(i.pr==='A'&&i.area)autoTop(i)}break;
     case 'ed-clear-due':if(i)i.due='';break;
     case 'ed-top':case 'ed-prog':case 'ed-drop':case 'ed-back':if(i){var er=smista(i,act);if(er)ui.sheet.err=er;else{ui.sheet=null;toast('«'+i.text+'» '+({'ed-top':'in Top '+(i.area?AREAS[i.area]:''),'ed-prog':'in Da programmare','ed-drop':'eliminata','ed-back':'rimessa in Svuota la mente'}[act]))}}break;
     case 'ed-deleg':if(i)ui.sheet=openDeleg(i);break;
@@ -3415,7 +3415,7 @@ document.addEventListener('change',function(e){
   var f=t.getAttribute('data-f'),id=t.getAttribute('data-id'),d=day(),v=t.value;
   if(c==='date'){if(v)st.date=v}
   else if(c==='hours'){var h=parseFloat(v);if(h>=4&&h<=18)st.hours=h}
-  else if(c==='edit'){var ebk=ui.sheet&&ui.sheet.bid?blkFind(ui.sheet):null,ei=item(ui.sheet&&(ui.sheet.id||(ebk&&ebk.ref)));if(ei){if(f==='text'){if(v.trim())ei.text=v.trim()}else if(f==='area'){ei.area=v;save();render();return}else ei[f]=v}return}
+  else if(c==='edit'){var ebk=ui.sheet&&ui.sheet.bid?blkFind(ui.sheet):null,ei=item(ui.sheet&&(ui.sheet.id||(ebk&&ebk.ref)));if(ei){if(f==='text'){if(v.trim())ei.text=v.trim()}else if(f==='area'){ei.area=v;if(ei.pr==='A'&&ei.area)autoTop(ei);save();render();return}else ei[f]=v}return}
   else if(c==='sheet'){ui.sheet[f]=v;ui.sheet.err='';if(f==='src'){ui.sheet.frog=undefined;ui.sheet.tedit=false}if(f==='title')ui.sheet.tedit=true;if(f==='rep'||f==='rfq')repInit(ui.sheet);if(f==='who'||f==='title'||f==='rcount'||f==='name'||f==='riv'||f==='res')return;if(t.type==='date'){lastDateTs=Date.now();setTimeout(render,350);return}}
   else if(c==='deleg'){var dx=d.deleg.filter(function(x){return x.id===id})[0];if(dx)dx[f]=v}
   else if(c==='rana'){d.rana[f]=v;if(ui.sheet&&ui.sheet.mode==='rana'&&f!=='goal'){save();return}}
