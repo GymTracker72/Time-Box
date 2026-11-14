@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1740">
+<meta name="tb-build" content="2026-11-14-1910">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -2369,7 +2369,7 @@ function prepOk(){
 }
 function prepCard(isToday,nowMin){
   var td=isoOf(new Date()),T=prepTarget(),dT=st.days[T],has=dT&&frogItem(dT);
-  if(isToday&&nowMin<17*60)return '';
+  if(isToday)return '';
   if(!isToday&&st.date<=td)return '';
   var lab=isToday?'domani':'questa giornata',dtd=st.days[td];
   return '<div class="ora"><div class="olab" style="display:flex;gap:6px;align-items:center">'+FROG+'<span>'+(has?'Rana scelta: '+esc(item(dT.tops[dT.frog]).text):'Cinque minuti')+'</span></div><div class="ttl">'+(isToday&&!(dtd&&dtd.closed)?'Chiudi e prepara domani':'Prepara '+lab)+'</div><div class="oleft">'+(has?'Puoi cambiare la rana e l\'ordine delle voci quando vuoi.':'Scegli la rana, la voce più pesante, e mettila per prima al mattino. Le A vengono dopo.')+'</div><div class="row2"><button class="obtn p" data-act="prep-open">'+(has?'Rivedi':'Inizia')+'</button></div></div>';
@@ -4866,7 +4866,7 @@ document.addEventListener('focusout',function(e){if(e.target&&e.target.id==='ogg
   function reset(){if(el){el.style.transition='transform .18s,opacity .18s';el.style.transform='';el.style.opacity=''}drag=false}
   function start(e){
     ok=false;drag=false;if(!{oggi:1,plan:1,sett:1,mese:1,anno:1}[ui.mode]||ui.sheet||document.getElementById('quote')||e.touches.length!==1)return;
-    var tg=e.target;if(tg.closest&&tg.closest('.swit,.swdel,.blk,.wcb,.sw,input,textarea,select,#sheet,#toast,#clipbar'))return;
+    var tg=e.target;if(tg.closest&&tg.closest('.swit,.swdel,.sw,.rz,.cb,input,textarea,select,#sheet,#toast,#clipbar'))return;
     var p=e.touches[0];
     el=document.getElementById(ui.mode==='plan'?'plancols':ui.mode);x0=xl=p.clientX;y0=yl=p.clientY;t0=Date.now();ok=true}
   function move(e){
