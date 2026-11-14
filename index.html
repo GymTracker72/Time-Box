@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1200">
+<meta name="tb-build" content="2026-11-14-1210">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -677,6 +677,8 @@ body.m-plan #schedcard .sched{margin:0}
 .bsr i.sw{width:46px;height:28px;border-radius:14px;background:#d3d7d6;position:relative;flex:none;font-size:0}
 .bsr i.sw::after{content:"";position:absolute;left:2px;top:2px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
 .bsr i.sw.on{background:var(--green)}.bsr i.sw.on::after{left:20px}
+.arow i.sw{display:block;width:51px;height:31px;border-radius:16px;background:#d3d7d6;position:relative;flex:none;transition:background .15s}.arow i.sw::after{content:"";position:absolute;left:2px;top:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}.arow i.sw.on{background:#34c759}.arow i.sw.on::after{left:22px}
+.jb .arows .arow[data-act=kind-tog] .av{justify-content:flex-end}
 
 /* Tutte le voci e Completate: pagine semplici */
 body.m-voci .top:not(.blk)>div:first-child,body.m-voci .datebox,body.m-voci #stats,body.m-voci #daybar{display:none!important}
@@ -1484,9 +1486,13 @@ function repCheck(sh,pr){
   if(e.t==='c'&&!(e.c>=2&&e.c<=400))return 'Le ripetizioni vanno da 2 a 400.';
   return '';
 }
-function repHtml(sh){
+/* righe della scheda blocco: interruttore Impegno fisso e Ripeti, al posto della riga «Altro» */
+function fixRow(sh){var on=sh.kind==='fixed';return '<button type="button" class="arow" data-act="kind-tog" role="switch" aria-checked="'+on+'"><span class="an">Impegno fisso</span><span class="av"><i class="sw'+(on?' on':'')+'"></i></span></button>'}
+function repRow(sh){var o=REPS.map(function(r){return '<option value="'+r[0]+'"'+((sh.rep||'')===r[0]?' selected':'')+'>'+r[1]+'</option>'}).join(''),cur=REPS.filter(function(r){return r[0]===(sh.rep||'')})[0];return selRow('Ripeti','sheet','rep',o,esc(cur?cur[1]:'Mai'))}
+function repMore(sh){if(!sh.rep)return '';var x=repHtml(sh,true);return x?'<div class="bsc">'+x+'</div>':''}
+function repHtml(sh,noSel){
   var o=REPS.map(function(r){return '<option value="'+r[0]+'"'+((sh.rep||'')===r[0]?' selected':'')+'>'+r[1]+'</option>'}).join('');
-  var h='<label><span class="lbl">Ripeti</span><select data-chg="sheet" data-f="rep">'+o+'</select></label>';
+  var h=noSel?'':'<label><span class="lbl">Ripeti</span><select data-chg="sheet" data-f="rep">'+o+'</select></label>';
   if(sh.rep==='c'){
     var sp=specOf(sh),fo=[['d','giorni'],['w','settimane'],['m','mesi'],['y','anni']].map(function(x){return '<option value="'+x[0]+'"'+(sp.fq===x[0]?' selected':'')+'>'+x[1]+'</option>'}).join('');
     h+='<div class="g"><label><span class="lbl">Ogni</span><input type="number" min="1" max="99" inputmode="numeric" data-chg="sheet" data-f="riv" value="'+sp.iv+'"></label><label><span class="lbl">Unità</span><select data-chg="sheet" data-f="rfq">'+fo+'</select></label></div>';
@@ -2354,12 +2360,11 @@ function blkHtml(sh,b){
     jbTitle(sh.title,'Titolo','sheet',nb)+
     dcardTop(sh,false,'sheet','<label><span class="lbl">Data</span><input type="date" data-chg="sheet" data-f="date" value="'+esc(sh.date)+'"></label>'+
     '<label><span class="lbl">Inizio</span><select data-chg="sheet" data-f="s">'+starts+'</select></label>'+
-    '<label><span class="lbl">Durata</span><select data-chg="sheet" data-f="n">'+durs+'</select></label>'+due,(it?'':areaF)+alHtml(sh,true),dueRow(it,sh.date))+
+    '<label><span class="lbl">Durata</span><select data-chg="sheet" data-f="n">'+durs+'</select></label>'+due,(it?'':areaF)+alHtml(sh,true)+fixRow(sh)+repRow(sh),dueRow(it,sh.date))+repMore(sh)+
     (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+cf+
     (it?itemChips(it):'<div class="arows">'+selRow('Priorità','sheet','pr','<option value=""'+(!sh.pr?' selected':'')+'>Da classificare</option><option value="A"'+(sh.pr==='A'?' selected':'')+'>A · Top priority</option><option value="B"'+(sh.pr==='B'?' selected':'')+'>B · minore</option><option value="C"'+(sh.pr==='C'?' selected':'')+'>C · nessuna urgenza</option>',sh.pr?({A:'A · Top',B:'B · minore',C:'C · nessuna urgenza'}[sh.pr]):'Da classificare')+'</div>')+
-    moreRow(sh,moreVal(sh),(it?'<div class="bsc bsl">'+frogRow(sh,it,sh.from)+'</div>':(sh.pr==='A'&&sh.area?'<div class="bsc bsl">'+frogRow(sh,{id:'_',pr:'A',area:sh.area},sh.from)+'</div>':''))+
-    '<div class="bsc"><div class="g"><label><span class="lbl">Tipo</span><select data-chg="sheet" data-f="kind"><option value="flex"'+(sh.kind==='flex'?' selected':'')+'>Flessibile</option><option value="fixed"'+(sh.kind==='fixed'?' selected':'')+'>Fisso</option></select></label></div>'+repHtml(sh)+'</div>'+
-    (b.rid&&st.rec[b.rid]?'<div class="sub">Fa parte di una serie: '+esc(repLabel(st.rec[b.rid],sh.date))+'.</div>':''))+
+    (function(){var fr=it?frogRow(sh,it,sh.from):(sh.pr==='A'&&sh.area?frogRow(sh,{id:'_',pr:'A',area:sh.area},sh.from):'');return fr?'<div class="bsc bsl">'+fr+'</div>':''})()+
+    (b.rid&&st.rec[b.rid]?'<div class="sub">Fa parte di una serie: '+esc(repLabel(st.rec[b.rid],sh.date))+'.</div>':'')+
     '<button type="button" class="arow dang" data-act="blk-del">Togli dal piano</button><div class="bsf bsf2"><button class="mini" data-act="blk-copy" type="button">Copia</button>'+(it?(sh.confirm?'<button class="mini red" data-act="ed-del2" data-id="'+it.id+'" type="button">Conferma: cancella</button>':'<button class="mini red" data-act="ed-del" data-id="'+it.id+'" type="button">Elimina voce</button>'):'')+'</div></div></div>';
 }
 function blkDelScope(v){
@@ -2586,6 +2591,7 @@ function frogRow(sh,i,date){
 }
 function frogNew(sh,it){
   if(!it&&(sh.kind!=='flex'||sh.rep))return '';
+  if((it?it.pr:sh.pr)!=='A')return '';
   var on=it?frogOn(sh,it,sh.date):sh.frog===true,ar=it?it.area:sh.area;
   var dz=st.days[sh.date],cu=dz&&ar&&dz.tops[ar],ot=cu&&cu!=='empty'&&(!it||cu!==it.id)?item(cu):null;
   var warn=on&&!ar?'<div class="sub" style="padding:0 0 8px">Scegli l\'area: la rana diventa la Top di quell\'area.</div>':on&&ot?'<div class="sub" style="padding:0 0 8px">Prende il posto di «'+esc(ot.text)+'» come Top '+AREAS[ar]+' di quel giorno.</div>':'';
@@ -3681,6 +3687,7 @@ document.addEventListener('click',function(e){
     case 'quick-place':if(i){var inEd=ui.sheet&&ui.sheet.mode==='edit',qe=quickPlace(i);if(qe){if(inEd)ui.sheet.err=qe;else{ui.sheet=openSheet(i);ui.sheet.err=qe}}else if(inEd)ui.sheet=null}break;
     case 'fill-day':fillDay();break;
     case 'fill-day-today':fillDay();break;
+    case 'kind-tog':if(ui.sheet){ui.sheet.kind=ui.sheet.kind==='fixed'?'flex':'fixed';if(ui.sheet.mode==='blk')ui.sheet.dirty=true}break;
     case 'now-next':ui.propI=(ui.propI||0)+1;break;
     case 'now-start':if(i){var ns0=+t.getAttribute('data-s'),nn0=+t.getAttribute('data-n'),er1=scheduleItem(i,st.date,ns0,nn0,'flex');if(er1)toast(er1);else{ui.propI=0;ui.lsN=0;ui.ls=null;toast('«'+i.text+'» iniziata, fino alle '+slotLab(ns0+nn0))}}break;
     case 'blk-tomorrow':var btm=d.blocks.filter(function(x){return x.id===id})[0];if(btm){var tmd=addDays(st.date,1),bit=btm.ref&&item(btm.ref);ui.puMenu='';
@@ -3930,11 +3937,10 @@ function newHtml(sh){
     srcR+
     dcardTop(sh,true,'sheet','<label><span class="lbl">Data</span><input type="date" data-chg="sheet" data-f="date" value="'+esc(sh.date)+'"></label>'+
     '<label><span class="lbl">Inizio</span><select data-chg="sheet" data-f="s">'+starts+'</select></label>'+
-    '<label><span class="lbl">Durata</span><select data-chg="sheet" data-f="n">'+durs+'</select></label>',areaR+alHtml(sh,true),dueRow(it,sh.date))+
+    '<label><span class="lbl">Durata</span><select data-chg="sheet" data-f="n">'+durs+'</select></label>',areaR+alHtml(sh,true)+fixRow(sh)+repRow(sh),dueRow(it,sh.date))+repMore(sh)+
     (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+cf+
     (prR?'<div class="arows">'+prR+'</div>':'')+
-    moreRow(sh,moreVal(sh),frogNew(sh,it)+
-    '<div class="bsc"><div class="g"><label><span class="lbl">Tipo</span><select data-chg="sheet" data-f="kind"><option value="flex"'+(sh.kind==='flex'?' selected':'')+'>Flessibile</option><option value="fixed"'+(sh.kind==='fixed'?' selected':'')+'>Fisso</option></select></label></div>'+repHtml(sh)+'</div>')+'</div></div>';
+    frogNew(sh,it)+'</div></div>';
 }
 function newOk(){
   var sh=ui.sheet;if(!sh)return;
