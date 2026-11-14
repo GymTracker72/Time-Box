@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1700">
+<meta name="tb-build" content="2026-11-14-1055">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -4094,7 +4094,7 @@ function gdLoad(){return new Promise(function(res,rej){
   e.onload=function(){res()};e.onerror=function(){rej({code:'net',message:'non riesco a caricare l\'accesso Google: controlla la connessione.'})};document.head.appendChild(e)})}
 /* Rinnovo automatico dei permessi Google: con TBW (indirizzo del servizio di rinnovo) l'accesso si fa una volta e poi si rinnova da solo.
    Senza TBW l'app usa l'accesso a un'ora di prima (richiede un tocco a ogni scadenza). */
-var TBW='',RTK='timebox-rt',rtP=null;
+var TBW='https://timebox-auth.audino-giovanni.workers.dev',RTK='timebox-rt',rtP=null;
 function tbwOn(){return !!TBW&&GDon()}
 function rtGet(){try{return localStorage.getItem(RTK)||''}catch(e){return ''}}
 function rtSet(v){try{if(v)localStorage.setItem(RTK,v);else localStorage.removeItem(RTK)}catch(e){}}
