@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1430">
+<meta name="tb-build" content="2026-11-14-1322">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -3508,6 +3508,14 @@ function tickNow(){
 }
 function nearHide(tm){var z=document.getElementById('sched');if(!z)return;z.querySelectorAll('.srow span[data-m]').forEach(function(x){x.classList.toggle('nh',Math.abs(+x.getAttribute('data-m')-tm)<18)})}
 setInterval(tickNow,30000);
+/* iOS: dopo la rotazione o la chiusura della tastiera la barra in basso (position:fixed) può restare a metà schermo; la riposiziono forzando un nuovo calcolo */
+(function(){var t=0;function fix(){clearTimeout(t);t=setTimeout(function(){var b=document.querySelector('.tabs');if(!b)return;b.style.display='none';void b.offsetHeight;b.style.display='';window.scrollTo(window.scrollX,window.scrollY)},180)}
+  window.addEventListener('orientationchange',fix);window.addEventListener('resize',fix);
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',fix);
+  document.addEventListener('focusout',function(e){if(e.target&&/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))fix()});
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)fix()});
+  window.addEventListener('pageshow',fix);
+})();
 /* Giornata: scorrere a sinistra su una voce da chiudere mostra le azioni, a destra le nasconde */
 (function(){var x0=0,y0=0,row=null;
   document.addEventListener('touchstart',function(e){var r=e.target.closest&&e.target.closest('.orow.pu2');row=r;if(!r)return;x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
