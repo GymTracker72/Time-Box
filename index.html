@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1240">
+<meta name="tb-build" content="2026-11-14-1250">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -633,7 +633,7 @@ body.m-plan #schedcard .sched{margin:0}
 .w2 .wcb.top.L{background:var(--blue)}.w2 .wcb.top.F{background:var(--green)}.w2 .wcb.top.P{background:var(--red)}.w2 .wcb.top{color:#fff}
 .w2 .wcb.fixed{background:var(--surface);box-shadow:inset 0 0 0 1px var(--soft)}
 .w2 .wcb .tm{font-weight:400;font-size:11px}
-.w2 .wcb .tt{overflow-wrap:anywhere;hyphens:none}
+.w2 .wcb .tt{overflow-wrap:break-word;word-break:normal;hyphens:none}
 .w2 .wch{border-bottom:1px solid var(--soft)}.w2 .wch.t{border-right:0}
 @media (max-width:699px){.w2 .wcg{margin-left:-6px;margin-right:-6px}.w2 .wch.d{padding:6px 0 8px;align-items:center}.w2 .wch .dn{align-items:center}.w2 .wcb{padding:3px 3px;font-size:11px}.w2 .wcb .tm{display:none}}
 .w2 .wcn{border-top:2px solid var(--red)}
@@ -1829,7 +1829,7 @@ document.addEventListener('click',function(e){
   document.addEventListener('pointercancel',end,true);
 })();
 function wkIsWide(){return window.innerWidth>=700}
-function wkMode(){var v=ui.wkv;if(!v){try{v=localStorage.getItem('timebox-wkv')}catch(e){}}return wkIsWide()?(v||'cols'):'cols'}
+function wkMode(){var v=ui.wkv;if(!v){try{v=localStorage.getItem('timebox-wkv')}catch(e){}}return wkIsWide()?(v||'cols'):'list'}
 function wkCols(m){
   var today=isoOf(new Date()),nar=!wkIsWide(),RH=nar?rowBase():(window.innerWidth>=1000?28:26),col={L:'blue',F:'green',P:'red'};
   var days=[];for(var k=0;k<7;k++)days.push(addDays(m,k));
