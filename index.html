@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1640">
+<meta name="tb-build" content="2026-11-14-1700">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -320,6 +320,7 @@ textarea{width:100%;min-height:110px;border:1px solid var(--line);background:var
 .btn{background:var(--ink);color:var(--surface);border:0;padding:7px 14px;font-weight:600}
 .btn[disabled]{opacity:.35;cursor:not-allowed}
 #daybar{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;gap:10px;align-items:center;justify-content:center;padding:calc(6px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 6px max(12px,env(safe-area-inset-left,0px));background:var(--surface);border-bottom:1.2px solid var(--line);transform:translateY(-120%);transition:transform .15s;pointer-events:none}#daybar.on{transform:none;pointer-events:auto}#daybar b{font:700 15px var(--body);min-width:130px;text-align:center}#daybar b.today{color:var(--red)}
+@media (max-width:700px){.tabs{will-change:transform;-webkit-transform:translateZ(0)}}
 .tabs{display:flex;gap:0}@media (min-width:701px){.tabs{display:inline-flex;gap:2px;padding:4px;border-radius:999px;background:color-mix(in srgb,var(--ink) 7%,transparent);align-self:flex-start;width:max-content}}.tabs button{border:0;border-radius:999px;background:transparent;padding:8px 20px;font-weight:500;color:var(--muted);cursor:pointer;transition:background .15s,color .15s}.tabs button:hover{color:var(--ink)}.tabs button.on{background:var(--surface);color:var(--ink);font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,.12),0 0 0 .5px color-mix(in srgb,var(--ink) 10%,transparent)}
 .big{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.big:last-child{border-bottom:0}.big .cb{width:24px;height:24px;margin-top:2px}.big .tx{font-size:17px;font-weight:500}
 .otop{display:flex;gap:2px;align-items:center;background:var(--surface);border-radius:16px;padding:4px 6px}
@@ -4961,23 +4962,31 @@ window.__tbui=function(){return ui};
 
 
 
-/* Barra Oggi/Calendario/Da programmare: se iOS lascia il viewport "incastrato" (dopo tastiera o zoom), la barra fissa resta a mezza altezza.
-   La riporto sul bordo basso dello schermo visibile. */
+/* Barra Oggi/Calendario/Da programmare: su iOS a volte la barra fissa "si aggancia" al contenuto (segue lo scroll) o resta a mezza altezza
+   dopo tastiera/zoom. La riporto sul bordo basso dello schermo visibile: misuro dove sta e correggo con una traslazione. */
 (function(){
-  var vv=window.visualViewport;if(!vv)return;
-  function editing(){var a=document.activeElement;return !!a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)||!!(a&&a.isContentEditable)}
+  var vv=window.visualViewport,cur=0,raf=0;
+  function editing(){var a=document.activeElement;return !!a&&(/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)||a.isContentEditable)}
+  function put(t,d){cur=d;t.style.transform=d?'translate3d(0,'+d+'px,0)':''}
   function fix(){
+    raf=0;
     var t=document.querySelector('.tabs');if(!t)return;
-    if(getComputedStyle(t).position!=='fixed'){t.style.transform='';return}
-    if(editing()||vv.scale>1.02){t.style.transform='';return}
-    var d=Math.round(vv.offsetTop+vv.height-window.innerHeight);
-    t.style.transform=d>4?'translateY('+d+'px)':'';
+    var cs=getComputedStyle(t);
+    if(cs.position!=='fixed'){if(cur)put(t,0);return}
+    if(editing()||(vv&&vv.scale>1.02)){if(cur)put(t,0);return}
+    var bot=parseFloat(cs.bottom)||0,vh=vv?vv.offsetTop+vv.height:window.innerHeight;
+    var want=vh-bot,have=t.getBoundingClientRect().bottom-cur,d=Math.round(want-have);
+    if(Math.abs(d)<=3)d=0;
+    if(d!==cur)put(t,d);
   }
-  vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);
-  window.addEventListener('pageshow',fix);window.addEventListener('orientationchange',function(){setTimeout(fix,300)});
-  document.addEventListener('focusout',function(){setTimeout(fix,350)});
-  document.addEventListener('visibilitychange',function(){if(!document.hidden)setTimeout(fix,150)});
-  setInterval(fix,1500);fix();
+  function soon(){if(!raf)raf=requestAnimationFrame(fix)}
+  if(vv){vv.addEventListener('resize',soon);vv.addEventListener('scroll',soon)}
+  window.addEventListener('scroll',soon,{passive:true});
+  document.addEventListener('touchmove',soon,{passive:true});document.addEventListener('touchend',function(){setTimeout(soon,120)},{passive:true});
+  window.addEventListener('pageshow',soon);window.addEventListener('orientationchange',function(){setTimeout(soon,300)});
+  document.addEventListener('focusout',function(){setTimeout(soon,350)});
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)setTimeout(soon,150)});
+  setInterval(soon,1000);soon();
 })();
 
 /* Aggiornamento automatico: confronta la versione online con quella in uso */
