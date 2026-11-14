@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1410">
+<meta name="tb-build" content="2026-11-14-1420">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -247,6 +247,7 @@ details.foot summary{cursor:pointer;color:var(--muted)}
 .gset .mini{border:0!important;border-radius:20px!important;background:var(--bg)!important;color:var(--ink)!important;font:600 14.5px/1 var(--body)!important;padding:11px 16px!important;min-height:40px}
 .gset textarea{border-radius:12px;border:1px solid var(--soft)}
 #dumpcard{display:none!important}
+.mdr.on{background:color-mix(in srgb,var(--amber) 12%,transparent);border-radius:12px}
 .w2no{font:400 14px/1.3 var(--body);color:var(--muted);padding:2px 0}
 .mol{height:calc(100vh - 70px);display:flex;flex-direction:column;gap:6px;padding:0 max(env(safe-area-inset-right),8px) 0 max(env(safe-area-inset-left),8px);box-sizing:border-box}
 .molh{display:flex;align-items:center;justify-content:space-between;height:36px;flex:none}.molh h1{margin:0;font:700 22px/1 var(--body);color:var(--ink)}.molh h1 span{color:var(--red)}
@@ -2085,11 +2086,10 @@ function renderMese(){
     h+='</div>'}
   h+='</div>';
   if(!mac){
-    var sl=(dueBy[msel]||[]).filter(function(e){return !e.done}),lab=DOW[parse(msel).getDay()]+' '+parse(msel).getDate()+' '+MON[+msel.slice(5,7)-1];
-    if(!sl.length){var up=dueL.filter(function(e){return !e.done&&e.d>=msel}).slice(0,5);h+='<div class="mdl"><div class="mdh">'+esc(lab)+(up.length?' · nessuna scadenza. Le prossime':' · nessuna scadenza')+'</div>'+up.map(function(e){return moRow(e,true)}).join('')+'</div>'}
-    else h+='<div class="mdl"><div class="mdh">'+esc(lab)+'</div>'+sl.map(function(e){return moRow(e,false)}).join('')+'</div>';
+    /* tutte le scadenze aperte del mese, in ordine di data; quelle del giorno toccato sono evidenziate */
+    var open=dueL.filter(function(e){return !e.done});
+    h+='<div class="mdl"><div class="mdh">Scadenze di '+MON[+mo-1]+(open.length?' · '+open.length:'')+'</div>'+(open.length?open.map(function(e){var r=moRow(e,true);return e.d===msel?r.replace('class="mdr"','class="mdr on"'):r}).join(''):'<div class="sub" style="padding:6px 0">Nessuna scadenza questo mese.</div>')+'</div>';
   }
-  h+='<div class="w2m mob">'+revCard('M',ym,'Revisione del mese','Top completate '+td+'/'+tt+' · Rane '+fd+'/'+ft)+'</div>';
   document.getElementById('mese').innerHTML='<div class="mo'+(mac?' momac':'')+'">'+h+'</div>';
 }
 function renderAnno(){
