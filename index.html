@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1230">
+<meta name="tb-build" content="2026-11-14-1240">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -232,6 +232,23 @@ body.ddrag{cursor:grabbing}
 .ok{color:var(--green);font-weight:600;font-size:12px}
 details.foot{border:1px dashed var(--muted);padding:8px 12px}
 details.foot summary{cursor:pointer;color:var(--muted)}
+/* Google: un solo gruppo stile Impostazioni di iOS */
+.gsh{font:600 13px/1 var(--body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:28px 0 8px 16px}
+.gset{background:var(--surface);border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(31,42,40,.08)}
+.gset details.foot{border:0!important;padding:0!important;margin:0!important;background:transparent!important;border-radius:0!important}
+.gset details.foot+details.foot{border-top:1px solid var(--soft)!important}
+.gset details.foot[hidden]+details.foot{border-top:0!important}
+.gset summary{list-style:none;display:flex;align-items:center;gap:12px;min-height:60px;padding:0 16px;color:var(--ink)!important;cursor:pointer}
+.gset summary::-webkit-details-marker{display:none}
+.gset .gic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex:none}
+.gset .gtx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.gset .gtx b{font:500 17px/1.2 var(--body)}.gset .gtx i{font:normal 13.5px/1.2 var(--body);color:var(--muted)}
+.gset .gch{flex:none;color:#b3b9b7;transition:transform .2s}.gset details[open] .gch{transform:rotate(90deg)}
+.gset details>div{padding:4px 16px 16px!important}
+.gset .mini{border:0!important;border-radius:20px!important;background:var(--bg)!important;color:var(--ink)!important;font:600 14.5px/1 var(--body)!important;padding:11px 16px!important;min-height:40px}
+.gset textarea{border-radius:12px;border:1px solid var(--soft)}
+#dumpcard{display:none!important}
+#schedcard .sched{border-bottom:0}
+.gset .mini[data-act=clear]{color:var(--red)!important}
 .gsum{cursor:pointer;font-weight:600;padding:10px 12px;display:flex;justify-content:space-between;gap:8px;align-items:center}
 textarea{width:100%;min-height:110px;border:1px solid var(--line);background:var(--surface);padding:6px;font:12px/1.35 ui-monospace,Menlo,monospace}
 .eg{font-size:11px;color:var(--muted)}
@@ -1234,9 +1251,11 @@ html,body{touch-action:manipulation;min-height:100vh}
 
   <section class="card" id="closecard" hidden><h2>Chiusura della giornata</h2><div class="in" id="close"></div></section>
 
-  <details class="foot" id="cald" hidden><summary>Google Calendar: eventi e avvisi</summary><div id="calbox" style="display:flex;flex-direction:column;gap:8px;padding-top:8px"></div></details>
+  <h2 class="gsh" id="gsh">Google</h2>
+  <section class="gset" id="gset" aria-label="Google">
+  <details class="foot" id="cald" hidden><summary><span class="gic" style="background:#ff3b30"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span><span class="gtx"><b>Google Calendar</b><i>Eventi e avvisi</i></span><svg class="gch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 5l7 7-7 7"/></svg></summary><div id="calbox" style="display:flex;flex-direction:column;gap:8px;padding-top:8px"></div></details>
   <details class="foot" id="footd">
-    <summary>Dati: Google Drive, esporta, importa</summary>
+    <summary><span class="gic" style="background:#2f6188"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.2 9.1 4.5 4.5 0 0 0 7 18z"/></svg></span><span class="gtx"><b>Google Drive</b><i>Dati, esporta, importa</i></span><svg class="gch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 5l7 7-7 7"/></svg></summary>
     <div style="display:flex;flex-direction:column;gap:8px;padding-top:8px">
       <div id="dvctl" style="display:flex;gap:8px;flex-wrap:wrap"></div>
       <textarea id="json" aria-label="Dati in JSON" spellcheck="false"></textarea>
@@ -1249,6 +1268,7 @@ html,body{touch-action:manipulation;min-height:100vh}
       <div class="eg" id="jmsg"></div>
     </div>
   </details>
+  </section>
 </div>
 
 <div id="sheet" hidden></div><div id="toast" hidden></div>
@@ -1655,7 +1675,7 @@ function render(){
   renderSched(d);renderDump();renderClose(d,s);var dgc=document.getElementById('delegcard');if(dgc)dgc.hidden=!(d.deleg&&d.deleg.length);
   var M=ui.mode;
   ['oggi','sett','mese','anno','obj','stampa','voci','storico'].forEach(function(k){document.getElementById(k).hidden=M!==k});
-  ['overload','footd'].forEach(function(k){document.getElementById(k).hidden=M!=='plan'});
+  ['overload','footd','gset','gsh'].forEach(function(k){document.getElementById(k).hidden=M!=='plan'});
   document.getElementById('plancols').hidden=M!=='plan';
   var nd=M==='oggi'||M==='sett'||M==='mese'||M==='anno'||(M==='stampa'&&printScope()!=='day');document.querySelector('.datebox').hidden=nd;document.getElementById('stats').hidden=M!=='plan';
   if(M==='plan'||M==='sett'||M==='mese'||M==='anno')ui.lastCal=M;
@@ -3644,7 +3664,7 @@ document.addEventListener('click',function(e){
       if(t.getAttribute('data-m')==='voci')ui.vback=ui.mode==='plan'?'plan':'oggi';if(t.getAttribute('data-m')==='oggi')ui.oggiNav=0;if(t.getAttribute('data-m')==='mese'&&t.closest('.tabs,.cseg')){st.date=isoOf(new Date());ui.msel='';ui.scrollTop=1}if(t.getAttribute('data-m')==='anno'&&t.closest('.tabs,.cseg')){st.date=isoOf(new Date());ui.scrollTop=1}if(t.getAttribute('data-m')==='plan'&&ui.mode==='plan'&&t.closest('.tabs,.cseg')){st.date=isoOf(new Date());toast('Oggi')}if(t.getAttribute('data-m')==='sett'&&t.closest('.tabs,.cseg')){ui.wsel='';st.date=isoOf(new Date());ui.scrollToday=1}if(t.getAttribute('data-m')==='oggi'&&ui.mode==='oggi'&&t.closest('.tabs,.cseg')){st.date=isoOf(new Date());setTimeout(centerNext,40);toast('Oggi')}ui.mode=t.getAttribute('data-m');if(ui.mode==='plan')ui.snap=true;if(ui.mode==='voci')setTimeout(function(){window.scrollTo(0,0)},0);break;
     case 'dump-toggle':ui.vback=ui.mode==='plan'?'plan':'oggi';ui.mode='voci';setTimeout(function(){window.scrollTo(0,0)},0);break;
     case 'dump-tab':ui.dumpTab=t.getAttribute('data-v');ui.dumpOpen=1;break;
-    case 'to-dump':ui.dumpOpen=1;ui.dumpTab='todo';ui.mode='plan';setTimeout(function(){var e=document.getElementById('dumpcard');if(e)e.scrollIntoView({behavior:'smooth',block:'start'})},80);break;
+    case 'to-dump':ui.mode='voci';break;
     case 'view-copy':if(ui.sheet&&ui.sheet.mode==='view'){var vcb=blkFind(ui.sheet);if(vcb){clipFrom(vcb);ui.sheet=null}}break;
     case 'blk-copy':if(ui.sheet&&ui.sheet.mode==='blk'){var bcb=blkFind(ui.sheet);if(bcb){clipFrom(bcb);ui.sheet=null}}break;
     case 'clip-x':ui.clip=null;break;
