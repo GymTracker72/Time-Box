@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1210">
+<meta name="tb-build" content="2026-11-14-1215">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -158,6 +158,7 @@ button{cursor:pointer}
 .nowline i{position:absolute;left:-5px;top:-6px;width:10px;height:10px;border-radius:50%;background:#ff3b30}
 .blk{position:absolute;border:3px solid var(--ink);background:var(--surface);padding:2px 6px 2px 26px;overflow:hidden;font-size:14.5px;line-height:1.2;font-weight:600}
 .blk .sm{font-weight:400;font-size:12px;opacity:.85}
+.blk .lc{display:flex;align-items:center;gap:4px;font-weight:400;font-size:.9em;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.blk .lc svg{flex:none;width:.85em;height:.85em}
 .blk .cb{position:absolute;left:5px;top:4px;border-color:currentColor}
 .blk.top{color:#fff}
 .blk.top.L{background:var(--blue);border-color:var(--blue)}.blk.top.F{background:var(--green);border-color:var(--green)}.blk.top.P{background:var(--red);border-color:var(--red)}
@@ -3378,12 +3379,12 @@ function renderSched(d){
   var fi=frogItem(d);
   h+='<div class="blks">'+xb.map(function(b){
     var L=lay[b.id];
-    return '<div class="blk ext" data-s="'+b.s+'" data-n="'+b.n+'" style="top:'+(b.s*ROWH+1)+'px;height:'+(b.n*ROWH-2)+'px;left:calc('+(L.c*100/L.n)+'% + 2px);width:calc('+(100*(L.span||1)/L.n)+'% - 4px);" data-act="view-ext" data-id="'+esc(b.id)+'" role="button" tabindex="0" aria-label="Evento Google: '+esc(b.title)+'"><div>'+esc(b.title)+'</div>'+(b.n>1?'<div class="sm">'+slotLab(b.s)+'\u2013'+slotLab(b.s+b.n)+(b.cal?' \u00b7 '+esc(b.cal):'')+'</div>':'')+'</div>'}).join('')+d.blocks.map(function(b){
+    return '<div class="blk ext" data-s="'+b.s+'" data-n="'+b.n+'" style="top:'+(b.s*ROWH+1)+'px;height:'+(b.n*ROWH-2)+'px;left:calc('+(L.c*100/L.n)+'% + 2px);width:calc('+(100*(L.span||1)/L.n)+'% - 4px);" data-act="view-ext" data-id="'+esc(b.id)+'" role="button" tabindex="0" aria-label="Evento Google: '+esc(b.title)+'"><div>'+esc(b.title)+'</div>'+(b.loc?'<div class="lc"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>'+esc(b.loc)+'</div>':'')+(b.n>1?'<div class="sm">'+slotLab(b.s)+'\u2013'+slotLab(b.s+b.n)+(b.cal?' \u00b7 '+esc(b.cal):'')+'</div>':'')+'</div>'}).join('')+d.blocks.map(function(b){
     var L=lay[b.id],it=b.ref&&item(b.ref),isTop=it&&it.status==='top';
     var cls='blk '+(b.kind==='fixed'?'fixed '+(b.area||''):isTop?'top '+(it.area||''):'flex '+((it?it.area:b.area)||''))+(cl[b.id]?' clash':'')+(fi&&b.ref===fi.id?' fg':'');
     var style='top:'+(b.s*ROWH+1)+'px;height:'+(b.n*ROWH-2)+'px;left:calc('+(L.c*100/L.n)+'% + 2px);width:calc('+(100*(L.span||1)/L.n)+'% - 4px);';
     var frog=fi&&b.ref===fi.id?'<span class="fr" style="color:#1f2a28">'+FROG+'</span>':'';
-    return '<div class="'+cls+'" data-s="'+b.s+'" data-n="'+b.n+'" style="'+style+'" data-act="view-block" data-id="'+b.id+'" role="button" tabindex="0" aria-label="Apri '+esc(b.title)+'">'+cbH(bst(b),'cyc-block',b.id)+frog+'<span class="rz" aria-hidden="true"></span><div>'+(cl[b.id]?'! ':'')+(b.rid?'↻ ':'')+esc(b.title)+(notesOf(b).length?' ✎':'')+'</div>'+(b.n>1?'<div class="sm">'+slotLab(b.s)+'–'+slotLab(b.s+b.n)+''+'</div>':'')+'</div>';
+    return '<div class="'+cls+'" data-s="'+b.s+'" data-n="'+b.n+'" style="'+style+'" data-act="view-block" data-id="'+b.id+'" role="button" tabindex="0" aria-label="Apri '+esc(b.title)+'">'+cbH(bst(b),'cyc-block',b.id)+frog+'<span class="rz" aria-hidden="true"></span><div>'+(cl[b.id]?'! ':'')+(b.rid?'↻ ':'')+esc(b.title)+(notesOf(b).length?' ✎':'')+'</div>'+(b.loc?'<div class="lc"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>'+esc(b.loc)+'</div>':'')+(b.n>1?'<div class="sm">'+slotLab(b.s)+'–'+slotLab(b.s+b.n)+''+'</div>':'')+'</div>';
   }).join('')+'</div>';
   var tn=new Date(),tm=tn.getHours()*60+tn.getMinutes();
   if(tm>=S0&&tm<=S0+NSLOT*30)h+='<div class="nowline" id="nowline" style="top:'+((tm-S0)/30*ROWH)+'px"><span class="nt">'+pad(tn.getHours())+':'+pad(tn.getMinutes())+'</span><i></i></div>';
@@ -3432,7 +3433,7 @@ function snapSched(){
 function fitBlocks(){
   var els=document.querySelectorAll('#sched .blk');
   [].forEach.call(els,function(el){
-    var sm=el.querySelector('.sm'),x=el.querySelector('.x'),fixed=el.classList.contains('fixed');
+    var sm=el.querySelector('.sm'),lc=el.querySelector('.lc'),x=el.querySelector('.x'),fixed=el.classList.contains('fixed');if(lc)lc.style.display='';
     el.style.fontSize='';el.style.paddingLeft='';el.style.paddingRight='';el.style.paddingTop='';el.style.paddingBottom='';el.style.lineHeight='';
     if(sm){sm.style.display='';sm.style.fontSize=''}
     if(x)x.style.padding='';
@@ -3446,6 +3447,8 @@ function fitBlocks(){
     function over(){return el.scrollHeight>el.clientHeight+1||el.scrollWidth>el.clientWidth+1}
     function set(fs){el.style.fontSize=fs+'px';if(sm)sm.style.fontSize=(fs*0.9)+'px'}
     function best(){var lo=el.classList.contains('one')?7:el.classList.contains('narrow')?12:8,hi=17,ok=false;set(lo);if(over())return false;for(var k=0;k<7;k++){var mid=(lo+hi)/2;set(mid);if(over())hi=mid;else{lo=mid;ok=true}}set(lo);return true}
+    /* il luogo si vede solo se tutto sta a 13 px o più; altrimenti si nasconde per primo (ingrandendo con due dita ricompare) */
+    if(lc){set(13);var td0=el.querySelector('div:not(.lc):not(.sm)');if(over()||(el.classList.contains('one')&&td0&&td0.offsetHeight>13*1.5))lc.style.display='none'}
     if(!best()&&sm){sm.style.display='none';best()}
   });
 }
