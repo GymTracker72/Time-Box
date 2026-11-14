@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1400">
+<meta name="tb-build" content="2026-11-14-1410">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -260,6 +260,7 @@ details.foot summary{cursor:pointer;color:var(--muted)}
 .mold.we .moln b{color:var(--muted)}.mold.td .moln b{background:#ff3b30;color:#fff}
 .mole{display:block;flex:none;border-radius:4px;font:600 11px/14px var(--body);padding:0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mole.dn{opacity:.55;text-decoration:line-through}
 body.land #mese{padding:0}
+body.mland{padding-left:max(8px,env(safe-area-inset-left,0px))!important;padding-right:max(8px,env(safe-area-inset-right,0px))!important}body.mland .mol{padding-left:0;padding-right:0}
 .molr1{display:flex;align-items:center;gap:4px;min-width:0;height:17px;flex:none}.molr1 b{min-width:17px;height:17px;padding:0 3px;box-sizing:border-box;border-radius:9px;font:700 12.5px/17px var(--body);text-align:center;flex:none}
 .molr1 u{width:6px;height:6px;border-radius:3px;background:var(--amber);flex:none;text-decoration:none}
 .mold.we .molr1 b{color:var(--muted)}.mold.td .molr1 b{background:#ff3b30;color:#fff}
@@ -267,6 +268,7 @@ body.land #mese{padding:0}
 .mold .mole i{width:6px;height:6px;border-radius:3px;flex:none}.mold .mole.fg{font-weight:800}
 .molr1 .mole{flex:1}
 .molm{font:600 10.5px/12px var(--body);color:var(--muted);flex:none}
+@media (min-height:600px){.mol .mold{padding:6px 8px;gap:3px}.mol .molr1{height:24px}.mol .molr1 b{min-width:24px;height:24px;font-size:15px;line-height:24px;border-radius:12px}.mol .mold .mole{font-size:14px;line-height:18px}.mol .mold .mole i{width:8px;height:8px;border-radius:4px}.molh h1{font-size:28px}.molw span{font-size:13px}}
 body.land{padding-top:2px!important;padding-bottom:0!important}body.land .molh{height:30px}body.land .molg{gap:2px}body.land .mold{padding:2px 3px;gap:1px}body.land .mole{font-size:10.5px;line-height:13px}body.land .moln{height:16px}body.land .moln b{height:16px;min-width:16px;line-height:16px}
 /* iPhone in orizzontale: solo la griglia della settimana, come Calendario Apple */
 body.land .tabs,body.land .cseg,body.land .wseg,body.land .mog1,body.land .wkg,body.land .w2m,body.land .w2k,body.land #gset,body.land #gsh,body.land .tbver{display:none!important}
@@ -1677,7 +1679,7 @@ function typing(){var a=document.activeElement;return !!(a&&/^(INPUT|TEXTAREA|SE
 function rSoft(cl){if(typing()){rPend=Math.max(rPend,cl?2:1);return}if(cl)ui.sheet=null;render()}
 document.addEventListener('focusout',function(){setTimeout(function(){if(rPend&&!typing()){var c=rPend===2;rPend=0;if(c)ui.sheet=null;render()}},400)});
 function render(){
-  document.body.classList.toggle('land',phoneLand()&&(ui.mode==='sett'||ui.mode==='mese'));
+  document.body.classList.toggle('land',phoneLand()&&(ui.mode==='sett'||ui.mode==='mese'));document.body.classList.toggle('mland',touchLand()&&ui.mode==='mese');
   document.body.classList.toggle('hide-tb',calHid().indexOf('\u0001tb')>=0);
   if(ui.mode==='oggi'&&!ui.oggiNav)st.date=isoOf(new Date());
   document.body.classList.toggle('m-oggi',ui.mode==='oggi');document.body.classList.toggle('m-sett',ui.mode==='sett');document.body.classList.toggle('m-mese',ui.mode==='mese'||ui.mode==='anno');document.body.classList.toggle('m-voci',ui.mode==='voci'||ui.mode==='storico');document.body.classList.toggle('w2on',ui.mode==='sett');
@@ -1804,6 +1806,8 @@ function oggiBtn(key){if(key)return '';
   return '<button class="nav goto" data-act="day-today" aria-label="Torna a oggi">'+'Oggi'+'</button>';
 }
 /* iPhone girato in orizzontale: si apre la settimana a colonne (come Calendario Apple); tornando in verticale si torna alla vista di prima */
+/* qualsiasi dispositivo touch girato in orizzontale (iPhone, iPad): il Mese usa la griglia a riquadri a tutto schermo */
+function touchLand(){return !!(window.matchMedia&&matchMedia('(pointer:coarse)').matches)&&window.innerWidth>window.innerHeight}
 function phoneLand(){return !!(window.matchMedia&&matchMedia('(pointer:coarse)').matches)&&window.innerWidth>window.innerHeight&&window.innerHeight<600}
 (function(){var rt=0,wasL=phoneLand();
   function chk(){var L=phoneLand();
@@ -2039,11 +2043,11 @@ function renderMeseLand(){
   setTimeout(molFit,0);
 }
 /* adatta la griglia all'altezza dello schermo e nasconde le voci che non entrano, aggiornando il +N */
-function molFit(){var el=document.querySelector('.mol');if(!el)return;window.scrollTo(0,0);var top=el.getBoundingClientRect().top;el.style.height=Math.max(240,window.innerHeight-top-6)+'px';
+function molFit(){var el=document.querySelector('.mol');if(!el)return;window.scrollTo(0,0);var top=el.getBoundingClientRect().top,bot=window.innerHeight,tb=document.querySelector('.tabs');if(tb&&tb.offsetParent!==null){var r=tb.getBoundingClientRect();if(r.top>window.innerHeight/2)bot=Math.min(bot,r.top-6)}el.style.height=Math.max(240,bot-top-6)+'px';
   [].forEach.call(el.querySelectorAll('.mold'),function(c){var ev=c.querySelectorAll('.mole'),hid=0,tot=+(c.getAttribute('data-n')||0);for(var i=ev.length-1;i>=0&&c.scrollHeight>c.clientHeight+1;i--){ev[i].style.display='none';hid++}
     if(hid){var mi=c.querySelector('.molm');if(!mi){mi=document.createElement('span');mi.className='molm';c.appendChild(mi)}mi.textContent='+'+hid}})}
 function renderMese(){
-  if(phoneLand()){renderMeseLand();return}
+  if(touchLand()){renderMeseLand();return}
   var y=st.date.slice(0,4),mo=st.date.slice(5,7),ym=y+'-'+mo,first=ym+'-01',today=isoOf(new Date());
   var ld=parse(first);ld=new Date(ld.getFullYear(),ld.getMonth()+1,0);var lastIso=isoOf(ld);
   var AC={L:'var(--blue)',F:'var(--green)',P:'var(--red)'};
