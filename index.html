@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1055">
+<meta name="tb-build" content="2026-11-14-1104">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -472,6 +472,10 @@ body.m-plan .datebox.card{border:0;background:transparent;box-shadow:none;paddin
 .srow{border-top:1px solid transparent}
 .srow.h{border-top:1px solid var(--soft)}
 .srow span{border-right:0}
+/* ore dello schedule: più grandi e scure, centrate sulla linea come in Calendario Apple; nascoste quando la linea rossa è vicina */
+.srow span{font:600 13px/16px var(--body);color:var(--grey);padding:0 6px 0 4px;height:16px;align-self:flex-start;transform:translateY(-9px);background:var(--bg);width:auto;min-width:44px;box-sizing:border-box;letter-spacing:.01em;font-variant-numeric:tabular-nums;position:relative;z-index:1}
+.srow span.nh{visibility:hidden}
+.nowline .nt{font:700 13px/22px var(--body);font-variant-numeric:tabular-nums}
 .blk{border:0!important;border-radius:10px;color:#fff;background:var(--muted);padding-top:4px}
 .blk.flex.L,.blk.fixed.L,.blk.top.L{background:var(--blue)}.blk.flex.F,.blk.fixed.F,.blk.top.F{background:var(--green)}.blk.flex.P,.blk.fixed.P,.blk.top.P{background:var(--red)}
 .blk.fixed{background-image:none;color:#fff}
@@ -973,6 +977,8 @@ body.hide-tb .blk:not(.ext){display:none!important}
 .jb .arows .arow input.locin{flex:1 1 auto;min-width:0;border:0;background:transparent;box-shadow:none;padding:0;margin:0;font:600 17px/1.3 var(--body);color:var(--ink);outline:0}
 .jb .arows .arow input.locin::placeholder{font-weight:400;color:var(--muted);opacity:.7}
 .arows .alx+.arow{border-top:1px solid var(--soft)}
+.jb .arows .duew .av{color:var(--amber)}.jb .arows .duew.late .av{color:var(--red)}
+.vmeta.duev{color:var(--amber);font-weight:600}.vmeta.duev.late{color:var(--red)}
 .jb .dcard .alx .g{background:transparent;padding:0}
 .achip.aL{background:color-mix(in srgb,var(--blue) 18%,var(--surface))}.achip.aP{background:color-mix(in srgb,var(--red) 16%,var(--surface))}.achip.a,.achip.a{background:var(--soft)}
 .achip{display:inline-block;padding:6px 14px;border-radius:12px;background:color-mix(in srgb,var(--green) 18%,var(--surface));color:var(--ink);font:700 15px/1 var(--body);letter-spacing:.04em;text-transform:uppercase}
@@ -1752,7 +1758,7 @@ document.addEventListener('click',function(e){
     if(x.nd===x.date){if(x.ns!==b.s){b.s=x.ns;dragUndo(sn3,'«'+b.title+'» spostato alle '+slotLab(b.s))}render();return}
     if(b.rid){toast('Evento ricorrente: per cambiare giorno usa Modifica');render();return}
     var it=b.ref&&item(b.ref);
-    if(it){var er=scheduleItem(it,x.nd,x.ns,b.n,b.kind);if(er)toast(er);else dragUndo(sn3,'«'+b.title+'» spostato a '+ddmm(x.nd)+' alle '+slotLab(x.ns))}
+    if(it){var er=scheduleItem(it,x.nd,x.ns,b.n,b.kind);if(er)toast(er);else dragUndo(sn3,'«'+b.title+'» spostato a '+ddmm(x.nd)+' alle '+slotLab(x.ns)+dueMsg(it,x.nd))}
     else{st.days[x.date].blocks=st.days[x.date].blocks.filter(function(o){return o!==b});b.s=x.ns;day(x.nd).blocks.push(b);dragUndo(sn3,'«'+b.title+'» spostato a '+ddmm(x.nd)+' alle '+slotLab(x.ns))}
     render();
   }
@@ -2055,20 +2061,24 @@ function sheetOk(){
   if(err){sh.err=err;return}
   applyFrog(sh,it,sh.date);
   if(sh.rep){var fb=day(sh.date).blocks.filter(function(x){return x.ref===it.id})[0];startSeries(sh,sh.date,fb,it)}
-  ui.sheet=null;toast('«'+it.text+'» in calendario il '+ddmm(sh.date)+' alle '+slotLab(+sh.s)+(sh.frog===true?', rana':''));
+  ui.sheet=null;toast('«'+it.text+'» in calendario il '+ddmm(sh.date)+' alle '+slotLab(+sh.s)+(sh.frog===true?', rana':'')+dueMsg(it,sh.date));
 }
 
 
+function dueLab(d){var x=parse(d);return x.getDate()+' '+MON[x.getMonth()].slice(0,3)}
+/* scadenza nelle schede del blocco: compare solo se il giorno programmato coincide con la scadenza o la supera */
+function dueRow(it,date){if(!it||!it.due||!date||date<it.due)return '';var late=date>it.due;return '<div class="arow duew'+(late?' late':'')+'"><span class="an">Scadenza</span><span class="av">'+esc(dueLab(it.due))+(late?' · superata':' · stesso giorno')+'</span></div>'}
+function dueMsg(it,date){return it&&it.due&&date>it.due?' · dopo la scadenza ('+dueLab(it.due)+')':''}
 function whenLab(date,s,n){var d=parse(date);return DOW[d.getDay()].slice(0,3)+' '+d.getDate()+' '+MON[d.getMonth()].slice(0,3)+' · '+hm(S0+30*s)+' – '+hm(S0+30*(s+n))}
 function qoOpen(sh,isNew){return !!sh.qo}
 function moreRow(sh,val,inner){
   var op=!!sh.more;
   return '<div class="arows moreb"><button type="button" class="arow" data-act="more-tog" aria-expanded="'+op+'"><span class="an">Altro</span><span class="av">'+esc(val)+'</span><svg class="achv" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+(op?'M7 14.5l5-5 5 5':'M9.5 7l5 5-5 5')+'"/></svg></button></div>'+(op?inner:'')}
 function moreVal(sh){var a=[sh.kind==='fixed'?'Fisso':'Flessibile'];if(sh.rep)a.push('ripete');if(sh.frog===true)a.push('Rana');return a.join(' · ')}
-function dcardTop(sh,isNew,chg,fields,extra){
+function dcardTop(sh,isNew,chg,fields,extra,dr){
   var op=qoOpen(sh,isNew);
   return '<div class="arows dcard"><button type="button" class="arow" data-act="qo-tog" aria-expanded="'+op+'"><span class="an">Quando</span><span class="av">'+esc(whenLab(sh.date,+sh.s,+sh.n))+'</span></button>'+
-    (op?'<div class="alx"><div class="g">'+fields+'</div></div>':'')+
+    (op?'<div class="alx"><div class="g">'+fields+'</div></div>':'')+(dr||'')+
     '<label class="arow"><span class="an">Luogo</span><input class="locin" data-chg="'+chg+'" data-f="loc" placeholder="Aggiungi luogo" value="'+esc(sh.loc||'')+'" autocomplete="off" aria-label="Luogo"></label>'+(extra||'')+'</div>'}
 function confHtml(sh,hit,skip){
   var AC={L:'var(--blue)',F:'var(--green)',P:'var(--red)'},dt=new Date(sh.date+'T12:00'),n=+sh.n,k=qFree(sh.date,n,Math.max(0,Math.floor(+sh.s)),skip||''),h='<div class="cfl"><div class="cft">'+DOW[dt.getDay()]+' hai già</div>';
@@ -2272,13 +2282,14 @@ function viewHtml(sh,b){
   meta.push(b.kind==='fixed'?'Impegno fisso':'Flessibile');
   if(b.area)meta.push(AREAS[b.area]);
   if(it&&it.pr==='A')meta.push('Top priority');else if(it&&it.pr)meta.push('Priorità '+it.pr);
-  if(it&&it.due)meta.push('scade '+ddmm(it.due));
+  
   var fr=frogItem(day(sh.from));
   var h='<div class="sheet-bg mid" data-act="sheet-bg"><div class="vcard" role="dialog" aria-label="'+esc(b.title)+'" style="border-left-color:'+col+'">'+
     '<span class="lbl">'+DOW[dt.getDay()]+' '+dt.getDate()+' '+MON[dt.getMonth()]+'</span>'+
     '<div class="vt'+(dn?' dn':'')+'">'+(b.rid?'↻ ':'')+esc(b.title)+(fr&&b.ref===fr.id?' '+FROG:'')+'</div>'+
     '<div class="vtm">'+slotLab(b.s)+'–'+slotLab(b.s+b.n)+'<span> · '+hm(b.n*30)+'</span></div>'+
     '<div class="vmeta">'+meta.map(esc).join(' · ')+'</div>'+
+    (it&&it.due&&sh.from>=it.due?'<div class="vmeta duev'+(sh.from>it.due?' late':'')+'">'+(sh.from>it.due?'Scadenza superata: ':'Scade lo stesso giorno: ')+esc(dueLab(it.due))+'</div>':'')+
     (ser?'<div class="vmeta">Si ripete: '+esc(repLabel(ser,sh.from))+'</div>':'')+
     (it&&it.sub?'<div class="sublist" style="margin-top:4px">'+it.sub.map(function(x){return '<div class="subr"><button type="button" class="subc'+(x.st==='d'?' on':'')+'" data-act="sub-tog" data-id="'+it.id+'" data-s="'+x.id+'" aria-label="'+esc(x.text)+'"></button><span class="subt'+(x.st==='d'?' done':'')+'">'+esc(x.text)+'</span></div>'}).join('')+'</div>':'')+
     notesHtml(it||b)+
@@ -2324,7 +2335,7 @@ function blkHtml(sh,b){
     jbTitle(sh.title,'Titolo','sheet',nb)+
     dcardTop(sh,false,'sheet','<label><span class="lbl">Data</span><input type="date" data-chg="sheet" data-f="date" value="'+esc(sh.date)+'"></label>'+
     '<label><span class="lbl">Inizio</span><select data-chg="sheet" data-f="s">'+starts+'</select></label>'+
-    '<label><span class="lbl">Durata</span><select data-chg="sheet" data-f="n">'+durs+'</select></label>'+due,(it?'':areaF)+alHtml(sh,true))+
+    '<label><span class="lbl">Durata</span><select data-chg="sheet" data-f="n">'+durs+'</select></label>'+due,(it?'':areaF)+alHtml(sh,true),dueRow(it,sh.date))+
     (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+cf+
     (it?itemChips(it):'<div class="arows">'+selRow('Priorità','sheet','pr','<option value=""'+(!sh.pr?' selected':'')+'>Da classificare</option><option value="A"'+(sh.pr==='A'?' selected':'')+'>A · Top priority</option><option value="B"'+(sh.pr==='B'?' selected':'')+'>B · minore</option><option value="C"'+(sh.pr==='C'?' selected':'')+'>C · nessuna urgenza</option>',sh.pr?({A:'A · Top',B:'B · minore',C:'C · nessuna urgenza'}[sh.pr]):'Da classificare')+'</div>')+
     moreRow(sh,moreVal(sh),(it?'<div class="bsc bsl">'+frogRow(sh,it,sh.from)+'</div>':(sh.pr==='A'&&sh.area?'<div class="bsc bsl">'+frogRow(sh,{id:'_',pr:'A',area:sh.area},sh.from)+'</div>':''))+
@@ -3318,7 +3329,7 @@ function zoomApply(z){
 function renderSched(d){
   var ROWH=rowBase()*zoomF();document.documentElement.style.setProperty('--rh',ROWH+'px');
   var h='';
-  for(var i=0;i<NSLOT;i++){h+='<div class="srow'+(i%2===0?' h':'')+'"><span>'+(i%2===0?slotLab(i):'')+'</span></div>'}
+  for(var i=0;i<NSLOT;i++){h+='<div class="srow'+(i%2===0?' h':'')+'"><span'+(i%2===0?' data-m="'+(S0+30*i)+'"':'')+'>'+(i%2===0?slotLab(i):'')+'</span></div>'}
   var xb=extOf(d),lay=layout(d.blocks.concat(xb)),cl={};
   conflicts(d).forEach(function(p){cl[p[0].id]=1;cl[p[1].id]=1});
   var fi=frogItem(d);
@@ -3333,7 +3344,7 @@ function renderSched(d){
   }).join('')+'</div>';
   var tn=new Date(),tm=tn.getHours()*60+tn.getMinutes();
   if(tm>=S0&&tm<=S0+NSLOT*30)h+='<div class="nowline" id="nowline" style="top:'+((tm-S0)/30*ROWH)+'px"><span class="nt">'+pad(tn.getHours())+':'+pad(tn.getMinutes())+'</span><i></i></div>';
-  document.getElementById('sched').innerHTML=h;
+  document.getElementById('sched').innerHTML=h;if(tm>=S0&&tm<=S0+NSLOT*30)nearHide(tm);
   fitBlocks();
 }
 /* linea dell'ora corrente (stile Calendario Apple) e posizionamento all'apertura di Pianifica */
@@ -3342,7 +3353,9 @@ function tickNow(){
   var tn=new Date(),tm=tn.getHours()*60+tn.getMinutes(),rh=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--rh'))||22;
   if(tm<S0||tm>S0+NSLOT*30){el.style.display='none';return}
   el.style.display='';el.style.top=((tm-S0)/30*rh)+'px';el.firstChild.textContent=pad(tn.getHours())+':'+pad(tn.getMinutes());
+  nearHide(tm);
 }
+function nearHide(tm){var z=document.getElementById('sched');if(!z)return;z.querySelectorAll('.srow span[data-m]').forEach(function(x){x.classList.toggle('nh',Math.abs(+x.getAttribute('data-m')-tm)<13)})}
 setInterval(tickNow,30000);
 /* rientro in Oggi: porta al centro lo schermo il blocco in corso o il prossimo; la prima apertura resta sulle Top */
 function centerNext(){
@@ -3868,7 +3881,7 @@ function newHtml(sh){
     srcR+
     dcardTop(sh,true,'sheet','<label><span class="lbl">Data</span><input type="date" data-chg="sheet" data-f="date" value="'+esc(sh.date)+'"></label>'+
     '<label><span class="lbl">Inizio</span><select data-chg="sheet" data-f="s">'+starts+'</select></label>'+
-    '<label><span class="lbl">Durata</span><select data-chg="sheet" data-f="n">'+durs+'</select></label>',areaR+alHtml(sh,true))+
+    '<label><span class="lbl">Durata</span><select data-chg="sheet" data-f="n">'+durs+'</select></label>',areaR+alHtml(sh,true),dueRow(it,sh.date))+
     (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+cf+
     (prR?'<div class="arows">'+prR+'</div>':'')+
     moreRow(sh,moreVal(sh),frogNew(sh,it)+
