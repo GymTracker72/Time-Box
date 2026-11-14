@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1124">
+<meta name="tb-build" content="2026-11-14-1130">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -3076,7 +3076,7 @@ function renderVoci(){
   var all0=todoList(),nowMs=Date.now(),vf='',all=all0;
   var chips='<div class="vchips"><button type="button" class="vch'+(!vf?' on':'')+'" data-act="vf" data-v="">Tutte</button>'+AK.map(function(a){return '<button type="button" class="vch'+(vf===a?' on':'')+'" data-act="vf" data-v="'+a+'"><i class="dot '+a+'"></i>'+AREAS[a]+'</button>'}).join('')+'</div>';
   document.getElementById('voci').innerHTML='<h1 class="vt2">Da programmare<span>'+all.length+'</span></h1><section class="oquick">'+
-    (all.length?(function(){var g1=all.filter(function(i){return !i.pr}),g2=all.filter(function(i){return !!i.pr});function grp(t,a){return a.length?'<div class="vgh">'+t+'<span>'+a.length+'</span></div>'+a.map(function(i){return quickRow(i,nowMs)}).join(''):''}return grp('Da classificare',g1)+grp('Da programmare',g2)})():'<div class="sub" style="padding:16px 0">'+(vf?'Nessuna voce in questa area.':'Nessuna voce da pianificare.')+'</div>')+(doneList().length?'<div class="oalls"><button type="button" class="mini oall" data-act="storico-open">Completate ('+doneList().length+')</button></div>':'')+'</section>';
+    (all.length?(function(){var g1=all.filter(function(i){return !i.pr}),g2=all.filter(function(i){return !!i.pr});function grp(t,a){return a.length?'<div class="vgh">'+t+'<span>'+a.length+'</span></div>'+a.map(function(i){return quickRow(i,nowMs)}).join(''):''}return grp('Da pianificare',g1)+grp('Da programmare',g2)})():'<div class="sub" style="padding:16px 0">'+(vf?'Nessuna voce in questa area.':'Nessuna voce da pianificare.')+'</div>')+(doneList().length?'<div class="oalls"><button type="button" class="mini oall" data-act="storico-open">Completate ('+doneList().length+')</button></div>':'')+'</section>';
 }
 function renderOggi(d){
   var now=new Date(),isToday=st.date===isoOf(now),cur=-1,nowMin=now.getHours()*60+now.getMinutes(),h='',s=stats(d);
@@ -3095,7 +3095,7 @@ function renderOggi(d){
     return '<button class="q3r q3e '+a+'" data-act="top-open" data-a="'+a+'" aria-label="Scegli la Top '+AREAS[a]+'">'+ringSvg('',a)+'<span class="q3t">Scegli la Top</span><span class="q3a">'+AREAS[a]+'</span></button>';
   }).join('')+'</section>';
   /* Svuota la mente: subito sotto le Top */
-  h+='<form id="oggiform" class="ocap2" autocomplete="off"><input class="input" id="ogginew" placeholder="Svuota la mente…" aria-label="Svuota la mente: nuova voce" enterkeyhint="done"><button type="submit" class="ocapb" aria-label="Aggiungi"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></button></form>'+(recAll.length?'<div class="oalls" style="margin-top:-4px"><button type="button" class="mini oall" data-act="mode" data-m="voci">'+recAll.length+' da pianificare</button></div>':'');
+  h+='<form id="oggiform" class="ocap2" autocomplete="off"><input class="input" id="ogginew" placeholder="Svuota la mente…" aria-label="Svuota la mente: nuova voce" enterkeyhint="done"><button type="submit" class="ocapb" aria-label="Aggiungi"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 3v12M3 9h12"/></svg></button></form>'+(function(){var tl=todoList(),np=tl.filter(function(i){return !i.pr}).length,ng=tl.length-np,t=[];if(np)t.push(np+' da pianificare');if(ng)t.push(ng+' da programmare');return t.length?'<div class="oalls" style="margin-top:-4px"><button type="button" class="mini oall" data-act="mode" data-m="voci">'+t.join(' · ')+'</button></div>':''})();
   if(!fi&&topsTot){
     h+='<div class="ocard"><div class="olab" style="display:flex;gap:6px;align-items:center;font:600 15px/1 var(--body);color:var(--muted)">'+FROG+'<span>Rana di oggi</span></div><div class="sub" style="padding-top:4px;font-size:12px">Quale Top è la più difficile? Fai quella per prima.</div><div style="display:flex;flex-direction:column;gap:6px;padding-top:10px">'+
       AK.map(function(a){var v=d.tops[a],i=v&&v!=='empty'?item(v):null;return i?'<button type="button" class="obtn" style="background:var(--bg);text-align:left;padding:0 16px;font-size:15px;display:flex;align-items:center;gap:8px" data-act="frog" data-a="'+a+'"><span class="dot '+a+'" style="width:10px;height:10px"></span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(i.text)+'</span></button>':''}).join('')+'</div></div>';
