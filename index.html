@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1600">
+<meta name="tb-build" content="2026-11-14-1700">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -987,6 +987,23 @@ body.hide-tb .blk:not(.ext){display:none!important}
 .vgh{display:flex;align-items:baseline;justify-content:space-between;padding:18px 2px 6px;font:700 13px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .vgh span{font-weight:500;letter-spacing:0}
 .oquick>.vgh:first-child{padding-top:4px}
+
+/* scheda compatta: tutto dentro lo schermo */
+.sheet.jb{max-height:calc(100dvh - env(safe-area-inset-top,0px) - 10px);gap:10px;padding-top:12px}
+.jb .arows .arow,.jb .arows label.arow,.sheet.jb .arows label.arow{min-height:48px!important}
+.jb .tcard{gap:6px;padding:12px 16px}
+.jb .tcard>.bst{padding-bottom:8px!important}
+.jb .tcard>.jn{min-height:30px;padding:2px 0}
+.jb .shd{min-height:44px}
+@media (max-height:760px){.jb .arows .arow,.jb .arows label.arow,.sheet.jb .arows label.arow{min-height:44px!important}.sheet.jb{gap:8px}}
+
+.jb .cft{font-size:16px}
+.jb .cfc{padding:10px 14px;gap:10px}
+.jb .cfn{font-size:15px}
+.jb .cfs{font-size:13px}
+.jb .cfm{padding:11px 10px;font-size:14px;white-space:nowrap}
+.jb .notes{padding:8px 10px}
+.jb .oalls,.jb .subbtn{margin:0}
 /* Oggi: impostazione essenziale */
 .ohead .dvdot{width:14px;height:14px;margin:0 6px 12px 0;align-self:flex-end}
 body.m-oggi .top:not(.blk)>div:first-child,body.m-mese .top:not(.blk)>div:first-child,body.m-sett.w2on .top:not(.blk)>div:first-child{display:none!important}
@@ -2043,7 +2060,11 @@ function sheetOk(){
 
 
 function whenLab(date,s,n){var d=parse(date);return DOW[d.getDay()].slice(0,3)+' '+d.getDate()+' '+MON[d.getMonth()].slice(0,3)+' · '+hm(S0+30*s)+' – '+hm(S0+30*(s+n))}
-function qoOpen(sh,isNew){return sh.qo===undefined?!!isNew:!!sh.qo}
+function qoOpen(sh,isNew){return !!sh.qo}
+function moreRow(sh,val,inner){
+  var op=!!sh.more;
+  return '<div class="arows moreb"><button type="button" class="arow" data-act="more-tog" aria-expanded="'+op+'"><span class="an">Altro</span><span class="av">'+esc(val)+'</span><svg class="achv" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+(op?'M7 14.5l5-5 5 5':'M9.5 7l5 5-5 5')+'"/></svg></button></div>'+(op?inner:'')}
+function moreVal(sh){var a=[sh.kind==='fixed'?'Fisso':'Flessibile'];if(sh.rep)a.push('ripete');if(sh.frog===true)a.push('Rana');return a.join(' · ')}
 function dcardTop(sh,isNew,chg,fields,extra){
   var op=qoOpen(sh,isNew);
   return '<div class="arows dcard"><button type="button" class="arow" data-act="qo-tog" aria-expanded="'+op+'"><span class="an">Quando</span><span class="av">'+esc(whenLab(sh.date,+sh.s,+sh.n))+'</span></button>'+
@@ -2306,9 +2327,9 @@ function blkHtml(sh,b){
     '<label><span class="lbl">Durata</span><select data-chg="sheet" data-f="n">'+durs+'</select></label>'+due,(it?'':areaF)+alHtml(sh,true))+
     (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+cf+
     (it?itemChips(it):'<div class="arows">'+selRow('Priorità','sheet','pr','<option value=""'+(!sh.pr?' selected':'')+'>Da classificare</option><option value="A"'+(sh.pr==='A'?' selected':'')+'>A · Top priority</option><option value="B"'+(sh.pr==='B'?' selected':'')+'>B · minore</option><option value="C"'+(sh.pr==='C'?' selected':'')+'>C · nessuna urgenza</option>',sh.pr?({A:'A · Top',B:'B · minore',C:'C · nessuna urgenza'}[sh.pr]):'Da classificare')+'</div>')+
-    (it?'<div class="bsc bsl">'+frogRow(sh,it,sh.from)+'</div>':(sh.pr==='A'&&sh.area?'<div class="bsc bsl">'+frogRow(sh,{id:'_',pr:'A',area:sh.area},sh.from)+'</div>':''))+
+    moreRow(sh,moreVal(sh),(it?'<div class="bsc bsl">'+frogRow(sh,it,sh.from)+'</div>':(sh.pr==='A'&&sh.area?'<div class="bsc bsl">'+frogRow(sh,{id:'_',pr:'A',area:sh.area},sh.from)+'</div>':''))+
     '<div class="bsc"><div class="g"><label><span class="lbl">Tipo</span><select data-chg="sheet" data-f="kind"><option value="flex"'+(sh.kind==='flex'?' selected':'')+'>Flessibile</option><option value="fixed"'+(sh.kind==='fixed'?' selected':'')+'>Fisso</option></select></label></div>'+repHtml(sh)+'</div>'+
-    (b.rid&&st.rec[b.rid]?'<div class="sub">Fa parte di una serie: '+esc(repLabel(st.rec[b.rid],sh.date))+'.</div>':'')+
+    (b.rid&&st.rec[b.rid]?'<div class="sub">Fa parte di una serie: '+esc(repLabel(st.rec[b.rid],sh.date))+'.</div>':''))+
     '<button type="button" class="arow dang" data-act="blk-del">Togli dal piano</button><div class="bsf bsf2"><button class="mini" data-act="blk-copy" type="button">Copia</button>'+(it?(sh.confirm?'<button class="mini red" data-act="ed-del2" data-id="'+it.id+'" type="button">Conferma: cancella</button>':'<button class="mini red" data-act="ed-del" data-id="'+it.id+'" type="button">Elimina voce</button>'):'')+'</div></div></div>';
 }
 function blkDelScope(v){
@@ -3637,6 +3658,7 @@ document.addEventListener('click',function(e){
       else if(shf.mode==='new'||shf.mode==='blk'){shf.frog=shf.frog!==true;if(shf.frog)shf.pr='A';shf.dirty=true}}break;
     case 'sheet-ok':var nta2=document.getElementById('notenew'),no2=nta2&&nta2.value.trim()?noteOwner(ui.sheet):null;if(no2){(no2.notes=no2.notes||[]).push({id:uid(),c:Date.now(),x:nta2.value.trim()})}if(ui.sheet&&ui.sheet.mode==='deleg')delegOk();else if(ui.sheet&&ui.sheet.mode==='blk')blkOk();else if(ui.sheet&&ui.sheet.mode==='new')newOk();else sheetOk();if(ui.sheet&&ui.sheet.err)toast(ui.sheet.err);break;
     case 'vf':ui.vf=t.getAttribute('data-v')||'';break;
+    case 'more-tog':if(ui.sheet){ui.sheet.more=!ui.sheet.more}break;
     case 'qo-tog':if(ui.sheet){ui.sheet.qo=!qoOpen(ui.sheet,ui.sheet.mode==='new')}break;
     case 'conf-move':var cs0=ui.sheet,ck=cs0?qFree(cs0.date,+cs0.n,Math.max(0,Math.floor(+cs0.s)),t.getAttribute('data-skip')||''):-1;if(ck>=0)cs0.s=ck;break;
     case 'note-add':var no=noteOwner(ui.sheet),nta=document.getElementById('notenew'),ntx=nta?nta.value.trim():'';if(no&&ntx){(no.notes=no.notes||[]).push({id:uid(),c:Date.now(),x:ntx})}break;
@@ -3838,7 +3860,7 @@ function newHtml(sh){
   var prO='<option value=""'+(!sh.pr?' selected':'')+'>Da classificare</option><option value="A"'+(sh.pr==='A'?' selected':'')+'>A · Top priority</option><option value="B"'+(sh.pr==='B'?' selected':'')+'>B · minore</option><option value="C"'+(sh.pr==='C'?' selected':'')+'>C · nessuna</option>';
   var prR=(it||sh.kind!=='flex'||sh.rep)?'':selRow('Priorità','sheet','pr',prO,sh.pr?({A:'A · Top',B:'B · minore',C:'C · nessuna'}[sh.pr]):'Da classificare');
   var due='',srcR='<div class="arows">'+selRow('Da elenco','sheet','src',src,it?esc(it.text):'Voce libera')+'</div>';
-  var nt=it?'':'<textarea class="jn" data-chg="sheet" data-f="note" rows="2" placeholder="Note" aria-label="Note">'+esc(sh.note||'')+'</textarea>';
+  var nt=it?'':'<textarea class="jn" data-chg="sheet" data-f="note" rows="1" placeholder="Note" aria-label="Note">'+esc(sh.note||'')+'</textarea>';
   var dstr=sh.date===isoOf(new Date())?'Oggi':ddmm(sh.date);
   return '<div class="sheet-bg" data-act="sheet-bg"><div class="sheet prep bs jb" role="dialog" aria-label="Nuovo blocco">'+
     jbHead(sh,null,true)+
@@ -3849,8 +3871,8 @@ function newHtml(sh){
     '<label><span class="lbl">Durata</span><select data-chg="sheet" data-f="n">'+durs+'</select></label>',areaR+alHtml(sh,true))+
     (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+cf+
     (prR?'<div class="arows">'+prR+'</div>':'')+
-    frogNew(sh,it)+
-    '<div class="bsc"><div class="g"><label><span class="lbl">Tipo</span><select data-chg="sheet" data-f="kind"><option value="flex"'+(sh.kind==='flex'?' selected':'')+'>Flessibile</option><option value="fixed"'+(sh.kind==='fixed'?' selected':'')+'>Fisso</option></select></label></div>'+repHtml(sh)+'</div></div></div>';
+    moreRow(sh,moreVal(sh),frogNew(sh,it)+
+    '<div class="bsc"><div class="g"><label><span class="lbl">Tipo</span><select data-chg="sheet" data-f="kind"><option value="flex"'+(sh.kind==='flex'?' selected':'')+'>Flessibile</option><option value="fixed"'+(sh.kind==='fixed'?' selected':'')+'>Fisso</option></select></label></div>'+repHtml(sh)+'</div>')+'</div></div>';
 }
 function newOk(){
   var sh=ui.sheet;if(!sh)return;
@@ -4070,12 +4092,43 @@ function gdLoad(){return new Promise(function(res,rej){
   if(window.google&&google.accounts&&google.accounts.oauth2)return res();
   var e=document.createElement('script');e.src='https://accounts.google.com/gsi/client';e.async=true;
   e.onload=function(){res()};e.onerror=function(){rej({code:'net',message:'non riesco a caricare l\'accesso Google: controlla la connessione.'})};document.head.appendChild(e)})}
-function gdAsk(prompt){return new Promise(function(res,rej){
+/* Rinnovo automatico dei permessi Google: con TBW (indirizzo del servizio di rinnovo) l'accesso si fa una volta e poi si rinnova da solo.
+   Senza TBW l'app usa l'accesso a un'ora di prima (richiede un tocco a ogni scadenza). */
+var TBW='',RTK='timebox-rt',rtP=null;
+function tbwOn(){return !!TBW&&GDon()}
+function rtGet(){try{return localStorage.getItem(RTK)||''}catch(e){return ''}}
+function rtSet(v){try{if(v)localStorage.setItem(RTK,v);else localStorage.removeItem(RTK)}catch(e){}}
+function tbwPost(path,body){
+  return fetch(TBW+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){
+    return r.json().catch(function(){return {}}).then(function(j){if(!r.ok)throw {code:'auth',error:j.error||'',message:j.error==='invalid_grant'?'accesso scaduto.':'accesso non riuscito.'};return j})},
+    function(){throw {code:'net',message:'servizio di accesso non raggiungibile.'}})}
+function tbwApply(r){
+  var ex=Date.now()+((+r.expires_in||3600)-90)*1000,sc=r.scope||'';
+  if(sc.indexOf(GSCOPE)>=0){gd.tok=r.access_token;gd.exp=ex;gdSave();lsSet(GOK,1)}
+  if(sc.indexOf(CSCOPE)>=0){gc.tok=r.access_token;gc.exp=ex;gcSave()}
+  if(r.rt)rtSet(r.rt)}
+function rtRenew(){
+  if(rtP)return rtP;var rt=rtGet();if(!rt)return Promise.reject({code:'auth',message:'accesso scaduto.'});
+  rtP=tbwPost('/refresh',{rt:rt}).then(function(r){tbwApply(r);return r}).catch(function(e){if(e&&e.error==='invalid_grant')rtSet('');throw e});
+  rtP.then(function(){rtP=null},function(){rtP=null});return rtP}
+function codeAsk(scope){return new Promise(function(res,rej){
+  if(!(window.google&&google.accounts&&google.accounts.oauth2&&google.accounts.oauth2.initCodeClient)){rej({code:'net',message:'non riesco a caricare l\'accesso Google: controlla la connessione.'});return}
+  var cl=google.accounts.oauth2.initCodeClient({client_id:GCLIENT,scope:scope,ux_mode:'popup',
+    callback:function(r){
+      if(!(r&&r.code)){rej({code:'auth',message:r&&r.error==='access_denied'?'accesso non consentito per questo account.':'accesso non riuscito.'});return}
+      tbwPost('/exchange',{code:r.code}).then(function(j){
+        var ok=scope.split(' ').every(function(x){return (j.scope||'').indexOf(x)>=0});
+        if(!ok){rej({code:'perm',message:'permesso non concesso.'});return}
+        tbwApply(j);res(j)}).catch(rej)},
+    error_callback:function(e){rej({code:'auth',message:e&&e.type==='popup_closed'?'accesso annullato.':'accesso non riuscito.'})}});
+  cl.requestCode()})}
+function gdAsk(prompt){if(tbwOn())return codeAsk(GSCOPE+(calOn()?' '+CSCOPE:'')).then(function(){return gd.tok});return new Promise(function(res,rej){
   if(!gd.client)gd.client=google.accounts.oauth2.initTokenClient({client_id:GCLIENT,scope:GSCOPE,callback:function(r){gd.cb&&gd.cb(r)},error_callback:function(e){gd.eb&&gd.eb(e)}});
   gd.cb=function(r){if(r&&r.access_token){gd.tok=r.access_token;gd.exp=Date.now()+((+r.expires_in||3600)-90)*1000;gdSave();lsSet(GOK,1);res(gd.tok)}else rej({code:'auth',message:r&&r.error==='access_denied'?'accesso non consentito per questo account.':'accesso non riuscito.'})};
   gd.eb=function(e){rej({code:'auth',message:e&&e.type==='popup_closed'?'accesso annullato.':'accesso non riuscito.'})};
   gd.client.requestAccessToken({prompt:prompt})})}
 async function gdTok(){if(gd.tok&&Date.now()<gd.exp)return gd.tok;if(gdRead())return gd.tok;
+  if(tbwOn()&&rtGet()){try{await rtRenew();if(gd.tok&&Date.now()<gd.exp)return gd.tok}catch(e){if(e&&e.code==='net')throw e}}
   var ua=navigator.userActivation&&navigator.userActivation.isActive;
   if(!ua)throw {code:'auth',message:'accesso scaduto.'};
   await gdLoad();return gdAsk('')}
@@ -4111,8 +4164,9 @@ function gdLogin(){
   gdAsk('').then(function(){gateHide();lsSet(FK,1);dv.on=true;dv.auth=false;dv.st='busy';dvShow();dvSync()}).catch(function(e){if(document.getElementById('gate'))gateShow(e&&e.message||'accesso non riuscito.');else{dv.st='err';dv.msg=dvErr(e);dv.auth=true;dvShow()}})}
 async function gdOut(){
   if(lsGet(UK)>lsGet(SK)){dv.auth=false;await dvSync();if(dv.st!=='ok'){toast('Non riesco a salvare su Drive: uscita annullata');return}}
+  try{if(tbwOn()&&rtGet())tbwPost('/revoke',{rt:rtGet()}).catch(function(){})}catch(e){}
   try{if(gd.tok&&window.google)google.accounts.oauth2.revoke(gd.tok,function(){})}catch(e){}
-  [KEY,UK,SK,FK,GOK,GTK,CON,CTK,CID,KEY+'.quote','timebox-wkv','timebox-pwk','timebox-parea','timebox-pbusy'].forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});
+  [RTK,KEY,UK,SK,FK,GOK,GTK,CON,CTK,CID,KEY+'.quote','timebox-wkv','timebox-pwk','timebox-parea','timebox-pbusy'].forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});
   location.reload()}
 
 /* ---- Google Calendar: blocchi come eventi, colori per area, avvisi ---- */
@@ -4128,7 +4182,7 @@ function gcSave(){try{localStorage.setItem(CTK,JSON.stringify({t:gc.tok,e:gc.exp
 function gcRead(){try{var o=JSON.parse(localStorage.getItem(CTK)||'null');if(o&&o.t&&o.e>Date.now()+60000){gc.tok=o.t;gc.exp=o.e;return true}}catch(e){}return false}
 function gcDrop(){gc.tok='';gc.exp=0;try{localStorage.removeItem(CTK)}catch(e){}}
 function gcHas(){return !!(gc.tok&&Date.now()<gc.exp)||gcRead()}
-function gcAsk(prompt){return new Promise(function(res,rej){
+function gcAsk(prompt){if(tbwOn())return codeAsk(GSCOPE+' '+CSCOPE).then(function(){return gc.tok});return new Promise(function(res,rej){
   if(!gc.client)gc.client=google.accounts.oauth2.initTokenClient({client_id:GCLIENT,scope:CSCOPE,callback:function(r){gc.cb&&gc.cb(r)},error_callback:function(e){gc.eb&&gc.eb(e)}});
   gc.cb=function(r){if(r&&r.access_token){
       try{if(google.accounts.oauth2.hasGrantedAllScopes&&!google.accounts.oauth2.hasGrantedAllScopes(r,CSCOPE)){rej({code:'perm',message:'permesso del calendario non concesso.'});return}}catch(x){}
@@ -4136,7 +4190,7 @@ function gcAsk(prompt){return new Promise(function(res,rej){
     else rej({code:'auth',message:r&&r.error==='access_denied'?'accesso al calendario non consentito.':'accesso al calendario non riuscito'+(r&&r.error?' ('+r.error+')':'')+'.'})};
   gc.eb=function(e){rej({code:'auth',message:e&&e.type==='popup_closed'?'accesso annullato.':'accesso al calendario non riuscito.'})};
   gc.client.requestAccessToken({prompt:prompt})})}
-async function gcTok(){if(gcHas())return gc.tok;var ua=navigator.userActivation&&navigator.userActivation.isActive;if(!ua)throw {code:'auth',message:'accesso scaduto.'};await gdLoad();return gcAsk('')}
+async function gcTok(){if(gcHas())return gc.tok;if(tbwOn()&&rtGet()){try{await rtRenew();if(gcHas())return gc.tok}catch(e){if(e&&e.code==='net')throw e}}var ua=navigator.userActivation&&navigator.userActivation.isActive;if(!ua)throw {code:'auth',message:'accesso scaduto.'};await gdLoad();return gcAsk('')}
 function gcWait(ms){return new Promise(function(r){setTimeout(r,ms)})}
 async function gcFetch(path,o,n){
   o=o||{};n=n||0;var t=await gcTok();o.headers=Object.assign({},o.headers,{Authorization:'Bearer '+t});
@@ -4441,7 +4495,7 @@ calShow();setTimeout(function(){if(impCfg().on&&gcHas())impRun()},1800);
 /* permesso Google scaduto (dura circa un'ora): il browser non permette di riaprire l'accesso da solo,
    serve un gesto. Al primo tocco in qualunque punto rinnovo Drive e Calendar e riparto. */
 var rnw={busy:0,fail:0,cl:null,cb:null,eb:null};
-function bothAsk(){return new Promise(function(res,rej){
+function bothAsk(){if(tbwOn())return codeAsk(GSCOPE+' '+CSCOPE).then(function(){});return new Promise(function(res,rej){
   if(!rnw.cl)rnw.cl=google.accounts.oauth2.initTokenClient({client_id:GCLIENT,scope:GSCOPE+' '+CSCOPE,callback:function(r){rnw.cb&&rnw.cb(r)},error_callback:function(e){rnw.eb&&rnw.eb(e)}});
   rnw.cb=function(r){if(r&&r.access_token){var ex=Date.now()+((+r.expires_in||3600)-90)*1000;gd.tok=gc.tok=r.access_token;gd.exp=gc.exp=ex;gdSave();gcSave();lsSet(GOK,1);res()}else rej({code:'auth',message:'accesso non riuscito.'})};
   rnw.eb=function(e){rej({code:'auth',message:e&&e.type==='popup_closed'?'accesso annullato.':'accesso non riuscito.'})};
@@ -4449,6 +4503,7 @@ function bothAsk(){return new Promise(function(res,rej){
 function needGd(){return GDon()&&dv.on&&!(gd.tok&&Date.now()<gd.exp)&&!gdRead()}
 function needGc(){return GDon()&&calOn()&&!gcHas()}
 function renewTap(){
+  if(tbwOn()&&rtGet())return;
   if(rnw.busy||!(window.google&&google.accounts&&google.accounts.oauth2))return;
   if(!needGd()&&!needGc())return;
   if(Date.now()-rnw.fail<60000)return;
@@ -4458,7 +4513,13 @@ function renewTap(){
   p.catch(function(e){rnw.fail=Date.now();if(needGd()){dv.st='err';dv.msg=dvErr(e);dv.auth=true;dvShow()}else{cs.st='err';cs.auth=true;cs.msg=(e&&e.message)||'accesso non riuscito.';calShow()}})
    .then(function(){rnw.busy=0})}
 document.addEventListener('click',renewTap,true);
-if(GDon()&&lsGet(GOK)&&(needGd()||needGc()))setTimeout(function(){if(needGd()||needGc())toast('Tocca lo schermo per riprendere la sincronizzazione')},1500);
+function silentRenew(){
+  if(!tbwOn()||!rtGet()||rtP||!(needGd()||needGc()))return;
+  rtRenew().then(function(){dv.auth=false;cs.auth=false;if(dv.on){dv.st='busy';dvShow();dvSync()}if(calOn())calQueue(300)}).catch(function(e){if(!(e&&e.code==='net')){if(needGd()){dv.st='err';dv.msg=dvErr(e);dv.auth=true;dvShow()}}})}
+if(tbwOn())setTimeout(silentRenew,300);
+setInterval(silentRenew,45000);
+window.addEventListener('focus',silentRenew);window.addEventListener('pageshow',silentRenew);
+if(GDon()&&lsGet(GOK)&&!(tbwOn()&&rtGet())&&(needGd()||needGc()))setTimeout(function(){if(needGd()||needGc())toast('Tocca lo schermo per riprendere la sincronizzazione')},1500);
 setInterval(function(){
   if(!dv.on||document.hidden||dv.busy||ui.sheet)return;
   var ae=document.activeElement;if(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName))return;
