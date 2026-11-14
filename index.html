@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1130">
+<meta name="tb-build" content="2026-11-14-1200">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -296,6 +296,20 @@ textarea{width:100%;min-height:110px;border:1px solid var(--line);background:var
 .odc{font:600 12px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:16px 16px 8px}
 .orow.pu .go{flex:1 0 100%}
 .orow .pact{display:flex}
+.oadesso{background:var(--surface);box-shadow:0 1px 3px rgba(31,42,40,.08);display:flex;flex-direction:column;gap:4px}
+.oadesso .olab{letter-spacing:.02em}
+.oprop{display:flex;align-items:center;gap:12px;background:var(--bg);border-radius:14px;padding:12px 14px;margin-top:10px}
+.oprop .dot{width:10px;height:10px;border-radius:50%;background:var(--grey);flex:none}.oprop .dot.L{background:var(--blue)}.oprop .dot.F{background:var(--green)}.oprop .dot.P{background:var(--red)}
+.oprop .opt{min-width:0;display:flex;flex-direction:column;gap:2px}.oprop .tt{font:600 17px/1.25 var(--body)}.oprop .ow{font:400 14px/1.2 var(--body);color:var(--muted)}
+.oadesso .ostart{width:100%;margin-top:12px}
+.onext{align-self:center;border:0;background:transparent;color:var(--blue);font:600 16px/1 var(--body);padding:12px;min-height:44px;margin-bottom:-8px}
+.orow.pu2{flex-wrap:wrap;background:var(--amber-bg)}
+.orow.pu2 .tt small{display:block;font:600 12.5px/1.3 var(--body);color:var(--amber);margin-top:2px}
+.orow .pact2{flex:1 0 100%;display:flex;flex-wrap:wrap;gap:8px;padding:2px 12px 12px 16px}
+.pact2 .pa{border:0;border-radius:18px;background:var(--surface);color:var(--ink);font:600 14.5px/1 var(--body);padding:0 14px;min-height:38px}
+.pact2 .pa.b{background:var(--blue);color:#fff}.pact2 .pa.a{background:var(--amber);color:#fff}.pact2 .pa.rd{color:var(--red)}
+.vfill{width:100%;margin:0 0 12px}
+.odone.ob{border-bottom:0;border-top:1px solid var(--soft)}
 .odone{display:block;width:100%;border:0;border-bottom:1px solid var(--soft);background:transparent;color:var(--muted);font:500 14px/1 var(--body);text-align:left;padding:14px 16px}
 .onow{display:flex;align-items:center;gap:6px;padding:6px 12px 6px 8px;color:#ff3b30;font:700 11px/1 var(--body)}
 .onow i{width:10px;height:10px;border-radius:50%;background:#ff3b30;flex:none}
@@ -3027,6 +3041,18 @@ function ringSvg(s,a){
     (arc?'<circle cx="12" cy="12" r="9" fill="none" class="'+c+'" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="'+arc+' 57" transform="rotate(-90 12 12)"/>':'')+
     (s==='d'?'<path d="M8 12.5l3 3 5-6" fill="none" class="'+c+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>':'')+'</svg>';
 }
+function nowCands(d){
+  var td=isoOf(new Date()),seen={},out=[],rk={A:0,B:1,C:2,'':3};
+  function sched(i){return Object.keys(st.days).some(function(k){return k>=td&&(st.days[k].blocks||[]).some(function(b){return b.ref===i.id})})}
+  function ok(i){if(!i||seen[i.id]||i.st==='d'||i.pr==='D'||i.pr==='E'||sched(i))return false;if(i.pr==='A'&&i.area){var cu=d.tops[i.area];if(!i.area||(cu&&cu!=='empty'&&cu!==i.id))return false}if(i.pr==='A'&&!i.area)return false;return true}
+  function add(i){if(ok(i)){seen[i.id]=1;out.push(i)}}
+  add(frogItem(d));AK.forEach(function(a){var v=d.tops[a];if(v&&v!=='empty')add(item(v))});
+  (d.prog||[]).forEach(function(x){add(item(x))});
+  todoList().filter(function(i){return i.pr}).sort(function(a,b){var ra=rk[a.pr]!=null?rk[a.pr]:3,rb=rk[b.pr]!=null?rk[b.pr]:3;if(ra!==rb)return ra-rb;var da=a.due||'9999',db=b.due||'9999';return da<db?-1:da>db?1:0}).forEach(add);
+  return out.slice(0,12);
+}
+function propWhy(i,d){var a=[];if(i.area)a.push(AREAS[i.area]);var fr=frogItem(d);if(fr&&fr.id===i.id)a.push('la rana di oggi');else if(i.pr==='A')a.push('Top');else if(i.pr)a.push('priorità '+i.pr);
+  if(i.due){var td=isoOf(new Date());a.push(i.due<td?'scaduta il '+ddmm(i.due):i.due===td?'scade oggi':'scade il '+ddmm(i.due))}return a.join(' · ')}
 function fmtLeft(min){var h=Math.floor(min/60),m=min%60;return h?(h+' h'+(m?' '+m+' min':'')):(m+' min')}
 function oRow(b,withTime){
   var fr0=frogItem(day()),it=b.ref&&item(b.ref),dur=hm(b.n*30);var mm0=Math.round(b.n*30);dur=mm0<60?mm0+' min':(Math.floor(mm0/60)+' h'+(mm0%60?' '+mm0%60+' min':''));
@@ -3075,7 +3101,8 @@ function renderStorico(){
 function renderVoci(){
   var all0=todoList(),nowMs=Date.now(),vf='',all=all0;
   var chips='<div class="vchips"><button type="button" class="vch'+(!vf?' on':'')+'" data-act="vf" data-v="">Tutte</button>'+AK.map(function(a){return '<button type="button" class="vch'+(vf===a?' on':'')+'" data-act="vf" data-v="'+a+'"><i class="dot '+a+'"></i>'+AREAS[a]+'</button>'}).join('')+'</div>';
-  document.getElementById('voci').innerHTML='<h1 class="vt2">Da programmare<span>'+all.length+'</span></h1><section class="oquick">'+
+  var tdv=isoOf(new Date()),lsv=st.days[tdv]?todayLoose(st.days[tdv]):[];
+  document.getElementById('voci').innerHTML='<h1 class="vt2">Da programmare<span>'+all.length+'</span></h1>'+(lsv.length?'<button type="button" class="obtn p vfill" data-act="fill-day-today">Metti in fila da adesso '+(lsv.length===1?'la voce':'le '+lsv.length+' voci')+' di oggi</button>':'')+'<section class="oquick">'+
     (all.length?(function(){var g1=all.filter(function(i){return !i.pr}),g2=all.filter(function(i){return !!i.pr});function grp(t,a){return a.length?'<div class="vgh">'+t+'<span>'+a.length+'</span></div>'+a.map(function(i){return quickRow(i,nowMs)}).join(''):''}return grp('Da pianificare',g1)+grp('Da programmare',g2)})():'<div class="sub" style="padding:16px 0">'+(vf?'Nessuna voce in questa area.':'Nessuna voce da pianificare.')+'</div>')+(doneList().length?'<div class="oalls"><button type="button" class="mini oall" data-act="storico-open">Completate ('+doneList().length+')</button></div>':'')+'</section>';
 }
 function renderOggi(d){
@@ -3102,7 +3129,7 @@ function renderOggi(d){
   }
   var pcH=prepCard(isToday,nowMin);h+=pcH;
   var loose=isToday?todayLoose(d):[];
-  if(loose.length)h+='<div class="ora"><div class="olab">Da programmare oggi</div><div class="ttl">'+(loose.length===1?'1 voce':loose.length+' voci')+' senza orario</div><div class="oleft">'+loose.slice(0,3).map(function(i){return esc(i.text)}).join(' · ')+(loose.length>3?' …':'')+'</div><div class="row2"><button class="obtn p" data-act="fill-day">Metti in fila da adesso</button><button class="obtn" data-act="mode" data-m="plan">Pianifica</button></div></div>';
+  if(false)h+='<div class="ora"><div class="olab">Da programmare oggi</div><div class="ttl">'+(loose.length===1?'1 voce':loose.length+' voci')+' senza orario</div><div class="oleft">'+loose.slice(0,3).map(function(i){return esc(i.text)}).join(' · ')+(loose.length>3?' …':'')+'</div><div class="row2"><button class="obtn p" data-act="fill-day">Metti in fila da adesso</button><button class="obtn" data-act="mode" data-m="plan">Pianifica</button></div></div>';
   /* Ora */
   if(isToday){
     var undn=undone(d);
@@ -3118,9 +3145,12 @@ function renderOggi(d){
     }else{
       var start=Math.max(0,Math.ceil(cur)),nb=bl.filter(function(b){return b.s>=start})[0],gap=(nb?nb.s:NSLOT)-start;
       if(gap>0){
-        var cand=d.prog.map(item).filter(function(i){return i&&!d.blocks.some(function(b){return b.ref===i.id})}).slice(0,2),dn=Math.min(1,gap);
-        h+='<div class="ora"><div class="olab">'+pad(now.getHours())+':'+pad(now.getMinutes())+'</div><div class="ttl">Libero '+(nb?'fino alle '+slotLab(nb.s):'fino a sera')+'</div><div class="oleft">Hai '+fmtLeft(gap*30)+(cand.length?'. Cosa ci metti?':'.')+'</div>'+
-          cand.map(function(i){return '<div class="ofill">'+(i.area?'<span class="dot '+i.area+'"></span>':'<span class="dot"></span>')+'<span class="tt">'+esc(i.text)+'</span><button class="obtn" data-act="fill-gap" data-id="'+i.id+'" data-s="'+start+'" data-n="'+dn+'">Alle '+slotLab(start)+'</button></div>'}).join('')+'</div>';
+        /* card Adesso: una sola proposta (rana, Top, voci del giorno, poi le altre per priorità e scadenza), che parte da subito */
+        var fs=Math.floor(cur),end=nb?nb.s:NSLOT,fn=Math.min(end-fs,4),mins=Math.max(0,S0+30*end-nowMin),pc=nowCands(d),pi=pc.length?pc[(ui.propI||0)%pc.length]:null;
+        h+='<div class="ora oadesso"><div class="olab">Adesso</div><div class="ttl">Libero '+(nb?'fino alle '+slotLab(nb.s):'fino a sera')+'</div><div class="oleft">'+(nb?fmtLeft(mins):'Hai '+fmtLeft(mins))+'</div>'+
+          (pi?'<div class="oprop">'+(pi.area?'<span class="dot '+pi.area+'"></span>':'<span class="dot"></span>')+'<div class="opt"><div class="tt'+(fi&&pi.id===fi.id?' fg':'')+'">'+esc(pi.text)+(fi&&pi.id===fi.id?' '+FROG:'')+'</div><div class="ow">'+esc(propWhy(pi,d))+'</div></div></div>'+
+            '<button class="obtn p ostart" data-act="now-start" data-id="'+pi.id+'" data-s="'+fs+'" data-n="'+fn+'">Inizia ora</button>'+(pc.length>1?'<button type="button" class="onext" data-act="now-next">Un\'altra</button>':'')
+          :'<div class="row2"><button class="obtn" data-act="mode" data-m="voci">Scegli dalle voci</button></div>')+'</div>';
       }else if(nb){
         h+='<div class="ora '+(nb.area||'')+'"><div class="olab">Prossimo, '+slotLab(nb.s)+'</div><div class="ttl">'+(nb.rid?'↻ ':'')+esc(nb.title)+'</div></div>';
       }
@@ -3138,14 +3168,16 @@ function renderOggi(d){
     var pu=past.filter(function(b){return b.kind!=='fixed'&&bst(b)!=='d'}),pd=past.filter(function(b){return pu.indexOf(b)<0});
     if(past.length||rows.length){
       var inner='';
-      if(pd.length)inner+='<button type="button" class="odone" data-act="toggle-done">Già svolti ('+pd.length+') · '+(ui.showDone?'nascondi':'mostra')+'</button>'+(ui.showDone?pd.map(function(b){return oRow(b).replace('class="orow"','class="orow past"')}).join(''):'');
-      if(pu.length)inner+='<div class="odc">Da chiudere · '+pu.length+'</div>';
+
       inner+=pu.map(function(b){
         var mm0=Math.round(b.n*30),it=b.ref&&item(b.ref),dur;dur=mm0<60?mm0+' min':(Math.floor(mm0/60)+' h'+(mm0%60?' '+mm0%60+' min':''));
-        return '<div class="orow pu"><button class="go" data-act="edit-block" data-id="'+b.id+'" aria-label="Modifica '+esc(b.title)+'"><span class="tm"><b>'+slotLab(b.s)+'</b><i>'+dur+'</i></span>'+(b.area?'<span class="dot '+b.area+'"></span>':'<span class="dot"></span>')+'<span class="tt">'+(b.rid?'↻ ':'')+esc(b.title)+'</span></button>'+
-          '<div class="pact"><button type="button" class="pfatto" data-act="blk-done" data-id="'+b.id+'">Fatto</button><button type="button" class="paltro" data-act="pu-menu" data-id="'+b.id+'" aria-expanded="'+(ui.puMenu===b.id)+'">Altro</button></div>'+(ui.puMenu===b.id?'<div class="pmenu"><button type="button" data-act="blk-slip" data-id="'+b.id+'">Slitta di un\'ora</button><button type="button" data-act="blk-move" data-id="'+b.id+'">Sposta a un altro giorno</button><button type="button" class="rd" data-act="ol-del" data-id="'+b.id+'">Scarta</button></div>':'')+'</div>'}).join('');
+        var om=ui.puMenu===b.id;
+        return '<div class="orow pu2'+(om?' open':'')+'" data-id="'+b.id+'"><button class="go" data-act="pu-menu" data-id="'+b.id+'" aria-expanded="'+om+'" aria-label="'+esc(b.title)+', da chiudere: mostra le azioni"><span class="tm"><b>'+slotLab(b.s)+'</b><i>'+dur+'</i></span>'+(b.area?'<span class="dot '+b.area+'"></span>':'<span class="dot"></span>')+'<span class="tt">'+(b.rid?'↻ ':'')+esc(b.title)+'<small>Da chiudere</small></span></button>'+
+          '<span class="ck"><button class="cb" data-act="blk-done" data-id="'+b.id+'" aria-label="Segna come fatto"></button></span>'+
+          (om?'<div class="pact2"><button type="button" class="pa b" data-act="blk-tomorrow" data-id="'+b.id+'">Domani</button><button type="button" class="pa a" data-act="blk-slip" data-id="'+b.id+'">+1 ora</button><button type="button" class="pa" data-act="blk-move" data-id="'+b.id+'">Sposta…</button><button type="button" class="pa" data-act="edit-block" data-id="'+b.id+'">Apri</button><button type="button" class="pa rd" data-act="ol-del" data-id="'+b.id+'">Scarta</button></div>':'')+'</div>'}).join('');
       inner+='<div class="onow"><i></i><span>'+pad(now.getHours())+':'+pad(now.getMinutes())+'</span><u></u></div>';
       inner+=rows.map(oRow).join('');
+      if(pd.length)inner+='<button type="button" class="odone ob" data-act="toggle-done">Già svolti · '+pd.length+'</button>'+(ui.showDone?pd.map(function(b){return oRow(b).replace('class="orow"','class="orow past"')}).join(''):'');
       h+='<div class="osh"><b>Giornata</b><span>'+'Libere '+hm(s.left)+'</span></div><div class="olist">'+inner+'</div>';
     }
   }else{
@@ -3362,6 +3394,12 @@ function tickNow(){
 }
 function nearHide(tm){var z=document.getElementById('sched');if(!z)return;z.querySelectorAll('.srow span[data-m]').forEach(function(x){x.classList.toggle('nh',Math.abs(+x.getAttribute('data-m')-tm)<18)})}
 setInterval(tickNow,30000);
+/* Giornata: scorrere a sinistra su una voce da chiudere mostra le azioni, a destra le nasconde */
+(function(){var x0=0,y0=0,row=null;
+  document.addEventListener('touchstart',function(e){var r=e.target.closest&&e.target.closest('.orow.pu2');row=r;if(!r)return;x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
+  document.addEventListener('touchend',function(e){if(!row)return;var t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0,id=row.getAttribute('data-id');row=null;if(Math.abs(dx)<50||Math.abs(dy)>35)return;
+    var want=dx<0?id:'';if(ui.puMenu===want)return;ui.puMenu=want;render()},{passive:true});
+})();
 /* rientro in Oggi: porta al centro lo schermo il blocco in corso o il prossimo; la prima apertura resta sulle Top */
 function centerNext(){
   var o=document.getElementById('oggi');if(!o||o.hidden||ui.mode!=='oggi'){return}
@@ -3642,6 +3680,12 @@ document.addEventListener('click',function(e){
     case 'sched-from':if(i)ui.sheet=openSheet(i);break;
     case 'quick-place':if(i){var inEd=ui.sheet&&ui.sheet.mode==='edit',qe=quickPlace(i);if(qe){if(inEd)ui.sheet.err=qe;else{ui.sheet=openSheet(i);ui.sheet.err=qe}}else if(inEd)ui.sheet=null}break;
     case 'fill-day':fillDay();break;
+    case 'fill-day-today':fillDay();break;
+    case 'now-next':ui.propI=(ui.propI||0)+1;break;
+    case 'now-start':if(i){var ns0=+t.getAttribute('data-s'),nn0=+t.getAttribute('data-n'),er1=scheduleItem(i,st.date,ns0,nn0,'flex');if(er1)toast(er1);else{ui.propI=0;ui.lsN=0;ui.ls=null;toast('«'+i.text+'» iniziata, fino alle '+slotLab(ns0+nn0))}}break;
+    case 'blk-tomorrow':var btm=d.blocks.filter(function(x){return x.id===id})[0];if(btm){var tmd=addDays(st.date,1),bit=btm.ref&&item(btm.ref);ui.puMenu='';
+      if(bit){var er2=scheduleItem(bit,tmd,btm.s,btm.n,btm.kind);if(er2)toast(er2);else ui.lsN=0;ui.ls=null;toast('«'+btm.title+'» spostata a domani alle '+slotLab(btm.s))}
+      else{d.blocks=d.blocks.filter(function(x){return x!==btm});day(tmd).blocks.push(btm);toast('«'+btm.title+'» spostata a domani alle '+slotLab(btm.s))}}break;
     case 'prep-open':ui.sheet=openPrep();if(ui.sheet.step===1&&ui.sheet.frog){ui.sheet.step=2;prepPick(ui.sheet)}break;
     case 'prep-rv':var dr0=day(isoOf(new Date()));dr0.review.ok=t.getAttribute('data-v');break;
     case 'prep-drop':if(ui.sheet&&ui.sheet.drop)ui.sheet.drop[id]=!ui.sheet.drop[id];break;
