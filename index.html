@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1250">
+<meta name="tb-build" content="2026-11-14-1305">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -247,6 +247,12 @@ details.foot summary{cursor:pointer;color:var(--muted)}
 .gset .mini{border:0!important;border-radius:20px!important;background:var(--bg)!important;color:var(--ink)!important;font:600 14.5px/1 var(--body)!important;padding:11px 16px!important;min-height:40px}
 .gset textarea{border-radius:12px;border:1px solid var(--soft)}
 #dumpcard{display:none!important}
+/* iPhone in orizzontale: solo la griglia della settimana, come Calendario Apple */
+body.land .tabs,body.land .cseg,body.land .wseg,body.land .mog1,body.land .wkg,body.land .w2m,body.land .w2k,body.land #gset,body.land #gsh,body.land .tbver{display:none!important}
+body.land .w2t{font-size:22px!important;margin:0 0 4px!important}
+body.land .w2h{min-height:0!important;margin:0!important}
+body.land .w2 .wch.d{padding:4px 0 6px!important}body.land .w2 .wch .dn{flex-direction:row!important;align-items:center!important;justify-content:center;gap:6px!important}body.land .w2 .wch .dn b{min-width:28px;height:28px;font-size:16px}
+body.land .w2 .wcg{margin-top:4px}
 #schedcard .sched{border-bottom:0}
 .gset .mini[data-act=clear]{color:var(--red)!important}
 .gsum{cursor:pointer;font-weight:600;padding:10px 12px;display:flex;justify-content:space-between;gap:8px;align-items:center}
@@ -1650,6 +1656,7 @@ function typing(){var a=document.activeElement;return !!(a&&/^(INPUT|TEXTAREA|SE
 function rSoft(cl){if(typing()){rPend=Math.max(rPend,cl?2:1);return}if(cl)ui.sheet=null;render()}
 document.addEventListener('focusout',function(){setTimeout(function(){if(rPend&&!typing()){var c=rPend===2;rPend=0;if(c)ui.sheet=null;render()}},400)});
 function render(){
+  document.body.classList.toggle('land',phoneLand()&&ui.mode==='sett');
   document.body.classList.toggle('hide-tb',calHid().indexOf('\u0001tb')>=0);
   if(ui.mode==='oggi'&&!ui.oggiNav)st.date=isoOf(new Date());
   document.body.classList.toggle('m-oggi',ui.mode==='oggi');document.body.classList.toggle('m-sett',ui.mode==='sett');document.body.classList.toggle('m-mese',ui.mode==='mese'||ui.mode==='anno');document.body.classList.toggle('m-voci',ui.mode==='voci'||ui.mode==='storico');document.body.classList.toggle('w2on',ui.mode==='sett');
@@ -1775,7 +1782,18 @@ function oggiBtn(key){if(key)return '';
   if(a===b)return '';
   return '<button class="nav goto" data-act="day-today" aria-label="Torna a oggi">'+'Oggi'+'</button>';
 }
-(function(){var rt=0,lw=window.innerWidth;window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){var w=window.innerWidth,cross=(lw<700)!==(w<700);lw=w;if((ui.mode==='sett'||ui.mode==='mese')&&typeof render==='function')render()},200)})})();
+/* iPhone girato in orizzontale: si apre la settimana a colonne (come Calendario Apple); tornando in verticale si torna alla vista di prima */
+function phoneLand(){return !!(window.matchMedia&&matchMedia('(pointer:coarse)').matches)&&window.innerWidth>window.innerHeight&&window.innerHeight<600}
+(function(){var rt=0,wasL=phoneLand();
+  function chk(){var L=phoneLand();
+    if(L&&!wasL&&!ui.sheet&&ui.mode!=='sett'){ui.landPrev=ui.mode;ui.mode='sett';ui.wsel='';st.date=st.date||isoOf(new Date())}
+    else if(!L&&wasL&&ui.landPrev&&ui.mode==='sett'){ui.mode=ui.landPrev;ui.landPrev=''}
+    else if(!L&&wasL)ui.landPrev='';
+    wasL=L;if(typeof render==='function')render();if(L&&ui.mode==='sett')setTimeout(landSnap,60)}
+  function landSnap(){var g=document.querySelector('.wcn')||document.querySelector('.wcg');if(!g)return;var y=g.getBoundingClientRect().top+window.pageYOffset-window.innerHeight*0.4;window.scrollTo(0,Math.max(0,y))}
+  window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(chk,200)});
+  window.addEventListener('orientationchange',function(){clearTimeout(rt);rt=setTimeout(chk,250)});
+})();
 document.addEventListener('click',function(e){
   var z=e.target.closest&&e.target.closest('.wcc');if(!z||e.target.closest('.wcb'))return;
   var rh=parseFloat(z.getAttribute('data-rh'))||26,k=Math.floor((e.clientY-z.getBoundingClientRect().top)/rh);
@@ -1829,11 +1847,11 @@ document.addEventListener('click',function(e){
   document.addEventListener('pointercancel',end,true);
 })();
 function wkIsWide(){return window.innerWidth>=700}
-function wkMode(){var v=ui.wkv;if(!v){try{v=localStorage.getItem('timebox-wkv')}catch(e){}}return wkIsWide()?(v||'cols'):'list'}
+function wkMode(){if(phoneLand())return 'cols';var v=ui.wkv;if(!v){try{v=localStorage.getItem('timebox-wkv')}catch(e){}}return wkIsWide()?(v||'cols'):'list'}
 function wkCols(m){
-  var today=isoOf(new Date()),nar=!wkIsWide(),RH=nar?rowBase():(window.innerWidth>=1000?28:26),col={L:'blue',F:'green',P:'red'};
+  var today=isoOf(new Date()),nar=!wkIsWide()||phoneLand(),RH=nar?rowBase():(window.innerWidth>=1000?28:26),col={L:'blue',F:'green',P:'red'};
   var days=[];for(var k=0;k<7;k++)days.push(addDays(m,k));
-  var stk=window.innerHeight>=600;
+  var stk=window.innerHeight>=600||phoneLand();
   var h='<div class="wcg'+(stk?' stk':'')+'" style="--wrh:'+RH+'px"><div class="wch t"></div>';
   days.forEach(function(x){
     var dd=st.days[x],dt=parse(x),isT=x===today;
