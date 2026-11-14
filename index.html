@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1457">
+<meta name="tb-build" content="2026-11-14-1640">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -4960,6 +4960,25 @@ window.__tbui=function(){return ui};
 })();
 
 
+
+/* Barra Oggi/Calendario/Da programmare: se iOS lascia il viewport "incastrato" (dopo tastiera o zoom), la barra fissa resta a mezza altezza.
+   La riporto sul bordo basso dello schermo visibile. */
+(function(){
+  var vv=window.visualViewport;if(!vv)return;
+  function editing(){var a=document.activeElement;return !!a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)||!!(a&&a.isContentEditable)}
+  function fix(){
+    var t=document.querySelector('.tabs');if(!t)return;
+    if(getComputedStyle(t).position!=='fixed'){t.style.transform='';return}
+    if(editing()||vv.scale>1.02){t.style.transform='';return}
+    var d=Math.round(vv.offsetTop+vv.height-window.innerHeight);
+    t.style.transform=d>4?'translateY('+d+'px)':'';
+  }
+  vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix);
+  window.addEventListener('pageshow',fix);window.addEventListener('orientationchange',function(){setTimeout(fix,300)});
+  document.addEventListener('focusout',function(){setTimeout(fix,350)});
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)setTimeout(fix,150)});
+  setInterval(fix,1500);fix();
+})();
 
 /* Aggiornamento automatico: confronta la versione online con quella in uso */
 (function(){
