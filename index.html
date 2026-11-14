@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1107">
+<meta name="tb-build" content="2026-11-14-1114">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -1912,7 +1912,7 @@ function moRow(e,showD){
   var ds=showD?parse(e.d).getDate()+' '+MON[+e.d.slice(5,7)-1].slice(0,3)+' · ':'';
   return '<button type="button" class="mdr"'+(e.i?' data-act="edit-item" data-id="'+e.i.id+'"':' data-act="gpick" data-lv="O" data-a="'+e.a+'"')+'><i style="background:'+(AC[e.a]||'var(--muted)')+'"></i><span><b>'+esc(e.t)+'</b><small class="'+w.c.trim()+'">'+ds+esc(w.t)+'</small></span></button>';
 }
-var TBVER='9 nov 2026 · 15:30';
+var TBVER=(function(){var m=((document.querySelector('meta[name="tb-build"]')||{}).content||'').match(/^(\d{4})-(\d\d)-(\d\d)-(\d\d)(\d\d)$/);if(!m)return '';var M=['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];return (+m[3])+' '+M[+m[2]-1]+' '+m[1]+' · '+m[4]+':'+m[5]})();
 function mog1(lv){return '<button type="button" class="mog1" data-act="gpick" data-lv="'+lv+'" data-a="L"><span class="m1d"><i style="background:var(--blue)"></i><i style="background:var(--green)"></i><i style="background:var(--red)"></i></span><span class="m1t">Scegli le 3 priorità '+(lv==='O'?'del mese':lv==='R'?'della settimana':'dell\'anno')+'</span><u>›</u></button>'}
 function renderMese(){
   var y=st.date.slice(0,4),mo=st.date.slice(5,7),ym=y+'-'+mo,first=ym+'-01',today=isoOf(new Date());
