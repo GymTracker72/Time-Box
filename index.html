@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1420">
+<meta name="tb-build" content="2026-11-14-1430">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -4836,19 +4836,24 @@ window.__tbui=function(){return ui};
   var mine=(document.querySelector('meta[name="tb-build"]')||{}).content;
   if(!mine)return;
   var busy=false;
+  /* dopo un aggiornamento l'indirizzo porta ?b=<build>: lo ripulisco */
+  try{if(/[?&]b=/.test(location.search))history.replaceState(null,'',location.pathname+location.hash)}catch(e){}
   function check(){
     if(busy||!navigator.onLine)return;busy=true;
     fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){
       var m=t.match(/name="tb-build" content="([^"]+)"/);
       if(m&&m[1]!==mine){
         var open=document.querySelector('.sheet,.ov');
-        if(!open)location.reload();
+        /* l'indirizzo con ?b=<build> scavalca la cache di Safari e della app sulla schermata Home; un solo tentativo per build */
+        var k='tb-upd-'+m[1],tried=false;try{tried=sessionStorage.getItem(k)==='1';sessionStorage.setItem(k,'1')}catch(e){}
+        if(!open&&!tried)location.replace(location.pathname+'?b='+encodeURIComponent(m[1])+location.hash);
       }
     }).catch(function(){}).then(function(){busy=false});
   }
   document.addEventListener('visibilitychange',function(){if(!document.hidden)check()});
   window.addEventListener('pageshow',check);
   setTimeout(check,2000);
+  setInterval(function(){if(!document.hidden)check()},300000);
 })();
 
 </script>
