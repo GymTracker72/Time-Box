@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1545">
+<meta name="tb-build" content="2026-11-14-1600">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -2997,14 +2997,22 @@ function oRow(b,withTime){
     (b.kind==='fixed'?'<span style="width:44px;flex:none"></span>':'<span class="ck">'+cbH(bst(b),'tog-block',b.id)+'</span>')+'</div>';
 }
 /* voci da smistare: prima quelle senza priorità (le più recenti in alto), poi per priorità A→E */
+function qSort(a,b){
+  if(!a.pr!==!b.pr)return a.pr?1:-1;
+  if(!a.pr)return (b.c||0)-(a.c||0);
+  var la=a.pr[0],lb=b.pr[0];if(la!==lb)return la<lb?-1:1;
+  var na=+a.pr.slice(1)||0,nb=+b.pr.slice(1)||0;if(na!==nb)return na-nb;
+  return (a.c||0)-(b.c||0)}
 function quickList(){
-  return st.dump.filter(function(x){return (x.status==='open'||(x.status==='prog'&&!x.pr))&&x.st!=='d'}).sort(function(a,b){
-    if(!a.pr!==!b.pr)return a.pr?1:-1;
-    if(!a.pr)return (b.c||0)-(a.c||0);
-    var la=a.pr[0],lb=b.pr[0];if(la!==lb)return la<lb?-1:1;
-    var na=+a.pr.slice(1)||0,nb=+b.pr.slice(1)||0;if(na!==nb)return na-nb;
-    return (a.c||0)-(b.c||0)});
+  return st.dump.filter(function(x){return (x.status==='open'||(x.status==='prog'&&!x.pr))&&x.st!=='d'}).sort(qSort);
 }
+/* tab Da programmare: le voci aperte più quelle già in programma o Top che non hanno un blocco da oggi in poi (per esempio le Top non fatte dei giorni passati) */
+function todoList(){
+  var today=isoOf(new Date()),sc={},have={};
+  Object.keys(st.days).forEach(function(k){if(k<today)return;((st.days[k]||{}).blocks||[]).forEach(function(b){if(b.ref)sc[b.ref]=1})});
+  var base=quickList();base.forEach(function(i){have[i.id]=1});
+  var extra=st.dump.filter(function(i){return i.st!=='d'&&(i.status==='top'||i.status==='prog')&&i.pr&&!sc[i.id]&&!have[i.id]});
+  return base.concat(extra).sort(qSort)}
 function quickRow(i,nowMs){return '<div class="sw"><button type="button" class="swdel" data-act="ed-del2" data-id="'+i.id+'">Cancella</button><button type="button" class="it swit'+((i.c||0)>nowMs-2500?' fresh':'')+'" data-act="edit-item" data-id="'+i.id+'"><span class="bd'+(i.pr?'':' none')+'">'+(i.pr||'?')+'</span>'+(i.area?'<span class="dot '+i.area+'"></span>':'<span style="width:9px;flex:none"></span>')+'<span class="tt">'+esc(i.text)+'</span><span class="rt">'+(i.due?'<span>'+ddmm(i.due)+'</span>':'')+'</span></button></div>'}
 function doneList(){return st.dump.filter(function(x){return x.st==='d'}).sort(function(a,b){return (b.doneAt||0)-(a.doneAt||0)})}
 function doneHtml(){
@@ -3028,7 +3036,7 @@ function renderStorico(){
     (all.length?'<div style="display:flex;flex-direction:column;gap:8px">'+h+'</div>':'<div class="sub" style="padding:16px 0">Qui finiscono le voci completate. Per ora non ce n\'è nessuna.</div>');
 }
 function renderVoci(){
-  var all0=quickList(),nowMs=Date.now(),vf='',all=all0;
+  var all0=todoList(),nowMs=Date.now(),vf='',all=all0;
   var chips='<div class="vchips"><button type="button" class="vch'+(!vf?' on':'')+'" data-act="vf" data-v="">Tutte</button>'+AK.map(function(a){return '<button type="button" class="vch'+(vf===a?' on':'')+'" data-act="vf" data-v="'+a+'"><i class="dot '+a+'"></i>'+AREAS[a]+'</button>'}).join('')+'</div>';
   document.getElementById('voci').innerHTML='<h1 class="vt2">Da programmare<span>'+all.length+'</span></h1><section class="oquick">'+
     (all.length?(function(){var g1=all.filter(function(i){return !i.pr}),g2=all.filter(function(i){return !!i.pr});function grp(t,a){return a.length?'<div class="vgh">'+t+'<span>'+a.length+'</span></div>'+a.map(function(i){return quickRow(i,nowMs)}).join(''):''}return grp('Da classificare',g1)+grp('Da programmare',g2)})():'<div class="sub" style="padding:16px 0">'+(vf?'Nessuna voce in questa area.':'Nessuna voce da pianificare.')+'</div>')+(doneList().length?'<div class="oalls"><button type="button" class="mini oall" data-act="storico-open">Completate ('+doneList().length+')</button></div>':'')+'</section>';
