@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1350">
+<meta name="tb-build" content="2026-11-14-1400">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -260,6 +260,13 @@ details.foot summary{cursor:pointer;color:var(--muted)}
 .mold.we .moln b{color:var(--muted)}.mold.td .moln b{background:#ff3b30;color:#fff}
 .mole{display:block;flex:none;border-radius:4px;font:600 11px/14px var(--body);padding:0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mole.dn{opacity:.55;text-decoration:line-through}
 body.land #mese{padding:0}
+.molr1{display:flex;align-items:center;gap:4px;min-width:0;height:17px;flex:none}.molr1 b{min-width:17px;height:17px;padding:0 3px;box-sizing:border-box;border-radius:9px;font:700 12.5px/17px var(--body);text-align:center;flex:none}
+.molr1 u{width:6px;height:6px;border-radius:3px;background:var(--amber);flex:none;text-decoration:none}
+.mold.we .molr1 b{color:var(--muted)}.mold.td .molr1 b{background:#ff3b30;color:#fff}
+.mold .mole{display:flex;align-items:center;gap:4px;min-width:0;background:none!important;padding:0;font:600 11px/13px var(--body);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mold .mole i{width:6px;height:6px;border-radius:3px;flex:none}.mold .mole.fg{font-weight:800}
+.molr1 .mole{flex:1}
+.molm{font:600 10.5px/12px var(--body);color:var(--muted);flex:none}
 body.land{padding-top:2px!important;padding-bottom:0!important}body.land .molh{height:30px}body.land .molg{gap:2px}body.land .mold{padding:2px 3px;gap:1px}body.land .mole{font-size:10.5px;line-height:13px}body.land .moln{height:16px}body.land .moln b{height:16px;min-width:16px;line-height:16px}
 /* iPhone in orizzontale: solo la griglia della settimana, come Calendario Apple */
 body.land .tabs,body.land .cseg,body.land .wseg,body.land .mog1,body.land .wkg,body.land .w2m,body.land .w2k,body.land #gset,body.land #gsh,body.land .tbver{display:none!important}
@@ -2020,19 +2027,21 @@ function renderMeseLand(){
     '<button type="button" class="molt" data-act="day-today">Oggi</button>'+
     '<button type="button" class="molr" data-act="mo-next" aria-label="Mese successivo"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></div></div>'+
     '<div class="molw">'+['LUN','MAR','MER','GIO','VEN','SAB','DOM'].map(function(t,i){return '<span'+(i>4?' class="we"':'')+'>'+t+'</span>'}).join('')+'</div><div class="molg">';
+  var dueD={};st.dump.forEach(function(i){if(i.due&&i.st!=='d'&&i.status!=='discard')dueD[i.due]=1});
   rows.forEach(function(w){for(var k=0;k<7;k++){var x=addDays(w,k),inM=x.slice(0,7)===ym,dd=st.days[x],list=[];
-    if(dd)dd.blocks.slice().sort(function(a,b){return a.s-b.s}).forEach(function(b){var it=b.ref&&item(b.ref),a=(it&&b.kind!=='fixed'?it.area:b.area)||'',top=it&&it.status==='top';list.push({t:b.title,bg:top&&a?C[a]:(T[a]||'var(--soft2)'),fg:top&&a?'#fff':'var(--ink)',dn:bst(b)==='d'})});
-    if(cal)(ex.by[x]||[]).filter(function(e){return hid.indexOf(e.cal)<0}).forEach(function(e){list.push({t:e.title,bg:'var(--soft2)',fg:'var(--ink)',s:e.s})});
-    var n=parse(x).getDate();
-    h+='<button type="button" class="mold'+(inM?'':' out')+(x===today?' td':'')+(k>4?' we':'')+'" data-n="'+list.length+'" data-act="goto-week" data-d="'+x+'" aria-label="'+n+' '+MON[+x.slice(5,7)-1]+(list.length?', '+list.length+(list.length===1?' voce':' voci'):'')+'"><span class="moln"><b>'+n+'</b>'+(list.length>2?'<i>+'+(list.length-2)+'</i>':'')+'</span>'+
-      list.slice(0,2).map(function(e){return '<span class="mole'+(e.dn?' dn':'')+'" style="background:'+e.bg+';color:'+e.fg+'">'+esc(e.t)+'</span>'}).join('')+'</button>'}});
+    /* solo le Top del giorno: prima la rana, poi le altre */
+    if(dd){var o=AK.slice();if(dd.frog)o.sort(function(a,b){return (dd.frog===b?1:0)-(dd.frog===a?1:0)});
+      o.forEach(function(a){var v=dd.tops&&dd.tops[a],it=v&&v!=='empty'?item(v):null;if(it)list.push({t:it.text,a:a,dn:it.st==='d',fg:dd.frog===a})})}
+    var n=parse(x).getDate(),row=function(e){return '<span class="mole'+(e.dn?' dn':'')+(e.fg?' fg':'')+'"><i style="background:'+C[e.a]+'"></i>'+esc(e.t)+'</span>'};
+    h+='<button type="button" class="mold'+(inM?'':' out')+(x===today?' td':'')+(k>4?' we':'')+'" data-n="'+list.length+'" data-act="goto-week" data-d="'+x+'" aria-label="'+n+' '+MON[+x.slice(5,7)-1]+(list.length?', '+list.length+(list.length===1?' Top':' Top'):'')+(dueD[x]&&inM?', scadenza':'')+'">'+
+      '<span class="molr1"><b>'+n+'</b>'+(dueD[x]&&inM?'<u aria-hidden="true"></u>':'')+(list[0]?row(list[0]):'')+'</span>'+list.slice(1).map(row).join('')+'</button>'}});
   document.getElementById('mese').innerHTML=h+'</div></div>';
   setTimeout(molFit,0);
 }
 /* adatta la griglia all'altezza dello schermo e nasconde le voci che non entrano, aggiornando il +N */
 function molFit(){var el=document.querySelector('.mol');if(!el)return;window.scrollTo(0,0);var top=el.getBoundingClientRect().top;el.style.height=Math.max(240,window.innerHeight-top-6)+'px';
   [].forEach.call(el.querySelectorAll('.mold'),function(c){var ev=c.querySelectorAll('.mole'),hid=0,tot=+(c.getAttribute('data-n')||0);for(var i=ev.length-1;i>=0&&c.scrollHeight>c.clientHeight+1;i--){ev[i].style.display='none';hid++}
-    if(hid){var mi=c.querySelector('.moln i');if(!mi){mi=document.createElement('i');c.querySelector('.moln').appendChild(mi)}mi.textContent='+'+(tot-(ev.length-hid))}})}
+    if(hid){var mi=c.querySelector('.molm');if(!mi){mi=document.createElement('span');mi.className='molm';c.appendChild(mi)}mi.textContent='+'+hid}})}
 function renderMese(){
   if(phoneLand()){renderMeseLand();return}
   var y=st.date.slice(0,4),mo=st.date.slice(5,7),ym=y+'-'+mo,first=ym+'-01',today=isoOf(new Date());
