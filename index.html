@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-14-1910">
+<meta name="tb-build" content="2026-11-16-1300">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -1079,7 +1079,7 @@ body.hide-tb .blk:not(.ext){display:none!important}
 
 /* tre puntini sulla riga del titolo */
 .w2h{position:relative}
-.w2h>span:last-child{position:absolute;right:0;top:30px;height:40px;align-items:center}
+.w2h>span:last-child:not(.w2k){position:absolute;right:0;top:30px;height:40px;align-items:center}
 
 /* sovrapposizione: scheda dell'evento in conflitto + sposta */
 .cfl{display:flex;flex-direction:column;gap:10px}
@@ -1265,6 +1265,22 @@ html,body{touch-action:manipulation;min-height:100vh}
 .card.datebox{border-radius:18px}
 .datebox .nav,#daybar .nav{border-radius:12px}
 .dwrap .dlab{border-radius:12px}
+#phead .ohead{align-items:center;gap:8px}
+#phead .odrow{display:flex;align-items:center;gap:8px;min-width:0}
+#phead .odate{font-size:min(32px,6.5vw);margin-top:0;white-space:nowrap}
+#phead .odrow .prbtn{width:36px;height:36px}
+#phead .hmn{right:auto;left:0}
+.hnv{display:flex;gap:5px;align-items:center;flex:none;align-self:flex-end;margin-bottom:2px}
+.hnv button{height:34px;min-width:34px;border:0;border-radius:18px;background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink);font:600 16px/1 var(--body);display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.hnv button:active{background:color-mix(in srgb,var(--ink) 16%,transparent)}
+.hnv .hno{padding:0 12px}.hnv .hno.cur{color:var(--muted)}
+@media (max-width:380px){#phead .odate{font-size:5.8vw}#phead .odrow{gap:6px}#phead .odrow .prbtn{width:32px;height:32px}.hnv{gap:4px}.hnv button{height:30px;min-width:30px;font-size:15px}.hnv .hno{padding:0 9px}}
+body .odrow{display:flex;align-items:center;gap:8px;min-width:0}
+.odrow .hmn{right:auto;left:0}.odrow .prbtn{width:36px;height:36px}
+.hrow{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.hrow .w2t{margin:0;font-size:min(32px,5.8vw);white-space:nowrap}
+@media (min-width:430px){.hrow .w2t{font-size:32px}}
+.mohd{flex-wrap:wrap}.mol1{min-width:0}.mohd .hnv{margin-left:auto}
 </style>
 
 <div class="wrap">
@@ -1698,12 +1714,14 @@ function hbtns(){var o=!!ui.hmenu;return '<span class="hbt"><button type="button
 document.addEventListener('click',function(e){if(ui.hmenu&&!(e.target.closest&&e.target.closest('.hbt'))){ui.hmenu=0;try{render()}catch(x){}}},true);
 function calSeg(M){
   return '<div class="cseg" role="tablist" aria-label="Vista del calendario">'+[['plan','Giorno'],['sett','Settimana'],['mese','Mese'],['anno','Anno']].map(function(x){return '<button type="button" role="tab" data-act="mode" data-m="'+x[0]+'" aria-selected="'+(x[0]===M)+'"'+(x[0]===M?' class="on"':'')+'>'+x[1]+'</button>'}).join('')+'</div>'}
+function hnav(k,show){var A={d:['day-prev','day-next','Giorno precedente','Giorno successivo'],w:['wk-prev','wk-next','Settimana precedente','Settimana successiva'],m:['mo-prev','mo-next','Mese precedente','Mese successivo'],y:['yr-prev','yr-next','Anno precedente','Anno successivo']}[k];
+  return '<span class="hnv"><button type="button" data-act="'+A[0]+'" aria-label="'+A[2]+'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>'+(show?'<button type="button" class="hno" data-act="day-today" aria-label="Torna a oggi">Oggi</button>':'')+'<button type="button" data-act="'+A[1]+'" aria-label="'+A[3]+'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></span>'}
 function renderPHead(){
   var el=document.getElementById('phead');if(!el)return;
   var on=ui.mode==='plan';el.hidden=!on;document.body.classList.toggle('m-plan',on);if(!on)return;
   var now=new Date(),today=isoOf(now),dt=parse(st.date),m=mondayOf(st.date),isT=st.date===today;
   var days=[];for(var q=0;q<7;q++)days.push(addDays(m,q));
-  var h='<div class="ohead"><div class="ohl"><div class="odowr"><span class="odow">'+DOW[dt.getDay()]+'</span>'+(isT?'':'<button type="button" class="otd" data-act="day-today" aria-label="Torna a oggi">'+(st.date>today?'‹ Oggi':'Oggi ›')+'</button>')+'</div><div class="odate'+(isT?' tdy':'')+'">'+dt.getDate()+' '+MON[dt.getMonth()]+(dt.getFullYear()!==now.getFullYear()?' '+dt.getFullYear():'')+'</div></div>'+hbtns()+'</div>';
+  var h='<div class="ohead"><div class="ohl"><div class="odowr"><span class="odow">'+DOW[dt.getDay()]+'</span></div><div class="odrow"><div class="odate'+(isT?' tdy':'')+'">'+dt.getDate()+' '+MON[dt.getMonth()]+(dt.getFullYear()!==now.getFullYear()?' '+dt.getFullYear():'')+'</div>'+hbtns()+'</div></div>'+hnav('d',!isT)+'</div>';
   h+=calSeg('plan');
   h+='<div class="pstrip">'+['L','M','M','G','V','S','D'].map(function(l){return '<span class="w2l">'+l+'</span>'}).join('')+days.map(function(x){return '<button type="button" data-act="pday" data-d="'+x+'" aria-label="'+DOW[parse(x).getDay()]+' '+parse(x).getDate()+'"><span class="w2n'+(x===today?' tdy':'')+(x===st.date?' sel':'')+'">'+parse(x).getDate()+'</span></button>'}).join('')+'</div>';
   var sd=stats(day()),pl=hm(sd.left)+' libere'+(sd.conf?'</span><i>·</i><span class="w">'+sd.conf+(sd.conf===1?' sovrapposizione':' sovrapposizioni'):'');
@@ -1728,7 +1746,7 @@ function render(){
   document.getElementById('dlab').classList.toggle('today',st.date===isoOf(new Date()));
   var dbl=document.getElementById('dblab');dbl.textContent=DOW[dt.getDay()]+' '+dt.getDate()+' '+MON[dt.getMonth()];dbl.classList.toggle('today',st.date===isoOf(new Date()));document.getElementById('dbtoday').hidden=st.date===isoOf(new Date());dayBar();
   document.getElementById('hrs').outerHTML=hrsRow(st.date,st.date).replace('class="hrs"','class="hrs" id="hrs"');
-  var tb=document.querySelector('[data-act=day-today]'),tdy=isoOf(new Date());
+  var tb=document.querySelector('.datebox [data-act=day-today]'),tdy=isoOf(new Date());
   tb.classList.toggle('goto',st.date!==tdy);tb.hidden=st.date===tdy;if(tb.parentNode&&tb.parentNode.classList.contains('todayrow'))tb.parentNode.hidden=tb.hidden;
   tb.innerHTML=st.date<tdy?'Oggi <span class="arr">→</span>':st.date>tdy?'<span class="arr">←</span> Oggi':'Oggi';
   tb.setAttribute('aria-label',st.date<tdy?'Torna a oggi, avanti':st.date>tdy?'Torna a oggi, indietro':'Oggi');
@@ -1949,13 +1967,13 @@ function renderSettNew(){
   var days=[];for(var q=0;q<7;q++)days.push(addDays(m,q));
   var sel=(ui.wsel&&ui.wsel>=m&&ui.wsel<=end)?ui.wsel:((st.date>=m&&st.date<=end)?st.date:m);
   var a=parse(m),z=parse(end),mn=function(d){return MON[d.getMonth()]};
-  var title=a.getDate()+(a.getMonth()===z.getMonth()?'':' '+mn(a).slice(0,3))+' – '+z.getDate()+' '+(a.getMonth()===z.getMonth()?mn(z):mn(z).slice(0,3));
+  var title=a.getDate()+(a.getMonth()===z.getMonth()?'':' '+mn(a).slice(0,3))+' – '+z.getDate()+' '+(a.getMonth()===z.getMonth()&&window.innerWidth>=430?mn(z):mn(z).slice(0,3));
   var wn=(periodLabel('R',m).match(/(\d+)/)||[])[1]||'';
   var nd=0;days.forEach(function(x){nd+=dues(x).length});
   var cap=Math.max(st.hours*60,1),cur=mondayOf(today);
   var ob=true?'':(m<cur?'<button type="button" class="w2o" data-act="day-today" aria-label="Torna a oggi">Oggi ›</button>':'<button type="button" class="w2o" data-act="day-today" aria-label="Torna a oggi">‹ Oggi</button>');
-  var h='<div class="w2h"><span class="w2k">Settimana '+wn+(nd?' · '+nd+(nd===1?' scadenza':' scadenze'):'')+'</span><span style="display:flex;align-items:center;gap:4px">'+hbtns()+(wide?'<button class="nav" data-act="wk-prev" aria-label="Settimana precedente"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><button class="nav" data-act="wk-next" aria-label="Settimana successiva"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>':'')+ob+'</span></div>';
-  h+='<h1 class="w2t">'+title+'</h1>'+calSeg('sett');
+  var h='<div class="w2h"><span class="w2k">Settimana '+wn+(nd?' · '+nd+(nd===1?' scadenza':' scadenze'):'')+'</span></div>';
+  h+='<div class="hrow"><div class="odrow"><h1 class="w2t">'+title+'</h1>'+hbtns()+'</div>'+hnav('w',!curP('w'))+'</div>'+calSeg('sett');
   (function(){
     var AC={L:'var(--blue)',F:'var(--green)',P:'var(--red)'},rg=goalsFor('R',m).filter(function(g){return g.text});
     if(!rg.length)h+=mog1('R');else h+='<div class="wkg">'+AK.map(function(a){
@@ -2095,7 +2113,7 @@ function renderMese(){
   var allDue=st.dump.filter(function(i){return i.due&&i.due.slice(0,7)===ym&&i.status!=='discard'}).sort(function(a,b){return a.due<b.due?-1:a.due>b.due?1:0});
   var weeks=[];for(var w=mondayOf(first);w<=lastIso;w=addDays(w,7))weeks.push(w);
   var og=goalsFor('O',ym).filter(function(g){return g.text}),dsh=function(x){return parse(x).getDate()+' '+MON[+x.slice(5,7)-1].slice(0,3)};
-  var h='<div class="mohd"><div><div class="moy">'+y+'</div><div class="mot">'+MON[+mo-1].charAt(0).toUpperCase()+MON[+mo-1].slice(1)+'</div></div><div class="mohr"><button class="nav monav" data-act="mo-prev" aria-label="Mese precedente"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><button class="nav monav" data-act="mo-next" aria-label="Mese successivo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>'+oggiBtn('m')+''+hbtns()+'</div></div>'+calSeg('mese')+'<div class="mos">Le tre cose che contano questo mese</div>';
+  var h='<div class="mohd"><div class="mol1"><div class="moy">'+y+'</div><div class="odrow"><div class="mot">'+MON[+mo-1].charAt(0).toUpperCase()+MON[+mo-1].slice(1)+'</div>'+hbtns()+'</div></div>'+hnav('m',!curP('m'))+'</div>'+calSeg('mese')+'<div class="mos">Le tre cose che contano questo mese</div>';
   if(!og.length)h+=mog1('O');else h+='<div class="mog">'+AK.map(function(a){
     var g=og.filter(function(x){return x.area===a})[0],c=AC[a];
     if(!g)return '<div class="mogc emp" data-act="gpick" data-lv="O" data-a="'+a+'"><span class="mock" style="border-color:'+c+';border-style:dashed"></span><div class="mogb"><div class="mogt" style="color:var(--muted);font-weight:500">Scegli l\'obiettivo di '+AREAS[a]+'</div></div></div>';
@@ -2136,7 +2154,7 @@ function renderAnno(){
   var tg=goalsFor('T',y).filter(function(g){return g.text});
   var dsh=function(x){return parse(x).getDate()+' '+MON[+x.slice(5,7)-1].slice(0,3)};
   var mOf=function(m){return st.goals.filter(function(o){return o.lv==='O'&&o.per===y+'-'+pad(m)&&o.text})};
-  var h='<div class="mohd"><div><div class="mot">'+y+'</div></div><div class="mohr"><button class="nav monav" data-act="yr-prev" aria-label="Anno precedente"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><button class="nav monav" data-act="yr-next" aria-label="Anno successivo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>'+oggiBtn('y')+''+hbtns()+'</div></div>'+calSeg('anno')+'<div class="mos">Le tre cose che contano quest\'anno</div>';
+  var h='<div class="mohd"><div class="mol1"><div class="odrow"><div class="mot">'+y+'</div>'+hbtns()+'</div></div>'+hnav('y',!curP('y'))+'</div>'+calSeg('anno')+'<div class="mos">Le tre cose che contano quest\'anno</div>';
   if(!tg.length)h+=mog1('T');else h+='<div class="mog">'+AK.map(function(a){
     var g=tg.filter(function(x){return x.area===a})[0],c=AC[a];
     if(!g)return '<div class="mogc emp" data-act="gpick" data-lv="T" data-a="'+a+'"><span class="mock" style="border-color:'+c+';border-style:dashed"></span><div class="mogb"><div class="mogt" style="color:var(--muted);font-weight:500">Scegli l\'obiettivo di '+AREAS[a]+'</div></div></div>';
@@ -2458,6 +2476,30 @@ function slipBlock(b){
   return '';
 }
 function toast(m){var e=document.getElementById('toast');e.className='';e.textContent=m;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){e.hidden=true},3600)}
+/* Rimanda: propone il primo spazio libero dopo adesso (oggi; se non c'e', nei giorni seguenti) */
+function snzFind(b){
+  var now=new Date(),today=isoOf(now),nm=now.getHours()*60+now.getMinutes(),from=Math.max(0,b.s+1,Math.ceil((nm-S0)/30));
+  var k=qFree(today,b.n,from,b.id);if(k>=0)return {date:today,s:k};
+  if(b.rid)return null;
+  for(var i=1;i<=14;i++){var dd=addDays(today,i);k=qFree(dd,b.n,0,b.id);if(k>=0)return {date:dd,s:k}}
+  return null}
+function snzDayLab(date){var t=isoOf(new Date());return date===t?'Oggi':date===addDays(t,1)?'Domani':DOW[parse(date).getDay()]+' '+ddmm(date)}
+function snzHtml(sh){
+  var f=sh.p;
+  return '<div class="sheet-bg" data-act="sheet-bg"><div class="sheet prep" role="dialog" aria-label="Rimanda">'+
+    '<div class="ph" style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Rimanda</div>'+
+    '<h2 style="margin:0;font:800 24px/1.15 var(--body)">'+esc(sh.title)+'</h2>'+
+    (f?'<div class="dik"><span>Primo spazio libero</span><b>'+snzDayLab(f.date)+' · '+slotLab(f.s)+'–'+slotLab(f.s+sh.n)+'</b></div>'+(f.date!==isoOf(new Date())?'<div class="oleft" style="color:var(--muted)">Oggi non c\'è più spazio per '+hm(sh.n*30)+'.</div>':''):'<div class="oleft" style="color:var(--muted)">Nessuno spazio libero per '+hm(sh.n*30)+' nei prossimi giorni.</div>')+
+    '<div style="display:flex;gap:8px;justify-content:flex-end;padding-top:8px"><button class="btn sec" data-act="sheet-close" type="button">Annulla</button><button class="btn sec" data-act="snz-edit" type="button">Altro orario</button>'+(f?'<button class="btn" data-act="snz-ok" type="button">Sposta qui</button>':'')+'</div></div></div>';
+}
+function snzApply(){
+  var sh=ui.sheet;if(!sh||!sh.p)return;
+  var d0=sh.date,b=(st.days[d0]&&st.days[d0].blocks||[]).filter(function(x){return x.id===sh.bid})[0];if(!b){ui.sheet=null;return}
+  var f=sh.p,sn=JSON.stringify(st),it=b.ref&&item(b.ref);
+  if(f.date===d0){b.s=f.s}
+  else if(it){var er=scheduleItem(it,f.date,f.s,b.n,b.kind);if(er){toast(er);return}}
+  else{st.days[d0].blocks=st.days[d0].blocks.filter(function(o){return o!==b});b.s=f.s;day(f.date).blocks.push(b)}
+  ui.sheet=null;dragUndo(sn,'«'+b.title+'» rimandato: '+snzDayLab(f.date).toLowerCase()+' alle '+slotLab(f.s))}
 function openBlk(b,date){
   var o={mode:'blk',bid:b.id,from:date,date:date,s:b.s,n:b.n,kind:b.kind,title:b.title,area:b.area||'',rep:'',rend:'n',rdate:'',rcount:10,err:'',ask:'',loc:b.loc||''},ser=b.rid&&st.rec&&st.rec[b.rid];if(Array.isArray(b.al))o.al=b.al.slice();
   if(ser){o.rep=ser.rep;o.rfq=ser.fq;o.riv=ser.iv;o.rwd=(ser.wd||[]).slice();o.rmm=ser.mm;o.rend=ser.end.t;o.rdate=ser.end.d||'';o.rcount=ser.end.c||10}
@@ -2703,6 +2745,7 @@ function renderSheet(){
   var el=document.getElementById('sheet'),sh=ui.sheet,i=sh&&item(sh.id);
   if(sh&&sh.mode==='blk'){var bb=blkFind(sh);if(!bb){ui.sheet=null;el.hidden=true;el.innerHTML='';return}setSheet(blkHtml(sh,bb));return}
   if(sh&&sh.mode==='view'){var vb=blkFind(sh);if(!vb){ui.sheet=null;el.hidden=true;el.innerHTML='';return}setSheet(viewHtml(sh,vb));return}
+  if(sh&&sh.mode==='snz'){setSheet(snzHtml(sh));return}
   if(sh&&sh.mode==='ext'){setSheet(extHtml(sh));return}
   if(sh&&sh.mode==='filter'){setSheet(filterHtml());return}
   if(sh&&sh.mode==='search'){setSheet(searchHtml(sh));var sq=document.getElementById('sq');if(sq&&!sh.f){sh.f=1;setTimeout(function(){try{sq.focus()}catch(x){}},120)}return}
@@ -3307,7 +3350,7 @@ function renderOggi(d){
       var it0=nowB.ref&&item(nowB.ref),isF=fi&&nowB.ref===fi.id,left=S0+30*(nowB.s+nowB.n)-nowMin;
       h+='<div class="ora adesso '+(nowB.area||'')+'"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="olab">Adesso · '+slotLab(nowB.s)+'–'+slotLab(nowB.s+nowB.n)+'</span>'+(isF?'<span class="ofrog">'+FROG+' Rana</span>':'')+'</div>'+
         '<div class="ttl">'+(nowB.rid?'↻ ':'')+esc(nowB.title)+'</div>'+mapLinks(nowB.loc,'dk')+'<div class="obar"><i style="width:'+Math.max(2,Math.min(100,Math.round(100*(1-left/(nowB.n*30)))))+'%"></i></div><div class="oleft">'+(nowB.kind==='fixed'?'Impegno fisso · ':'')+'Restano '+fmtLeft(Math.max(left,0))+'</div>'+
-        (nowB.kind==='fixed'?'':'<div class="row2"><button class="obtn p" data-act="blk-done" data-id="'+nowB.id+'">Fatto</button><button class="obtn" data-act="edit-block" data-id="'+nowB.id+'">Rimanda</button></div>')+'</div>';
+        (nowB.kind==='fixed'?'':'<div class="row2"><button class="obtn p" data-act="blk-done" data-id="'+nowB.id+'">Fatto</button><button class="obtn" data-act="blk-snz" data-id="'+nowB.id+'">Rimanda</button></div>')+'</div>';
     }else if(!bl.length){
       h+='<div class="ora"><div class="ttl">Nessun blocco oggi</div><div class="oleft">Programma in calendario le Top e il resto.</div><div class="row2"><button class="obtn p" data-act="mode" data-m="plan">Pianifica la giornata</button></div></div>';
     }else if(!bl.some(function(b){return b.s+b.n>cur})){
@@ -3922,6 +3965,9 @@ document.addEventListener('click',function(e){
         else{setTop(vi.area,vi.id,ui.sheet.from);vd.frog=vi.area;toast('«'+vi.text+'» è la Top e la rana '+AREAS[vi.area])}}}break;
     case 'view-edit':if(ui.sheet&&ui.sheet.mode==='view'){var ve=blkFind(ui.sheet);if(ve)ui.sheet=openBlk(ve,ui.sheet.from)}break;
     case 'view-del':if(ui.sheet&&ui.sheet.mode==='view'){var vx=blkFind(ui.sheet);if(vx){if(vx.rid){var ff=ui.sheet.from;ui.sheet=openBlk(vx,ff);ui.sheet.ask='del'}else{unplanBlock(ui.sheet.from,vx);ui.sheet=null}}}break;
+    case 'blk-snz':var sb=d.blocks.filter(function(x){return x.id===id})[0];if(sb){var sp=snzFind(sb);ui.sheet={mode:'snz',bid:sb.id,id:'',date:st.date,title:sb.title,n:sb.n,p:sp}}break;
+    case 'snz-ok':snzApply();break;
+    case 'snz-edit':var se=ui.sheet,sbk=se&&(st.days[se.date]&&st.days[se.date].blocks||[]).filter(function(x){return x.id===se.bid})[0];if(sbk)ui.sheet=openBlk(sbk,se.date);else ui.sheet=null;break;
     case 'edit-block':var eb=d.blocks.filter(function(x){return x.id===id})[0];if(eb)ui.sheet=openBlk(eb,st.date);break;
     case 'storico-open':ui.sback=ui.mode;ui.mode='storico';setTimeout(function(){window.scrollTo(0,0)},0);break;
     case 'storico-close':ui.mode=ui.sback&&ui.sback!=='storico'?ui.sback:'oggi';break;
