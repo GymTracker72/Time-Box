@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-16-1300">
+<meta name="tb-build" content="2026-11-20-1915">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -3278,8 +3278,13 @@ function qSort(a,b){
   var la=a.pr[0],lb=b.pr[0];if(la!==lb)return la<lb?-1:1;
   var na=+a.pr.slice(1)||0,nb=+b.pr.slice(1)||0;if(na!==nb)return na-nb;
   return (a.c||0)-(b.c||0)}
+function schedIds(){
+  var today=isoOf(new Date()),sc={};
+  Object.keys(st.days).forEach(function(k){if(k<today)return;((st.days[k]||{}).blocks||[]).forEach(function(b){if(b.ref)sc[b.ref]=1})});
+  return sc}
 function quickList(){
-  return st.dump.filter(function(x){return (x.status==='open'||(x.status==='prog'&&!x.pr))&&x.st!=='d'}).sort(qSort);
+  var sc=schedIds();
+  return st.dump.filter(function(x){return (x.status==='open'||(x.status==='prog'&&!x.pr))&&x.st!=='d'&&!sc[x.id]}).sort(qSort);
 }
 /* tab Da programmare: le voci aperte più quelle già in programma o Top che non hanno un blocco da oggi in poi (per esempio le Top non fatte dei giorni passati) */
 function todoList(){
