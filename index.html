@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-24-0220">
+<meta name="tb-build" content="2026-11-24-0235">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -1337,7 +1337,7 @@ body .odrow{display:flex;align-items:center;gap:8px;min-width:0}
 
 /* Nuovo blocco, stile «Nuovo evento» */
 .nv .nvl .locin:focus{outline:0!important;box-shadow:none!important;border:0!important}
-.nv .nvsug{display:flex;flex-direction:column}.nv .nvsug:empty{display:none}
+.nv .nvsug{display:flex;flex-direction:column}.nv .nvsug:empty{display:none}.nv .nvsn{padding:10px 20px;border-top:1px solid var(--soft);font:400 14px/1.35 var(--body);color:var(--muted)}.nv a.nvsb{text-decoration:none;color:var(--blue);display:block}
 .nv .nvsb{border:0;border-top:1px solid var(--soft);background:transparent;text-align:left;padding:14px 20px;font:500 17px/1.25 var(--body);color:var(--ink);cursor:pointer}
 
 .sheet.nv>*{flex:none}.sheet.nv .nvc>*{flex:none}
@@ -4449,7 +4449,7 @@ function newHtml(sh){
     '<button type="button" class="nvb ok" data-act="sheet-ok" aria-label="Aggiungi"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>'+
     '<div class="nvt" style="--bar:'+bar+'"><i class="nvbar"></i><textarea class="bst" rows="1" data-chg="sheet" data-f="title" placeholder="'+(pm?'Promemoria':'Nome o descrizione dell’evento')+'" aria-label="Titolo" autocomplete="off">'+esc(it&&!sh.tedit?it.text:sh.title)+'</textarea></div>'+
     srcR+when+
-    (pm?'':'<div class="nvs">Posizione</div><div class="nvc"><label class="arow nvl"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 8v8M8 12h8"/></svg><input class="locin" data-chg="sheet" data-f="loc" placeholder="Luogo o videochiamata" value="'+esc(sh.loc||'')+'" autocomplete="off" aria-label="Luogo">'+mapIcon(sh.loc)+'</label><div id="locsug" class="nvsug"></div></div>')+
+    (pm?'':'<div class="nvs">Posizione</div><div class="nvc"><label class="arow nvl"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><input class="locin" data-chg="sheet" data-f="loc" placeholder="Luogo o videochiamata" value="'+esc(sh.loc||'')+'" autocomplete="off" aria-label="Luogo">'+mapIcon(sh.loc)+'</label><div id="locsug" class="nvsug"></div></div>')+
     '<div class="nvs">Opzioni</div>'+opt+
     (nt?'<div class="nvs">Dettagli</div>'+nt:'')+
     (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+cf+
@@ -4467,19 +4467,21 @@ document.addEventListener('focusout',function(e){var t=e.target;if(t&&(t.type===
     var city=((p.postcode||'')+' '+(p.city||p.town||p.village||p.county||'')).trim();
     if(city)a.push(city);
     return a.join(', ')}
-  function show(list){var u=window.__tbui&&window.__tbui();if(u)u.locSug=list;var box=document.getElementById('locsug');if(!box)return;
-    box.innerHTML=list.map(function(x,i){return '<button type="button" class="nvsb" data-act="loc-pick" data-i="'+i+'">'+esc(x)+'</button>'}).join('')}
+  function show(list,failed,q){var u=window.__tbui&&window.__tbui();if(u)u.locSug=list;var box=document.getElementById('locsug');if(!box)return;
+    var h=list.map(function(x,i){return '<button type="button" class="nvsb" data-act="loc-pick" data-i="'+i+'">'+esc(x)+'</button>'}).join('');
+    if(q)h+=(failed?'<div class="nvsn">Qui i suggerimenti automatici sono bloccati: funzionano aprendo Time Box da Safari. Intanto puoi cercare l\u2019indirizzo su Google Maps, poi copiarlo qui.</div>':'')+'<a class="nvsb nvsm" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q)+'">Cerca \u00ab'+esc(q)+'\u00bb su Google Maps</a>';
+    box.innerHTML=h}
   document.addEventListener('input',function(e){
     var t=e.target;if(!t||!t.classList||!t.classList.contains('locin')||!t.closest('.nv'))return;
     var v=t.value.trim();clearTimeout(tmr);
     if(v.length<3){show([]);return}
-    var my=++seq;
+    var my=++seq,qq=v;
     tmr=setTimeout(function(){
       var gk='';try{gk=localStorage.getItem('timebox-gkey')||''}catch(x){}
       if(gk){fetch('https://places.googleapis.com/v1/places:autocomplete',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':gk},body:JSON.stringify({input:v,languageCode:'it',locationBias:{circle:{center:{latitude:41.9,longitude:12.5},radius:50000}}})}).then(function(r){return r.json()}).then(function(j){
-        if(my!==seq)return;var out=[];(j.suggestions||[]).forEach(function(g){var x=g.placePrediction&&g.placePrediction.text&&g.placePrediction.text.text;if(x&&out.indexOf(x)<0)out.push(x)});show(out)}).catch(function(){});return}
+        if(my!==seq)return;var out=[];(j.suggestions||[]).forEach(function(g){var x=g.placePrediction&&g.placePrediction.text&&g.placePrediction.text.text;if(x&&out.indexOf(x)<0)out.push(x)});show(out,false,qq)}).catch(function(){if(my===seq)show([],true,qq)});return}
       fetch('https://photon.komoot.io/api/?lang=it&limit=6&lat=41.9&lon=12.5&q='+encodeURIComponent(v)).then(function(r){return r.json()}).then(function(j){
-        if(my!==seq)return;var out=[];(j.features||[]).forEach(function(f){var x=fmt(f);if(x&&out.indexOf(x)<0)out.push(x)});show(out)}).catch(function(){})
+        if(my!==seq)return;var out=[];(j.features||[]).forEach(function(f){var x=fmt(f);if(x&&out.indexOf(x)<0)out.push(x)});show(out,false,qq)}).catch(function(){if(my===seq)show([],true,qq)})
     },450)});
 })();
 function newOk(){
