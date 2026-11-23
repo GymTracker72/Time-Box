@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-24-0410">
+<meta name="tb-build" content="2026-11-24-0445">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -1476,6 +1476,13 @@ body.kbd .sheet-bg .sheet{max-height:100%!important}
 
   <h2 class="gsh" id="gsh">Google</h2>
   <section class="gset" id="gset" aria-label="Google">
+  <details class="foot" id="mapsd"><summary><span class="gic" style="background:#34a853"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span><span>Google Maps</span></summary>
+    <div style="display:flex;flex-direction:column;gap:8px;padding-top:8px">
+      <div class="sub">Indirizzi e tempo di percorrenza con il traffico, come in Google Maps. Serve una chiave API Google con «Places API (New)» e «Routes API» abilitate. Nella console limitala al sito gymtracker72.github.io.</div>
+      <input class="input" id="gkey" type="password" placeholder="Chiave API Google Maps" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Chiave API Google Maps">
+      <div id="gkeyst" class="sub"></div>
+    </div>
+  </details>
   <details class="foot" id="cald" hidden><summary><span class="gic" style="background:#ff3b30"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span><span class="gtx"><b>Google Calendar</b><i>Eventi e avvisi</i></span><svg class="gch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 5l7 7-7 7"/></svg></summary><div id="calbox" style="display:flex;flex-direction:column;gap:8px;padding-top:8px"></div></details>
   <details class="foot" id="footd">
     <summary><span class="gic" style="background:#2f6188"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.2 9.1 4.5 4.5 0 0 0 7 18z"/></svg></span><span class="gtx"><b>Google Drive</b><i>Dati, esporta, importa</i></span><svg class="gch" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 5l7 7-7 7"/></svg></summary>
@@ -4213,7 +4220,7 @@ document.addEventListener('click',function(e){
     case 'blk-new':if(Date.now()-(window._lpSup||0)<900)break;ui.hmenu=0;var nk=placeSlots(day(st.date),1,curSlot());ui.sheet={mode:'new',date:st.date,s:nk<0?DS:nk,n:1,kind:'flex',title:'',area:'P',pr:'B',src:'',rep:'',rend:'n',rdate:'',rcount:10,err:''};break;
     case 'nv-seg':if(ui.sheet){ui.sheet.pm=t.getAttribute('data-v')==='p';ui.sheet.err=''}break;
     case 'nv-pdue-clear':if(ui.sheet)ui.sheet.pdue='';break;
-    case 'loc-pick':if(ui.sheet&&ui.locSug){var lp=ui.locSug[+t.getAttribute('data-i')];if(lp)ui.sheet.loc=lp;ui.locSug=[]}break;
+    case 'loc-pick':if(ui.sheet&&ui.locSug){var lp=ui.locSug[+t.getAttribute('data-i')];if(lp)ui.sheet.loc=lp;ui.locSug=[];setTimeout(ttAutoRun,0)}break;
     case 'al-add':if(ui.sheet){var ad=alCur(ui.sheet),pf=[0,10,30,60,1440,5,15,120],nx=pf.filter(function(m){return ad.indexOf(m)<0})[0];if(nx!==undefined){ad.push(nx);ui.sheet.al=ad.sort(function(x,y){return x-y})}}break;
     case 'search-open':ui.hmenu=0;ui.sheet={mode:'search',q:''};break;
     case 'search-go':var sd=t.getAttribute('data-d'),sid=t.getAttribute('data-id'),sk=t.getAttribute('data-k');ui.sheet=null;
@@ -4299,7 +4306,7 @@ document.addEventListener('change',function(e){
   else if(c==='hours'){var h=parseFloat(v);if(h>=4&&h<=18)st.hours=h}
   else if(c==='edit'){var ebk=ui.sheet&&ui.sheet.bid?blkFind(ui.sheet):null,ei=item(ui.sheet&&(ui.sheet.id||(ebk&&ebk.ref)));if(ei){if(f==='text'){if(v.trim())ei.text=v.trim()}else if(f==='area'){ei.area=v;if(ei.pr==='A'&&ei.area)autoTop(ei);save();render();return}else if(f==='pr'){ei.pr=v;if(v==='D'&&(ei.status==='open'||ei.status==='prog'))ui.sheet=openDeleg(ei);if(v==='A'&&ei.area)autoTop(ei);save();render();return}else ei[f]=v}return}
   else if(c==='xe'){if(ui.sheet&&ui.sheet.mode==='ext'){ui.sheet[f]=(f==='s'||f==='n')?+v:v;ui.sheet.err='';if(f==='title'||f==='loc'||f==='date'||f==='s'||f==='n')return}}
-  else if(c==='sheet'){if(!ui.sheet)return;if(f==='alsel'){var ac=alCur(ui.sheet),ix=+t.getAttribute('data-i')||0;if(v==='x')ac.splice(ix,1);else if(v==='')ac=[];else ac[ix]=+v;ui.sheet.al=ac.filter(function(x,i,a){return a.indexOf(x)===i}).sort(function(x,y){return x-y});render();return}ui.sheet[f]=v;if(f==='ts'||f==='te'){var tm=/^(\d+):(\d+)/.exec(v||'');if(tm){var q=Math.round(((+tm[1])*60+(+tm[2])-S0)/5)/6,sx=ui.sheet;if(f==='ts'){sx.s=Math.max(0,Math.min(NSLOT-1/6,q))}else sx.n=Math.max(1/6,q-+sx.s)}var pl=t.closest&&t.closest('.nvp'),ps=pl&&pl.querySelector('span');if(ps)ps.textContent=v;return}if(f==='e')ui.sheet.n=Math.max(1,+v-+ui.sheet.s);ui.sheet.err='';if(f==='src'){ui.sheet.frog=undefined;ui.sheet.tedit=false}if(f==='title')ui.sheet.tedit=true;if(f==='rep'||f==='rfq')repInit(ui.sheet);if(f==='who'||f==='title'||f==='note'||f==='loc'||f==='inv'||f==='url'||f==='rcount'||f==='name'||f==='riv'||f==='res')return;if(t.type==='date'&&t.closest&&t.closest('.nvp')){var dp=t.closest('.nvp'),dsp=dp.querySelector('span');if(dsp)dsp.textContent=v?nvDate(v):'Nessuna';return}if(t.type==='date'){lastDateTs=Date.now();setTimeout(render,350);return}}
+  else if(c==='sheet'){if(!ui.sheet)return;if(f==='alsel'){var ac=alCur(ui.sheet),ix=+t.getAttribute('data-i')||0;if(v==='x')ac.splice(ix,1);else if(v==='')ac=[];else ac[ix]=+v;ui.sheet.al=ac.filter(function(x,i,a){return a.indexOf(x)===i}).sort(function(x,y){return x-y});render();return}ui.sheet[f]=v;if(f==='ts'||f==='te'){var tm=/^(\d+):(\d+)/.exec(v||'');if(tm){var q=Math.round(((+tm[1])*60+(+tm[2])-S0)/5)/6,sx=ui.sheet;if(f==='ts'){sx.s=Math.max(0,Math.min(NSLOT-1/6,q))}else sx.n=Math.max(1/6,q-+sx.s)}var pl=t.closest&&t.closest('.nvp'),ps=pl&&pl.querySelector('span');if(ps)ps.textContent=v;return}if(f==='e')ui.sheet.n=Math.max(1,+v-+ui.sheet.s);ui.sheet.err='';if(f==='src'){ui.sheet.frog=undefined;ui.sheet.tedit=false}if(f==='title')ui.sheet.tedit=true;if(f==='rep'||f==='rfq')repInit(ui.sheet);if(f==='loc'&&e.type==='change')setTimeout(ttAutoRun,0);if(f==='tt'){ui.sheet.ttMan=1;ui.sheet.ttAuto=0;ui.sheet.ttMsg=''}if(f==='who'||f==='title'||f==='note'||f==='loc'||f==='inv'||f==='url'||f==='rcount'||f==='name'||f==='riv'||f==='res')return;if(t.type==='date'&&t.closest&&t.closest('.nvp')){var dp=t.closest('.nvp'),dsp=dp.querySelector('span');if(dsp)dsp.textContent=v?nvDate(v):'Nessuna';return}if(t.type==='date'){lastDateTs=Date.now();setTimeout(render,350);return}}
   else if(c==='deleg'){var dx=d.deleg.filter(function(x){return x.id===id})[0];if(dx)dx[f]=v}
   else if(c==='rana'){d.rana[f]=v;if(ui.sheet&&ui.sheet.mode==='rana'&&f!=='goal'){save();return}}
   else if(c==='goal'){var lv=t.getAttribute('data-lv'),ar=t.getAttribute('data-a'),per=gKey(lv,lv==='O'?thuOf(st.date):st.date);
@@ -4362,10 +4369,10 @@ function newCands(date){
 /* ---- Eventi di tutto il giorno (anche su più giorni): non occupano ore dello schedule ---- */
 var ADAL=[['','Nessuno'],['900','Il giorno prima alle 9:00'],['2340','2 giorni prima alle 9:00'],['9540','1 settimana prima alle 9:00']];
 /* luogo collegato a Mappe di Apple: apre l'indirizzo o le indicazioni (su iPhone, iPad e Mac apre l'app Mappe) */
-function mapUrl(loc,dir){return 'https://maps.apple.com/?'+(dir?'daddr=':'q=')+encodeURIComponent(loc)}
+function mapUrl(loc,dir){return dir?'https://www.google.com/maps/dir/?api=1&travelmode=driving&destination='+encodeURIComponent(loc):'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(loc)}
 function mapLinks(loc,cls){if(!loc||!loc.trim())return '';loc=loc.trim();
   return '<div class="mapl'+(cls?' '+cls:'')+'"><a href="'+mapUrl(loc)+'" target="_blank" rel="noopener" class="mapa"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>'+esc(loc)+'</span></a><a href="'+mapUrl(loc,1)+'" target="_blank" rel="noopener" class="mapd"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg><span>Indicazioni</span></a></div>'}
-function mapIcon(loc){if(!loc||!loc.trim())return '';return '<a href="'+mapUrl(loc.trim())+'" target="_blank" rel="noopener" class="mapi" aria-label="Apri in Mappe"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></a>'}
+function mapIcon(loc){if(!loc||!loc.trim())return '';return '<a href="'+mapUrl(loc.trim())+'" target="_blank" rel="noopener" class="mapi" aria-label="Apri in Google Maps"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></a>'}
 function adList(){if(!Array.isArray(st.ad))st.ad=[];return st.ad}
 function adOn(x){return adList().filter(function(e){return e.from<=x&&x<=(e.to||e.from)}).sort(function(a,b){return a.from<b.from?-1:a.from>b.from?1:0})}
 function adExtOn(x){if(!impCfg().on)return [];var h=calHid();return (ex.ad||[]).filter(function(e){return e.from<=x&&x<=e.to&&h.indexOf(e.cal)<0})}
@@ -4450,7 +4457,10 @@ function invShort(t){var a=parseInv(t);return a.length?(a.length===1?a[0]:a.leng
 var IC_PEOPLE='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c0-3 2.4-5 5.5-5s5.5 2 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14.2c2.7-.3 4.5 1.4 4.5 4"/></svg>';
 var IC_LINK='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/></svg>';
 function frRow(sh){var o='<option value=""'+(sh.fr!=='1'?' selected':'')+'>Occupato</option><option value="1"'+(sh.fr==='1'?' selected':'')+'>Disponibile</option>';return selRow('Mostra come','sheet','fr',o,sh.fr==='1'?'Disponibile':'Occupato')}
-function ttRow(sh){var o=TTV.map(function(m){return '<option value="'+m+'"'+(+sh.tt===m||(!sh.tt&&m===0)?' selected':'')+'>'+ttLab(m)+'</option>'}).join('');return selRow('Tempo di percorrenza','sheet','tt',o,esc(ttLab(+sh.tt||0)))}
+function ttRow(sh){var vals=TTV.slice(),cv=+sh.tt||0;if(vals.indexOf(cv)<0){vals.push(cv);vals.sort(function(x,y){return x-y})}
+  var o=vals.map(function(m){return '<option value="'+m+'"'+(cv===m?' selected':'')+'>'+ttLab(m)+'</option>'}).join('');
+  var val=sh.ttBusy?'Calcolo…':(esc(ttLab(cv))+(sh.ttAuto&&cv?' · stimato':''));
+  return selRow('Tempo di percorrenza','sheet','tt',o,val)+(sh.ttMsg?'<div class="sub" style="padding:6px 20px 10px">'+esc(sh.ttMsg)+'</div>':'')}
 function invRow(sh){if(!GDon())return '';return '<label class="arow nvl">'+IC_PEOPLE+'<input class="locin" type="text" inputmode="email" data-chg="sheet" data-f="inv" placeholder="Invitati (email, separate da virgola)" value="'+esc(sh.inv||'')+'" autocomplete="off" autocapitalize="off" aria-label="Invitati"></label>'}
 function urlRow(sh){return '<label class="arow nvl">'+IC_LINK+'<input class="locin" type="url" inputmode="url" data-chg="sheet" data-f="url" placeholder="URL" value="'+esc(sh.url||'')+'" autocomplete="off" autocapitalize="off" aria-label="URL"></label>'}
 function exApply(sh,b){if(!b)return;
@@ -4458,7 +4468,7 @@ function exApply(sh,b){if(!b)return;
   var t=+sh.tt;if(t>0)b.tt=t;else delete b.tt;
   var u=(sh.url||'').trim();if(u)b.url=/^[a-z][a-z0-9+.-]*:/i.test(u)?u:'https://'+u;else delete b.url;
   var iv=parseInv(sh.inv);if(iv.length&&GDon())b.inv=iv;else if(!iv.length)delete b.inv}
-function exLoad(o,b){if(b.fr)o.fr='1';if(b.tt)o.tt=String(b.tt);if(b.url)o.url=b.url;if(b.inv)o.inv=b.inv.join(', ')}
+function exLoad(o,b){if(b.fr)o.fr='1';if(b.tt){o.tt=String(b.tt);o.ttMan=1}if(b.url)o.url=b.url;if(b.inv)o.inv=b.inv.join(', ')}
 function newHtml(sh){
   var it=sh.src?item(sh.src):null,dd=st.days[sh.date],bl=dd?dd.blocks:[],pm=!!sh.pm&&!it;
   var hit=bl.filter(function(x){return overlap(x,{s:+sh.s,n:+sh.n})}),over=+sh.s+ +sh.n>NSLOT,note='',cf='';
@@ -4508,6 +4518,11 @@ document.addEventListener('focusout',function(e){var t=e.target;if(t&&(t.type===
     if(kb){var a=document.activeElement;if(a&&a.closest&&a.closest('.sheet')){setTimeout(function(){try{a.scrollIntoView({block:'nearest'})}catch(e){}},50)}}}
   vv.addEventListener('resize',f);vv.addEventListener('scroll',f);f();
 })();
+
+(function(){var el=document.getElementById('gkey'),st2=document.getElementById('gkeyst');if(!el)return;
+  function show(){var v='';try{v=localStorage.getItem('timebox-gkey')||''}catch(e){}if(st2)st2.textContent=v?'Chiave salvata su questo dispositivo: gli indirizzi arrivano da Google.':'Nessuna chiave: gli indirizzi arrivano da OpenStreetMap.'}
+  try{el.value=localStorage.getItem('timebox-gkey')||''}catch(e){}show();
+  el.addEventListener('change',function(){var v=el.value.trim();try{if(v)localStorage.setItem('timebox-gkey',v);else localStorage.removeItem('timebox-gkey')}catch(e){}show()})})();
 /* Suggerimenti di indirizzo (OpenStreetMap / Photon) per il campo Luogo */
 (function(){
   var tmr=null,seq=0;
@@ -4520,7 +4535,7 @@ document.addEventListener('focusout',function(e){var t=e.target;if(t&&(t.type===
     return a.join(', ')}
   function show(list,failed,q){var u=window.__tbui&&window.__tbui();if(u)u.locSug=list;var box=document.getElementById('locsug');if(!box)return;
     var h=list.map(function(x,i){return '<button type="button" class="nvsb" data-act="loc-pick" data-i="'+i+'">'+esc(x)+'</button>'}).join('');
-    if(q&&failed)h+=(failed?'<div class="nvsn">Qui i suggerimenti automatici sono bloccati: funzionano aprendo Time Box da Safari. Intanto puoi cercare l\u2019indirizzo su Google Maps, poi copiarlo qui.</div>':'')+'<a class="nvsb nvsm" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q)+'">Cerca \u00ab'+esc(q)+'\u00bb su Google Maps</a>';
+    if(q&&failed)h+=(typeof failed==='string'?'<div class="nvsn">'+esc(failed)+'</div>':'<div class="nvsn">Qui i suggerimenti automatici sono bloccati: funzionano aprendo Time Box da Safari. Intanto puoi cercare l\u2019indirizzo su Google Maps, poi copiarlo qui.</div>')+'<a class="nvsb nvsm" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q)+'">Cerca \u00ab'+esc(q)+'\u00bb su Google Maps</a>';
     box.innerHTML=h}
   document.addEventListener('input',function(e){
     var t=e.target;if(!t||!t.classList||!t.classList.contains('locin')||!t.closest('.nv'))return;
@@ -4529,12 +4544,38 @@ document.addEventListener('focusout',function(e){var t=e.target;if(t&&(t.type===
     var my=++seq,qq=v,nm=/^(.*?\S)[,\s]+(\d+\s?[a-zA-Z]?(?:\/\w+)?)\s*$/.exec(v),num=nm?nm[2].replace(/\s+/g,''):'',base=nm?nm[1]:v;
     tmr=setTimeout(function(){
       var gk='';try{gk=localStorage.getItem('timebox-gkey')||''}catch(x){}
-      if(gk){fetch('https://places.googleapis.com/v1/places:autocomplete',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':gk},body:JSON.stringify({input:v,languageCode:'it',locationBias:{circle:{center:{latitude:41.9,longitude:12.5},radius:50000}}})}).then(function(r){return r.json()}).then(function(j){
-        if(my!==seq)return;var out=[];(j.suggestions||[]).forEach(function(g){var x=g.placePrediction&&g.placePrediction.text&&g.placePrediction.text.text;if(x&&out.indexOf(x)<0)out.push(x)});show(out,false,qq)}).catch(function(){if(my===seq)show([],true,qq)});return}
+      if(gk){fetch('https://places.googleapis.com/v1/places:autocomplete',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':gk},body:JSON.stringify({input:v,languageCode:'it',includedRegionCodes:['it'],locationBias:{circle:{center:{latitude:41.9,longitude:12.5},radius:50000}}})}).then(function(r){return r.json()}).then(function(j){
+        if(my!==seq)return;if(j.error){show([],'Google: '+(j.error.status==='PERMISSION_DENIED'||j.error.code===403?'chiave non valida o «Places API (New)» non abilitata.':(j.error.message||'errore')),qq);return}var out=[];(j.suggestions||[]).forEach(function(g){var x=g.placePrediction&&g.placePrediction.text&&g.placePrediction.text.text;if(x&&out.indexOf(x)<0)out.push(x)});show(out,false,qq)}).catch(function(){if(my===seq)show([],true,qq)});return}
       fetch('https://photon.komoot.io/api/?limit=8&lat=41.9&lon=12.5&q='+encodeURIComponent(base)).then(function(r){return r.json()}).then(function(j){
         if(my!==seq)return;var out=[];(j.features||[]).forEach(function(f){var x=fmt(f,num);if(x&&out.indexOf(x)<0)out.push(x)});show(out,false,qq)}).catch(function(){if(my===seq)show([],true,qq)})
     },450)});
 })();
+
+/* Tempo di percorrenza automatico: posizione attuale -> luogo (OpenStreetMap + OSRM, in auto) */
+function ttAutoRun(){
+  var sh=ui.sheet;if(!sh||sh.ttMan||sh.pm)return;
+  var q=(sh.loc||'').trim(),my=(window.__tts=(window.__tts||0)+1);
+  if(!q){if(sh.ttAuto){sh.tt='';sh.ttAuto=0}sh.ttMsg='';sh.ttBusy=0;render();return}
+  if(!navigator.geolocation){sh.ttMsg='Posizione non disponibile su questo dispositivo.';render();return}
+  sh.ttBusy=1;sh.ttMsg='';render();
+  function fail(m){if(my!==window.__tts||ui.sheet!==sh)return;sh.ttBusy=0;sh.ttMsg=m;render()}
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var la=pos.coords.latitude,lo=pos.coords.longitude,gk='';try{gk=localStorage.getItem('timebox-gkey')||''}catch(x){}
+    if(gk){
+      var dep=new Date(sh.date+'T'+calHM(+sh.s).slice(0,8)),body={origin:{location:{latLng:{latitude:la,longitude:lo}}},destination:{address:q},travelMode:'DRIVE',routingPreference:'TRAFFIC_AWARE',languageCode:'it'};
+      if(dep>new Date(Date.now()+60000)&&dep<new Date(Date.now()+90*864e5))body.departureTime=new Date(dep.getTime()-(+sh.tt||30)*60000).toISOString();
+      fetch('https://routes.googleapis.com/directions/v2:computeRoutes',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':gk,'X-Goog-FieldMask':'routes.duration'},body:JSON.stringify(body)}).then(function(r){return r.json()}).then(function(j){
+        if(j.error)throw j.error;var rt=j.routes&&j.routes[0];if(!rt||!rt.duration)throw 0;
+        if(my!==window.__tts||ui.sheet!==sh)return;
+        var mn=Math.max(5,Math.ceil(parseInt(rt.duration,10)/60/5)*5);sh.tt=String(mn);sh.ttAuto=1;sh.ttBusy=0;sh.ttMsg='';render()}).catch(function(e){fail(e&&e.status==='PERMISSION_DENIED'?'Google: abilita «Routes API» per questa chiave.':'Non riesco a calcolare il percorso con Google.')});
+      return}
+    fetch('https://photon.komoot.io/api/?limit=1&lat='+la+'&lon='+lo+'&q='+encodeURIComponent(q.replace(/\s*\d+\s*[a-zA-Z]?$/,''))).then(function(r){return r.json()}).then(function(j){
+      var f=(j.features||[])[0];if(!f)throw 0;var c=f.geometry.coordinates;
+      return fetch('https://router.project-osrm.org/route/v1/driving/'+lo+','+la+';'+c[0]+','+c[1]+'?overview=false')}).then(function(r){return r.json()}).then(function(j){
+      var rt=j&&j.routes&&j.routes[0];if(!rt)throw 0;
+      if(my!==window.__tts||ui.sheet!==sh)return;
+      var mn=Math.max(5,Math.ceil(rt.duration/60/5)*5);sh.tt=String(mn);sh.ttAuto=1;sh.ttBusy=0;sh.ttMsg='';render()}).catch(function(){fail('Non riesco a calcolare il percorso da qui.')})
+  },function(){fail('Consenti la posizione in Safari per calcolare il tempo di percorrenza.')},{timeout:12000,maximumAge:120000,enableHighAccuracy:false})}
 function newOk(){
   var sh=ui.sheet;if(!sh)return;
   var it=sh.src?item(sh.src):null,s=+sh.s,n=+sh.n,title=it&&!sh.tedit?it.text:(sh.title||'').trim();
