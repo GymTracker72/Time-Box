@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-24-0235">
+<meta name="tb-build" content="2026-11-24-0250">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -1402,6 +1402,9 @@ body.m-plan #daybar{display:none!important}
 #phead .pr2 .hmn,.msc .pr2 .hmn{position:absolute;right:0;left:auto;top:46px;bottom:auto;z-index:45}
 @media (min-width:701px){#phead .pr2 .hmn,.msc .pr2 .hmn{bottom:auto}}
 body:not(.gshow) #gsh,body:not(.gshow) #gset{display:none!important}
+
+body.kbd .sheet-bg{inset:auto!important;left:0!important;right:0!important;top:var(--vvt,0px)!important;height:var(--vvh,100%)!important}
+body.kbd .sheet-bg .sheet{max-height:100%!important}
 </style>
 
 <div class="wrap">
@@ -4457,6 +4460,15 @@ function newHtml(sh){
 }
 
 document.addEventListener('focusout',function(e){var t=e.target;if(t&&(t.type==='time'||t.type==='date')&&t.closest&&t.closest('.nvp')&&ui.sheet)setTimeout(render,60)});
+
+/* Tastiera: le schede restano dentro l'area visibile */
+(function(){
+  var vv=window.visualViewport;if(!vv)return;
+  function f(){var kb=window.innerHeight-vv.height>120,r=document.documentElement.style;
+    r.setProperty('--vvh',vv.height+'px');r.setProperty('--vvt',vv.offsetTop+'px');document.body.classList.toggle('kbd',kb);
+    if(kb){var a=document.activeElement;if(a&&a.closest&&a.closest('.sheet')){setTimeout(function(){try{a.scrollIntoView({block:'nearest'})}catch(e){}},50)}}}
+  vv.addEventListener('resize',f);vv.addEventListener('scroll',f);f();
+})();
 /* Suggerimenti di indirizzo (OpenStreetMap / Photon) per il campo Luogo */
 (function(){
   var tmr=null,seq=0;
@@ -4469,7 +4481,7 @@ document.addEventListener('focusout',function(e){var t=e.target;if(t&&(t.type===
     return a.join(', ')}
   function show(list,failed,q){var u=window.__tbui&&window.__tbui();if(u)u.locSug=list;var box=document.getElementById('locsug');if(!box)return;
     var h=list.map(function(x,i){return '<button type="button" class="nvsb" data-act="loc-pick" data-i="'+i+'">'+esc(x)+'</button>'}).join('');
-    if(q)h+=(failed?'<div class="nvsn">Qui i suggerimenti automatici sono bloccati: funzionano aprendo Time Box da Safari. Intanto puoi cercare l\u2019indirizzo su Google Maps, poi copiarlo qui.</div>':'')+'<a class="nvsb nvsm" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q)+'">Cerca \u00ab'+esc(q)+'\u00bb su Google Maps</a>';
+    if(q&&failed)h+=(failed?'<div class="nvsn">Qui i suggerimenti automatici sono bloccati: funzionano aprendo Time Box da Safari. Intanto puoi cercare l\u2019indirizzo su Google Maps, poi copiarlo qui.</div>':'')+'<a class="nvsb nvsm" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q)+'">Cerca \u00ab'+esc(q)+'\u00bb su Google Maps</a>';
     box.innerHTML=h}
   document.addEventListener('input',function(e){
     var t=e.target;if(!t||!t.classList||!t.classList.contains('locin')||!t.closest('.nv'))return;
@@ -4480,7 +4492,7 @@ document.addEventListener('focusout',function(e){var t=e.target;if(t&&(t.type===
       var gk='';try{gk=localStorage.getItem('timebox-gkey')||''}catch(x){}
       if(gk){fetch('https://places.googleapis.com/v1/places:autocomplete',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':gk},body:JSON.stringify({input:v,languageCode:'it',locationBias:{circle:{center:{latitude:41.9,longitude:12.5},radius:50000}}})}).then(function(r){return r.json()}).then(function(j){
         if(my!==seq)return;var out=[];(j.suggestions||[]).forEach(function(g){var x=g.placePrediction&&g.placePrediction.text&&g.placePrediction.text.text;if(x&&out.indexOf(x)<0)out.push(x)});show(out,false,qq)}).catch(function(){if(my===seq)show([],true,qq)});return}
-      fetch('https://photon.komoot.io/api/?lang=it&limit=6&lat=41.9&lon=12.5&q='+encodeURIComponent(v)).then(function(r){return r.json()}).then(function(j){
+      fetch('https://photon.komoot.io/api/?limit=6&lat=41.9&lon=12.5&q='+encodeURIComponent(v)).then(function(r){return r.json()}).then(function(j){
         if(my!==seq)return;var out=[];(j.features||[]).forEach(function(f){var x=fmt(f);if(x&&out.indexOf(x)<0)out.push(x)});show(out,false,qq)}).catch(function(){if(my===seq)show([],true,qq)})
     },450)});
 })();
