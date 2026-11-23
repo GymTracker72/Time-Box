@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-24-0445">
+<meta name="tb-build" content="2026-11-24-0610">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -1422,6 +1422,12 @@ body.kbd .sheet-bg .sheet{max-height:100%!important}
 
 .arow.alad{border:0;background:var(--surface);width:100%;cursor:pointer;color:var(--blue)}.arow.alad .an{color:var(--blue);font-weight:600;flex:none}
 .nv .nvc>textarea+.arow,.nv .nvc>.nvn+.arow{border-top:1px solid var(--soft)}
+
+.nv .nvtt{flex:1;text-align:center;font:700 18px/1 var(--body);color:var(--ink)}
+.nv .nvnb{padding:14px 20px;display:flex;flex-direction:column;gap:10px}
+.nv .nvc .arow.dang{color:#e5342f;font-weight:600}
+.nv .nvc .arow.dang{justify-content:center}
+.nv .notes .lbl,.nv .subwrap .lbl{font:700 13px/1 var(--body);color:var(--muted)}
 </style>
 
 <div class="wrap">
@@ -2745,6 +2751,38 @@ function jbHead(sh,b,newMode){
     '<button type="button" class="shs" data-act="sheet-ok">'+(newMode?'Aggiungi':'Salva')+'</button></div>'}
 function jbTitle(titleVal,ph,chg,notesBlock){
   return '<div class="tcard"><textarea class="bst" rows="1" data-chg="'+chg+'" data-f="title" placeholder="'+ph+'" aria-label="Titolo" autocomplete="off">'+esc(titleVal)+'</textarea>'+notesBlock+'</div>'}
+
+/* Scheda di un blocco: stessa grafica del nuovo evento */
+function blkHtmlNew(sh,b){
+  var it=b.ref&&item(b.ref),dd=st.days[sh.date],bl=dd?dd.blocks:[];
+  var hit=bl.filter(function(x){return x.id!==b.id&&overlap(x,{s:+sh.s,n:+sh.n})}),over=+sh.s+ +sh.n>NSLOT,note='',cf='';
+  if(over)note='Il blocco finisce dopo la mezzanotte.';else if(hit.length)cf=confHtml(sh,hit,b.id);
+  var e0=+sh.s+ +sh.n,AC={L:'var(--blue)',F:'var(--green)',P:'var(--red)'},bar=AC[it?it.area:sh.area]||'var(--grey)',ow=noteOwner(sh);
+  var nb=notesHtml(ow)+(it?(it.sub?subHtml(it,''):subBtn(it)):'');
+  var when='<div class="nvc"><div class="nvr"><span class="an">Inizio</span><span class="nvv">'+nvPill(nvDate(sh.date),'<input type="date" data-chg="sheet" data-f="date" value="'+esc(sh.date)+'" aria-label="Data">')+nvPill(slotLab(+sh.s),'<input type="time" step="300" data-chg="sheet" data-f="ts" value="'+slotLab(+sh.s)+'" aria-label="Ora di inizio">')+'</span></div>'+
+    '<div class="nvr"><span class="an">Fine</span><span class="nvv">'+nvPill(nvDate(sh.date),'',true)+nvPill(slotLab(e0),'<input type="time" step="300" data-chg="sheet" data-f="te" value="'+slotLab(e0)+'" aria-label="Ora di fine">')+'</span></div>'+
+    (it?'<div class="nvr"><span class="an">Scadenza</span><span class="nvv">'+nvPill(it.due?nvDate(it.due):'Nessuna','<input type="date" data-chg="edit" data-f="due" value="'+esc(it.due||'')+'" aria-label="Scadenza">')+(it.due?'<button type="button" class="nvx2" data-act="ed-clear-due" data-id="'+it.id+'" aria-label="Togli la scadenza">×</button>':'')+'</span></div>':'')+
+    (it||b.rid?'':adSwitch(false))+repRow(sh)+fixRow(sh)+alHtml(sh,true)+'</div>'+repMore(sh);
+  var prO='<option value=""'+(!sh.pr?' selected':'')+'>Da classificare</option><option value="A"'+(sh.pr==='A'?' selected':'')+'>A · Top priority</option><option value="B"'+(sh.pr==='B'?' selected':'')+'>B · minore</option><option value="C"'+(sh.pr==='C'?' selected':'')+'>C · nessuna urgenza</option>';
+  var base=it?areaRow('edit',it.area)+priRow(it):areaRow('sheet',sh.area)+selRow('Priorità','sheet','pr',prO,sh.pr?({A:'A · Top',B:'B · minore',C:'C · nessuna urgenza'}[sh.pr]):'Da classificare');
+  var opt='<div class="nvc"><div class="arow"><span class="an">Da elenco</span><span class="av">'+(it?esc(it.text):'Voce libera')+'</span></div>'+base+frRow(sh)+'</div>';
+  var frg=(function(){var fr=it?frogRow(sh,it,sh.from):(sh.pr==='A'&&sh.area?frogRow(sh,{id:'_',pr:'A',area:sh.area},sh.from):'');return fr?'<div class="bsc bsl">'+fr+'</div>':''})();
+  return '<div class="sheet-bg" data-act="sheet-bg"><div class="sheet nv" role="dialog" aria-label="Scheda del blocco">'+
+    '<div class="nvh"><button type="button" class="nvb" data-act="sheet-close" aria-label="Chiudi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'+
+    '<div class="nvseg" role="tablist" aria-label="Tipo"><button type="button" role="tab" aria-selected="true" class="on">Evento</button><button type="button" role="tab" aria-selected="false" disabled>Promemoria</button></div>'+
+    '<button type="button" class="nvb ok" data-act="sheet-ok" aria-label="Salva"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>'+
+    '<div class="nvt" style="--bar:'+bar+'"><i class="nvbar"></i><textarea class="bst" rows="1" data-chg="sheet" data-f="title" placeholder="Titolo" aria-label="Titolo" autocomplete="off">'+esc(sh.title)+'</textarea></div>'+
+    opt+when+
+    '<div class="nvs">Posizione</div><div class="nvc"><label class="arow nvl"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><input class="locin" data-chg="sheet" data-f="loc" placeholder="Luogo o videochiamata" value="'+esc(sh.loc||'')+'" autocomplete="off" aria-label="Luogo">'+mapIcon(sh.loc)+'</label><div id="locsug" class="nvsug"></div>'+ttRow(sh)+'</div>'+
+    (GDon()?'<div class="nvs">Invitati</div><div class="nvc">'+invRow(sh)+'</div>':'')+
+    frg+
+    '<div class="nvs">Dettagli</div><div class="nvc"><div class="nvnb">'+nb+'</div>'+urlRow(sh)+'</div>'+
+    (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+cf+
+    (b.rid&&st.rec[b.rid]?'<div class="sub" style="padding:0 10px">Fa parte di una serie: '+esc(repLabel(st.rec[b.rid],sh.date))+'.</div>':'')+
+    '<div class="nvc"><button type="button" class="arow dang" data-act="blk-del">Togli dal piano</button></div>'+
+    '<div class="bsf bsf2" style="justify-content:center"><button class="mini" data-act="blk-copy" type="button">Copia</button>'+(it?(sh.confirm?'<button class="mini red" data-act="ed-del2" data-id="'+it.id+'" type="button">Conferma: cancella</button>':'<button class="mini red" data-act="ed-del" data-id="'+it.id+'" type="button">Elimina voce</button>'):'')+'</div>'+
+    '</div></div>';
+}
 function blkHtml(sh,b){
   if(sh.ask){
     var one=sh.ask==='save'&&sh.date!==sh.from;
@@ -2755,6 +2793,7 @@ function blkHtml(sh,b){
       (one?'':'<button class="btn" data-act="blk-scope" data-v="future" type="button">Questo e i successivi</button><button class="btn" data-act="blk-scope" data-v="all" type="button">Tutta la serie</button>')+
       '<button class="btn sec" data-act="blk-scope" data-v="back" type="button">Indietro</button></div></div>';
   }
+  if(true)return blkHtmlNew(sh,b);
   var it=b.ref&&item(b.ref),dd=st.days[sh.date],bl=dd?dd.blocks:[];
   var hit=bl.filter(function(x){return x.id!==b.id&&overlap(x,{s:+sh.s,n:+sh.n})});
   var fx=hit.some(function(x){return x.kind==='fixed'}),over=+sh.s+ +sh.n>NSLOT,note='';
@@ -4483,17 +4522,17 @@ function newHtml(sh){
   var areaR=it?'':areaRow('sheet',sh.area);
   var prO='<option value=""'+(!sh.pr?' selected':'')+'>Da classificare</option><option value="A"'+(sh.pr==='A'?' selected':'')+'>A · Top priority</option><option value="B"'+(sh.pr==='B'?' selected':'')+'>B · minore</option><option value="C"'+(sh.pr==='C'?' selected':'')+'>C · nessuna</option>';
   var prR=(it||(!pm&&(sh.kind!=='flex'||sh.rep)))?'':selRow('Priorità','sheet','pr',prO,sh.pr?({A:'A · Top',B:'B · minore',C:'C · nessuna'}[sh.pr]):'Da classificare');
-  var srcR=pm?'':'<div class="nvc">'+selRow('Da elenco','sheet','src',src,it?esc(it.text):'Voce libera')+'</div>';
+  var srcR=pm?'':'<div class="nvc">'+selRow('Da elenco','sheet','src',src,it?esc(it.text):'Voce libera')+areaR+(prR||'')+frRow(sh)+'</div>';
   var when;
   if(pm){
     when='<div class="nvc"><div class="nvr"><span class="an">Scadenza</span><span class="nvv">'+nvPill(sh.pdue?nvDate(sh.pdue):'Nessuna','<input type="date" data-chg="sheet" data-f="pdue" value="'+esc(sh.pdue||'')+'" aria-label="Scadenza">')+(sh.pdue?'<button type="button" class="nvx2" data-act="nv-pdue-clear" aria-label="Togli la scadenza">×</button>':'')+'</span></div></div>';
   }else{
     when='<div class="nvc"><div class="nvr"><span class="an">Inizio</span><span class="nvv">'+nvPill(nvDate(sh.date),'<input type="date" data-chg="sheet" data-f="date" value="'+esc(sh.date)+'" aria-label="Data">')+nvPill(slotLab(+sh.s),'<input type="time" step="300" data-chg="sheet" data-f="ts" value="'+slotLab(+sh.s)+'" aria-label="Ora di inizio">')+'</span></div>'+
       '<div class="nvr"><span class="an">Fine</span><span class="nvv">'+nvPill(nvDate(sh.date),'',true)+nvPill(slotLab(e0),'<input type="time" step="300" data-chg="sheet" data-f="te" value="'+slotLab(e0)+'" aria-label="Ora di fine">')+'</span></div>'+
-      (it?'':adSwitch(false))+repRow(sh)+'</div>'+repMore(sh);
+      (it?'':adSwitch(false))+repRow(sh)+fixRow(sh)+alHtml(sh,true)+'</div>'+repMore(sh);
   }
   var nt=it?'':'<div class="nvc"><textarea class="nvn" data-chg="sheet" data-f="note" rows="2" placeholder="Note" aria-label="Note">'+esc(sh.note||'')+'</textarea></div>';
-  var opt='<div class="nvc">'+areaR+(pm?'':fixRow(sh))+(prR||'')+(pm?'':frRow(sh)+ttRow(sh)+alHtml(sh,true))+'</div>';
+  var opt=pm?'<div class="nvc">'+areaR+(prR||'')+'</div>':'';
   var invS=(pm||!GDon())?'':'<div class="nvs">Invitati</div><div class="nvc">'+invRow(sh)+'</div>';
   return '<div class="sheet-bg" data-act="sheet-bg"><div class="sheet nv" role="dialog" aria-label="Nuovo blocco">'+
     '<div class="nvh"><button type="button" class="nvb" data-act="sheet-close" aria-label="Chiudi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>'+
@@ -4501,8 +4540,8 @@ function newHtml(sh){
     '<button type="button" class="nvb ok" data-act="sheet-ok" aria-label="Aggiungi"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button></div>'+
     '<div class="nvt" style="--bar:'+bar+'"><i class="nvbar"></i><textarea class="bst" rows="1" data-chg="sheet" data-f="title" placeholder="'+(pm?'Promemoria':'Nome o descrizione dell’evento')+'" aria-label="Titolo" autocomplete="off">'+esc(it&&!sh.tedit?it.text:sh.title)+'</textarea></div>'+
     srcR+when+
-    (pm?'':'<div class="nvs">Posizione</div><div class="nvc"><label class="arow nvl"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><input class="locin" data-chg="sheet" data-f="loc" placeholder="Luogo o videochiamata" value="'+esc(sh.loc||'')+'" autocomplete="off" aria-label="Luogo">'+mapIcon(sh.loc)+'</label><div id="locsug" class="nvsug"></div></div>')+invS+
-    '<div class="nvs">Opzioni</div>'+opt+
+    (pm?'':'<div class="nvs">Posizione</div><div class="nvc"><label class="arow nvl"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><input class="locin" data-chg="sheet" data-f="loc" placeholder="Luogo o videochiamata" value="'+esc(sh.loc||'')+'" autocomplete="off" aria-label="Luogo">'+mapIcon(sh.loc)+'</label><div id="locsug" class="nvsug"></div>'+ttRow(sh)+'</div>')+invS+
+    (opt?'<div class="nvs">Opzioni</div>'+opt:'')+
     (nt?'<div class="nvs">Dettagli</div><div class="nvc">'+nt.replace('<div class="nvc">','').replace(/<\/div>$/,'')+(pm?'':urlRow(sh))+'</div>':'')+
     (sh.err?'<div class="note err" style="margin:0">'+esc(sh.err)+'</div>':note?'<div class="note" style="margin:0">'+esc(note)+'</div>':'')+cf+
     (pm?'':frogNew(sh,it))+'</div></div>';
