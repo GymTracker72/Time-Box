@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-24-0250">
+<meta name="tb-build" content="2026-11-24-0305">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -4472,10 +4472,10 @@ document.addEventListener('focusout',function(e){var t=e.target;if(t&&(t.type===
 /* Suggerimenti di indirizzo (OpenStreetMap / Photon) per il campo Luogo */
 (function(){
   var tmr=null,seq=0;
-  function fmt(f){var p=f.properties||{},a=[];
-    var street=(p.street||'')+(p.housenumber?' '+p.housenumber:'');
-    if(p.name&&p.name!==p.street)a.push(p.name);
-    if(street.trim())a.push(street.trim());
+  function fmt(f,num){var p=f.properties||{},a=[];
+    var street=p.street||(p.osm_key==='highway'?p.name:''),hn=p.housenumber||(street?num:'');
+    if(p.name&&p.name!==street&&p.osm_key!=='highway')a.push(p.name);
+    if(street)a.push(street+(hn?' '+hn:''));
     var city=((p.postcode||'')+' '+(p.city||p.town||p.village||p.county||'')).trim();
     if(city)a.push(city);
     return a.join(', ')}
@@ -4487,13 +4487,13 @@ document.addEventListener('focusout',function(e){var t=e.target;if(t&&(t.type===
     var t=e.target;if(!t||!t.classList||!t.classList.contains('locin')||!t.closest('.nv'))return;
     var v=t.value.trim();clearTimeout(tmr);
     if(v.length<3){show([]);return}
-    var my=++seq,qq=v;
+    var my=++seq,qq=v,nm=/^(.*?\S)[,\s]+(\d+\s?[a-zA-Z]?(?:\/\w+)?)\s*$/.exec(v),num=nm?nm[2].replace(/\s+/g,''):'',base=nm?nm[1]:v;
     tmr=setTimeout(function(){
       var gk='';try{gk=localStorage.getItem('timebox-gkey')||''}catch(x){}
       if(gk){fetch('https://places.googleapis.com/v1/places:autocomplete',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':gk},body:JSON.stringify({input:v,languageCode:'it',locationBias:{circle:{center:{latitude:41.9,longitude:12.5},radius:50000}}})}).then(function(r){return r.json()}).then(function(j){
         if(my!==seq)return;var out=[];(j.suggestions||[]).forEach(function(g){var x=g.placePrediction&&g.placePrediction.text&&g.placePrediction.text.text;if(x&&out.indexOf(x)<0)out.push(x)});show(out,false,qq)}).catch(function(){if(my===seq)show([],true,qq)});return}
-      fetch('https://photon.komoot.io/api/?limit=6&lat=41.9&lon=12.5&q='+encodeURIComponent(v)).then(function(r){return r.json()}).then(function(j){
-        if(my!==seq)return;var out=[];(j.features||[]).forEach(function(f){var x=fmt(f);if(x&&out.indexOf(x)<0)out.push(x)});show(out,false,qq)}).catch(function(){if(my===seq)show([],true,qq)})
+      fetch('https://photon.komoot.io/api/?limit=8&lat=41.9&lon=12.5&q='+encodeURIComponent(base)).then(function(r){return r.json()}).then(function(j){
+        if(my!==seq)return;var out=[];(j.features||[]).forEach(function(f){var x=fmt(f,num);if(x&&out.indexOf(x)<0)out.push(x)});show(out,false,qq)}).catch(function(){if(my===seq)show([],true,qq)})
     },450)});
 })();
 function newOk(){
