@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-24-0610">
+<meta name="tb-build" content="2026-11-24-0700">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -1428,6 +1428,13 @@ body.kbd .sheet-bg .sheet{max-height:100%!important}
 .nv .nvc .arow.dang{color:#e5342f;font-weight:600}
 .nv .nvc .arow.dang{justify-content:center}
 .nv .notes .lbl,.nv .subwrap .lbl{font:700 13px/1 var(--body);color:var(--muted)}
+
+.nv .nnw{border:0;background:var(--bg,#f3f5f4);border-radius:14px;padding:6px 6px 6px 14px}
+.nv .nnw textarea,.nv .ntx{border:0;background:transparent;outline:0}
+.nv .ntx{background:var(--bg,#f3f5f4);border-radius:12px;padding:10px 14px}
+.nv .mini{border:0;background:var(--bg,#f3f5f4);border-radius:999px;padding:10px 16px;font-weight:600}
+.nv .bsf .mini{background:transparent;padding:6px 4px}
+.nv .bsf .mini.red{color:#e5342f}
 </style>
 
 <div class="wrap">
@@ -1883,7 +1890,7 @@ function renderPHead(){
   var days=[];for(var q=0;q<7;q++)days.push(addDays(m,q));
   var mn=MON[dt.getMonth()],mo=hmenuHtml();
   var h='<div class="ptop2"><button type="button" class="pmo2" data-act="mode" data-m="mese" aria-label="Vista mese"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span>'+mn.charAt(0).toUpperCase()+mn.slice(1)+(dt.getFullYear()!==now.getFullYear()?' '+dt.getFullYear():'')+'</span></button>'+
-    '<div class="pr2 hbt">'+(isT?'':'<button type="button" class="pogg" data-act="day-today" aria-label="Torna a oggi">Oggi</button>')+'<button type="button" class="pdt" data-act="hm-tog" aria-label="Cerca, stampa e altro" aria-haspopup="menu" aria-expanded="'+(!!ui.hmenu)+'"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18.5" cy="12" r="1.8"/></svg></button><button type="button" class="ppl" data-act="blk-new" aria-label="Nuovo blocco. Tieni premuto per Cerca, Filtra e Stampa" aria-haspopup="menu"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>'+mo+'</div></div>';
+    '<div class="pr2 hbt">'+'<button type="button" class="pogg" data-act="day-today" aria-label="Torna a oggi">Oggi</button>'+'<button type="button" class="pdt" data-act="hm-tog" aria-label="Cerca, stampa e altro" aria-haspopup="menu" aria-expanded="'+(!!ui.hmenu)+'"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18.5" cy="12" r="1.8"/></svg></button><button type="button" class="ppl" data-act="blk-new" aria-label="Nuovo blocco. Tieni premuto per Cerca, Filtra e Stampa" aria-haspopup="menu"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>'+mo+'</div></div>';
   h+='<div class="pstrip">'+['L','M','M','G','V','S','D'].map(function(l,ix){return '<span class="w2l'+(ix>4?' we':'')+'">'+l+'</span>'}).join('')+days.map(function(x,ix){return '<button type="button" data-act="pday" data-d="'+x+'" aria-label="'+DOW[parse(x).getDay()]+' '+parse(x).getDate()+'"><span class="w2n'+(ix>4?' we':'')+(x===today?' tdy':'')+(x===st.date?' sel':'')+'">'+parse(x).getDate()+'</span></button>'}).join('')+'</div>';
   el.innerHTML=h;
 }
@@ -2140,7 +2147,7 @@ function renderSettNew(){
   var cap=Math.max(st.hours*60,1),cur=mondayOf(today);
   var ob=true?'':(m<cur?'<button type="button" class="w2o" data-act="day-today" aria-label="Torna a oggi">Oggi ›</button>':'<button type="button" class="w2o" data-act="day-today" aria-label="Torna a oggi">‹ Oggi</button>');
   var h='<div class="msc"><div class="msch"><div class="ptop2"><button type="button" class="pmo2" data-act="mode" data-m="mese" aria-label="Torna al calendario"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span>'+title+'</span></button>'+
-    '<div class="pr2 hbt"><button type="button" class="pdt" data-act="hm-tog" aria-label="Cerca, stampa e altro" aria-haspopup="menu" aria-expanded="'+(!!ui.hmenu)+'"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18.5" cy="12" r="1.8"/></svg></button><button type="button" class="ppl" data-act="blk-new" aria-label="Nuovo blocco. Tieni premuto per Cerca, Filtra e Stampa" aria-haspopup="menu"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>'+hmenuHtml()+'</div></div></div></div>'+
+    '<div class="pr2 hbt"><button type="button" class="pogg" data-act="go-day" aria-label="Torna a oggi">Oggi</button><button type="button" class="pdt" data-act="hm-tog" aria-label="Cerca, stampa e altro" aria-haspopup="menu" aria-expanded="'+(!!ui.hmenu)+'"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18.5" cy="12" r="1.8"/></svg></button><button type="button" class="ppl" data-act="blk-new" aria-label="Nuovo blocco. Tieni premuto per Cerca, Filtra e Stampa" aria-haspopup="menu"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>'+hmenuHtml()+'</div></div></div></div>'+
     '<div class="mdnav"><span class="w2k">Settimana '+wn+(nd?' · '+nd+(nd===1?' scadenza':' scadenze'):'')+'</span>'+hnav('w',!curP('w'))+'</div>';
   (function(){
     var AC={L:'var(--blue)',F:'var(--green)',P:'var(--red)'},rg=goalsFor('R',m).filter(function(g){return g.text});
@@ -2284,7 +2291,7 @@ function renderMeseScroll(){
   var now=new Date(),today=isoOf(now),y=+st.date.slice(0,4),mo=+st.date.slice(5,7),sel=st.date.slice(0,7);
   var MN=function(i){var n=MON[i];return n.charAt(0).toUpperCase()+n.slice(1)};
   var h='<div class="msc"><div class="msch"><div class="ptop2"><button type="button" class="pmo2" data-act="mode" data-m="anno" aria-label="Vista anno"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span>'+y+'</span></button>'+
-    '<div class="pr2 hbt">'+(sel===today.slice(0,7)?'':'<button type="button" class="pogg" data-act="mo-today" aria-label="Vai a oggi">Oggi</button>')+'<button type="button" class="pdt" data-act="hm-tog" aria-label="Cerca, stampa e altro" aria-haspopup="menu" aria-expanded="'+(!!ui.hmenu)+'"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18.5" cy="12" r="1.8"/></svg></button><button type="button" class="ppl" data-act="blk-new" aria-label="Nuovo blocco. Tieni premuto per Cerca, Filtra e Stampa" aria-haspopup="menu"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>'+hmenuHtml()+'</div></div>'+
+    '<div class="pr2 hbt">'+'<button type="button" class="pogg" data-act="mo-today" aria-label="Vai a oggi">Oggi</button>'+'<button type="button" class="pdt" data-act="hm-tog" aria-label="Cerca, stampa e altro" aria-haspopup="menu" aria-expanded="'+(!!ui.hmenu)+'"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18.5" cy="12" r="1.8"/></svg></button><button type="button" class="ppl" data-act="blk-new" aria-label="Nuovo blocco. Tieni premuto per Cerca, Filtra e Stampa" aria-haspopup="menu"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>'+hmenuHtml()+'</div></div>'+
     '<div class="mscw">'+['L','M','M','G','V','S','D'].map(function(l,i){return '<span'+(i>4?' class="we"':'')+'>'+l+'</span>'}).join('')+'</div></div>';
   for(var k=-3;k<=11;k++){
     var md=new Date(y,mo-1+k,1),ym=isoOf(md).slice(0,7),first=ym+'-01',last=isoOf(new Date(md.getFullYear(),md.getMonth()+1,0)),col=(md.getDay()+6)%7,isSel=ym===sel;
@@ -2313,7 +2320,7 @@ function renderMese(){
   var og=goalsFor('O',ym).filter(function(g){return g.text}),dsh=function(x){return parse(x).getDate()+' '+MON[+x.slice(5,7)-1].slice(0,3)};
   var MNd=MON[+mo-1].charAt(0).toUpperCase()+MON[+mo-1].slice(1);
   var h='<div class="msc"><div class="msch"><div class="ptop2"><button type="button" class="pmo2" data-act="mode" data-m="mese" aria-label="Torna al calendario"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg><span>'+MNd+(y!==today.slice(0,4)?' '+y:'')+'</span></button>'+
-    '<div class="pr2 hbt"><button type="button" class="pdt" data-act="hm-tog" aria-label="Cerca, stampa e altro" aria-haspopup="menu" aria-expanded="'+(!!ui.hmenu)+'"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18.5" cy="12" r="1.8"/></svg></button><button type="button" class="ppl" data-act="blk-new" aria-label="Nuovo blocco. Tieni premuto per Cerca, Filtra e Stampa" aria-haspopup="menu"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>'+hmenuHtml()+'</div></div></div></div>'+
+    '<div class="pr2 hbt"><button type="button" class="pogg" data-act="mo-today" aria-label="Torna a oggi">Oggi</button><button type="button" class="pdt" data-act="hm-tog" aria-label="Cerca, stampa e altro" aria-haspopup="menu" aria-expanded="'+(!!ui.hmenu)+'"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5.5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18.5" cy="12" r="1.8"/></svg></button><button type="button" class="ppl" data-act="blk-new" aria-label="Nuovo blocco. Tieni premuto per Cerca, Filtra e Stampa" aria-haspopup="menu"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>'+hmenuHtml()+'</div></div></div></div>'+
     '<div class="mdnav">'+hnav('m',!curP('m'))+'</div><div class="mos">Le tre cose che contano questo mese</div>';
   if(!og.length)h+=mog1('O');else h+='<div class="mog">'+AK.map(function(a){
     var g=og.filter(function(x){return x.area===a})[0],c=AC[a];
@@ -4122,8 +4129,9 @@ document.addEventListener('click',function(e){
     case 'goal-frog':var g3=goalById(id);if(g3){var was=g3.frog;goalsFor(g3.lv,g3.per).forEach(function(x){x.frog=false});g3.frog=!was}break;
     case 'day-prev':if(ui.mode==='oggi')break;st.date=addDays(st.date,-1);break;
     case 'day-next':if(ui.mode==='oggi')break;st.date=addDays(st.date,1);break;
-    case 'day-today':st.date=isoOf(new Date());break;
-    case 'pday':st.date=t.getAttribute('data-d');break;
+    case 'go-day':st.date=isoOf(new Date());ui.wsel='';ui.mode='plan';ui.landPrev='';window.scrollTo(0,0);break;
+    case 'day-today':st.date=isoOf(new Date());ui.wsel=st.date;if(ui.mode==='sett'&&ui.wall){var wd2=st.date;setTimeout(function(){var e=document.querySelector('.w2x[data-wd="'+wd2+'"]');if(e)window.scrollTo({top:Math.max(0,e.getBoundingClientRect().top+window.scrollY-16),behavior:'smooth'})},80)}else window.scrollTo(0,0);break;
+    case 'pday':var pdd=t.getAttribute('data-d');if(pdd===st.date&&ui.mode==='plan'){ui.wsel='';ui.mode='sett';ui.scrollDay=pdd}else st.date=pdd;break;
     case 'cyc-item':if(i)i.st=cyc(i.st);break;
     case 'tog-item':if(i)i.st=i.st==='d'?'':'d';break;
     case 'tog-block':var bt=d.blocks.filter(function(x){return x.id===id})[0];if(bt)setBst(bt,bst(bt)==='d'?'':'d');break;
