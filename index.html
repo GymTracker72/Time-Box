@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-24-1150">
+<meta name="tb-build" content="2026-11-24-1055">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -994,6 +994,7 @@ body.m-plan #overload:empty{display:none}
 .arow .achv{color:var(--muted);flex:none;margin-left:-6px}
 .arow select{position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:16px;border:0;background:transparent;cursor:pointer}
 .arow.dis{opacity:.55}
+.arow.rsub .an{padding-left:14px;color:var(--muted);font-weight:500}
 .sheet label.arow,label.arow{display:flex!important;flex-direction:row!important;align-items:center!important;gap:14px!important;padding:0 16px!important;min-height:52px;text-align:left}
 .arow>span{display:flex!important;align-items:center;text-align:left}
 .arow .an{flex:1 1 auto}.arow .av{flex:none;margin-left:auto}
@@ -1786,7 +1787,15 @@ function repCheck(sh,pr){
 }
 /* righe della scheda blocco: interruttore Impegno fisso e Ripeti, al posto della riga «Altro» */
 function fixRow(sh){var on=sh.kind==='fixed';return '<button type="button" class="arow" data-act="kind-tog" role="switch" aria-checked="'+on+'"><span class="an">Impegno fisso</span><span class="av"><i class="sw'+(on?' on':'')+'"></i></span></button>'}
-function repRow(sh){var o=REPS.map(function(r){return '<option value="'+r[0]+'"'+((sh.rep||'')===r[0]?' selected':'')+'>'+r[1]+'</option>'}).join(''),cur=REPS.filter(function(r){return r[0]===(sh.rep||'')})[0];return selRow('Ripeti','sheet','rep',o,esc(cur?cur[1]:'Mai'))}
+function repRow(sh){var o=REPS.map(function(r){return '<option value="'+r[0]+'"'+((sh.rep||'')===r[0]?' selected':'')+'>'+r[1]+'</option>'}).join(''),cur=REPS.filter(function(r){return r[0]===(sh.rep||'')})[0];return selRow('Ripeti','sheet','rep',o,esc(cur?cur[1]:'Mai'))+repEndRows(sh)}
+/* Fine ripetizione: righe sotto Ripeti, nello stesso riquadro (come Calendario Apple) */
+function repEndRows(sh){if(!sh.rep)return '';var re=sh.rend||'n',rc=String(sh.rcount||10),rd=sh.rdate||addDays(sh.date,28);
+  var o=[['n','Mai'],['d','Alla data'],['c','Numero di volte']].map(function(x){return '<option value="'+x[0]+'"'+(re===x[0]?' selected':'')+'>'+x[1]+'</option>'}).join('');
+  var h=selRow('Fine ripetizione','sheet','rend',o,re==='d'?'Alla data':re==='c'?'Numero di volte':'Mai');
+  if(re==='d')h+='<div class="arow rsub"><span class="an">Fino al</span><span class="av">'+nvPill(nvDate(rd),'<input type="date" data-chg="sheet" data-f="rdate" value="'+esc(rd)+'" aria-label="Fino al">')+'</span></div>';
+  else if(re==='c'){var n0=Math.max(2,Math.min(400,+rc||10)),co='';for(var k=2;k<=100;k++)co+='<option value="'+k+'"'+(k===n0?' selected':'')+'>'+k+' volte</option>';if(n0>100)co+='<option value="'+n0+'" selected>'+n0+' volte</option>';
+    h+='<div class="arow rsub"><span class="an">Ripetizioni</span><span class="av">'+nvPill(n0+' volte','<select data-chg="sheet" data-f="rcount" aria-label="Numero di volte">'+co+'</select>')+'</span></div>'}
+  return h}
 function repMore(sh){if(!sh.rep)return '';var x=repHtml(sh,true);return x?'<div class="bsc">'+x+'</div>':''}
 function repHtml(sh,noSel){
   var o=REPS.map(function(r){return '<option value="'+r[0]+'"'+((sh.rep||'')===r[0]?' selected':'')+'>'+r[1]+'</option>'}).join('');
@@ -1798,7 +1807,7 @@ function repHtml(sh,noSel){
     if(sp.fq==='m'&&sh.date){var nn=nthOf(sh.date);h+='<label><span class="lbl">Nel mese</span><select data-chg="sheet" data-f="rmm"><option value="dom"'+(sp.mm==='dom'?' selected':'')+'>Il giorno '+parse(sh.date).getDate()+'</option><option value="nth"'+(sp.mm==='nth'?' selected':'')+'>Il '+(nn<0?'ultimo ':nn+'° ')+WDL[parse(sh.date).getDay()]+'</option></select></label>'}
     h+='<div class="sub">'+esc(repLabel(sp,sh.date).replace(/^./,function(c){return c.toUpperCase()}))+'</div>';
   }
-  if(sh.rep){
+  if(sh.rep&&!noSel){
     var re=sh.rend||'n',ex=re==='d'?'<label><span class="lbl">Fino al</span><input type="date" data-chg="sheet" data-f="rdate" value="'+esc(sh.rdate||addDays(sh.date,28))+'"></label>':re==='c'?'<label><span class="lbl">Volte</span><input type="number" min="2" max="400" inputmode="numeric" data-chg="sheet" data-f="rcount" value="'+esc(String(sh.rcount||10))+'"></label>':'';
     h+='<div class="g"><label><span class="lbl">Fine</span><select data-chg="sheet" data-f="rend"><option value="n"'+(re==='n'?' selected':'')+'>Mai</option><option value="d"'+(re==='d'?' selected':'')+'>Alla data</option><option value="c"'+(re==='c'?' selected':'')+'>Dopo un numero di volte</option></select></label>'+ex+'</div>';
     if(re==='n')h+='<div class="sub">Senza fine: l\'app prepara un anno di ripetizioni e lo rinnova da sola.</div>';
@@ -1920,7 +1929,7 @@ function typing(){var a=document.activeElement;return !!(a&&/^(INPUT|TEXTAREA|SE
 function rSoft(cl){if(typing()){rPend=Math.max(rPend,cl?2:1);return}if(cl)ui.sheet=null;render()}
 document.addEventListener('focusout',function(){setTimeout(function(){if(rPend&&!typing()){var c=rPend===2;rPend=0;if(c)ui.sheet=null;render()}},400)});
 var NAVS=[];
-function navTrack(){var cur={m:ui.mode,d:st.date,md:ui.mdet?1:0};if(cur.m==='plan'||cur.m==='sett'||cur.m==='mese'||cur.m==='anno')ui.lastCalS=cur}
+function navTrack(){var cur={m:ui.mode,d:st.date,md:ui.mdet?1:0};if(cur.m==='plan'||cur.m==='sett'||cur.m==='mese'||cur.m==='anno')ui.lastCalS=cur;try{sessionStorage.setItem('tb-view',JSON.stringify({m:cur.m,d:cur.d,md:cur.md,on:ui.oggiNav?1:0,t:Date.now()}))}catch(e){}}
 /* tasto calendario: sale giorno → settimana → mese → anno, poi ridiscende anno → mese → settimana → giorno */
 function navCal(){var L=['plan','sett','mese','anno'],m=ui.mode,i=L.indexOf(m);if(i<0)return false;
   if(i===0)ui.calDir=1;else if(i===3)ui.calDir=-1;else if(!ui.calDir)ui.calDir=1;
@@ -4386,7 +4395,7 @@ document.addEventListener('change',function(e){
   else if(c==='hours'){var h=parseFloat(v);if(h>=4&&h<=18)st.hours=h}
   else if(c==='edit'){var ebk=ui.sheet&&ui.sheet.bid?blkFind(ui.sheet):null,ei=item(ui.sheet&&(ui.sheet.id||(ebk&&ebk.ref)));if(ei){if(f==='text'){if(v.trim())ei.text=v.trim()}else if(f==='area'){ei.area=v;if(ei.pr==='A'&&ei.area)autoTop(ei);save();render();return}else if(f==='pr'){ei.pr=v;if(v==='D'&&(ei.status==='open'||ei.status==='prog'))ui.sheet=openDeleg(ei);if(v==='A'&&ei.area)autoTop(ei);save();render();return}else ei[f]=v}return}
   else if(c==='xe'){if(ui.sheet&&ui.sheet.mode==='ext'){ui.sheet[f]=(f==='s'||f==='n')?+v:v;ui.sheet.err='';if(f==='title'||f==='loc'||f==='date'||f==='s'||f==='n')return}}
-  else if(c==='sheet'){if(!ui.sheet)return;if(f==='alsel'){var ac=alCur(ui.sheet),ix=+t.getAttribute('data-i')||0;if(v==='x')ac.splice(ix,1);else if(v==='')ac=[];else ac[ix]=+v;ui.sheet.al=ac.filter(function(x,i,a){return a.indexOf(x)===i}).sort(function(x,y){return x-y});render();return}ui.sheet[f]=v;if(f==='ts'||f==='te'){var tm=/^(\d+):(\d+)/.exec(v||'');if(tm){var q=Math.round(((+tm[1])*60+(+tm[2])-S0)/5)/6,sx=ui.sheet;if(f==='ts'){sx.s=Math.max(0,Math.min(NSLOT-1/6,q))}else sx.n=Math.max(1/6,q-+sx.s)}var pl=t.closest&&t.closest('.nvp'),ps=pl&&pl.querySelector('span');if(ps)ps.textContent=v;return}if(f==='e')ui.sheet.n=Math.max(1,+v-+ui.sheet.s);ui.sheet.err='';if(f==='src'){ui.sheet.frog=undefined;ui.sheet.tedit=false}if(f==='title')ui.sheet.tedit=true;if(f==='rep'||f==='rfq')repInit(ui.sheet);if(f==='loc'&&e.type==='change')setTimeout(ttAutoRun,0);if(f==='tt'){ui.sheet.ttMan=1;ui.sheet.ttAuto=0;ui.sheet.ttMsg=''}if(f==='who'||f==='title'||f==='note'||f==='loc'||f==='inv'||f==='url'||f==='rcount'||f==='name'||f==='riv'||f==='res')return;if(t.type==='date'&&t.closest&&t.closest('.nvp')){var dp=t.closest('.nvp'),dsp=dp.querySelector('span');if(dsp)dsp.textContent=v?nvDate(v):'Nessuna';return}if(t.type==='date'){lastDateTs=Date.now();setTimeout(render,350);return}}
+  else if(c==='sheet'){if(!ui.sheet)return;if(f==='alsel'){var ac=alCur(ui.sheet),ix=+t.getAttribute('data-i')||0;if(v==='x')ac.splice(ix,1);else if(v==='')ac=[];else ac[ix]=+v;ui.sheet.al=ac.filter(function(x,i,a){return a.indexOf(x)===i}).sort(function(x,y){return x-y});render();return}ui.sheet[f]=v;if(f==='ts'||f==='te'){var tm=/^(\d+):(\d+)/.exec(v||'');if(tm){var q=Math.round(((+tm[1])*60+(+tm[2])-S0)/5)/6,sx=ui.sheet;if(f==='ts'){sx.s=Math.max(0,Math.min(NSLOT-1/6,q))}else sx.n=Math.max(1/6,q-+sx.s)}var pl=t.closest&&t.closest('.nvp'),ps=pl&&pl.querySelector('span');if(ps)ps.textContent=v;return}if(f==='e')ui.sheet.n=Math.max(1,+v-+ui.sheet.s);ui.sheet.err='';if(f==='src'){ui.sheet.frog=undefined;ui.sheet.tedit=false}if(f==='title')ui.sheet.tedit=true;if(f==='rep'||f==='rfq')repInit(ui.sheet);if(f==='loc'&&e.type==='change')setTimeout(ttAutoRun,0);if(f==='tt'){ui.sheet.ttMan=1;ui.sheet.ttAuto=0;ui.sheet.ttMsg=''}if(f==='who'||f==='title'||f==='note'||f==='loc'||f==='inv'||f==='url'||(f==='rcount'&&t.tagName!=='SELECT')||f==='name'||f==='riv'||f==='res')return;if(t.type==='date'&&t.closest&&t.closest('.nvp')){var dp=t.closest('.nvp'),dsp=dp.querySelector('span');if(dsp)dsp.textContent=v?nvDate(v):'Nessuna';return}if(t.type==='date'){lastDateTs=Date.now();setTimeout(render,350);return}}
   else if(c==='deleg'){var dx=d.deleg.filter(function(x){return x.id===id})[0];if(dx)dx[f]=v}
   else if(c==='rana'){d.rana[f]=v;if(ui.sheet&&ui.sheet.mode==='rana'&&f!=='goal'){save();return}}
   else if(c==='goal'){var lv=t.getAttribute('data-lv'),ar=t.getAttribute('data-a'),per=gKey(lv,lv==='O'?thuOf(st.date):st.date);
@@ -5289,6 +5298,12 @@ dv.on=lsGet(FK)===1;
 st=load();
 if(window._slotMig){try{ex.by={};ex.at=0;localStorage.removeItem('timebox-ext')}catch(e){}}
 if(window.innerWidth<700)ui.mode='oggi';
+/* se la pagina si ricarica (gesto Indietro di Safari, aggiornamento automatico) resto nella vista in cui ero, non torno a Oggi */
+(function(){try{var v=JSON.parse(sessionStorage.getItem('tb-view')||'null');
+  if(v&&Date.now()-v.t<30*60000&&{oggi:1,plan:1,sett:1,mese:1,anno:1}[v.m]&&/^\d{4}-\d\d-\d\d$/.test(v.d)){ui.mode=v.m;ui.mdet=v.md?1:0;st.date=v.d;ui.oggiNav=v.on?1:0;if(v.m==='plan')ui.snap=true}}catch(e){}})();
+/* il gesto Indietro/Avanti dal bordo non deve uscire dalla app: resto dove sono */
+(function(){try{if(!history.state||!history.state.tb)history.pushState({tb:1},'',location.href);
+  window.addEventListener('popstate',function(){try{history.pushState({tb:1},'',location.href)}catch(e){}})}catch(e){}})();
 if(!st.hours)st.hours=12;
 render();
 dvShow();
