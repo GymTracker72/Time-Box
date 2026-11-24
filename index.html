@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-24-0745">
+<meta name="tb-build" content="2026-11-24-0830">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -5065,10 +5065,26 @@ async function calEnsure(){
   if(!st.cal)st.cal={};st.cal.id=j.id;try{localStorage.setItem(CID,j.id)}catch(e){}cs.okid=j.id;save();return j.id}
 async function calRemote(id){
   var from=new Date();from.setHours(0,0,0,0);var te=new Date(from);te.setDate(te.getDate()+CWIN+1);
-  var map={},dup=[],gone={},pt='';
+  var map={},dup=[],gone={},fr=[],pt='';
   do{var r=await gcFetch('/calendars/'+encodeURIComponent(id)+'/events?singleEvents=true&showDeleted=true&maxResults=2500&timeMin='+encodeURIComponent(from.toISOString())+'&timeMax='+encodeURIComponent(te.toISOString())+(pt?'&pageToken='+encodeURIComponent(pt):'')),j=await r.json();
-    (j.items||[]).forEach(function(e){if(e.status==='cancelled'){gone[e.id]=1;return}var p=e.extendedProperties&&e.extendedProperties.private,k=p&&p.tb;if(!k)return;if(map[k])dup.push(e.id);else{var sl=extSlots(e);map[k]={id:e.id,h:p.h||'',sum:e.summary||'',k:sl.length===1?sl[0].k:'',s:sl.length===1?sl[0].s:0,n:sl.length===1?sl[0].n:0,one:sl.length===1}}});pt=j.nextPageToken||''}while(pt);
-  return {map:map,dup:dup,gone:gone}}
+    (j.items||[]).forEach(function(e){if(e.status==='cancelled'){gone[e.id]=1;return}var p=e.extendedProperties&&e.extendedProperties.private,k=p&&p.tb;if(!k){fr.push(e);return}if(map[k])dup.push(e.id);else{var sl=extSlots(e);map[k]={id:e.id,h:p.h||'',sum:e.summary||'',k:sl.length===1?sl[0].k:'',s:sl.length===1?sl[0].s:0,n:sl.length===1?sl[0].n:0,one:sl.length===1}}});pt=j.nextPageToken||''}while(pt);
+  return {map:map,dup:dup,gone:gone,fr:fr}}
+/* eventi creati direttamente nel calendario «Time Box» di Google (senza marcatore tb): diventano blocchi/eventi dell'app e poi vengono marcati */
+function calAdopt(rem){
+  var n=0;
+  (rem.fr||[]).forEach(function(e){
+    if(!e.start)return;
+    var gid='g'+calHash(e.id),ar={'9':'L','10':'F','11':'P'}[e.colorId]||'P',ov=null;
+    if(e.reminders&&!e.reminders.useDefault&&Array.isArray(e.reminders.overrides))ov=e.reminders.overrides.map(function(o){return +o.minutes}).filter(function(m){return m>=0});
+    if(e.start.date){
+      var key='ad_'+gid,en=(e.end&&e.end.date)||addDays(e.start.date,1);
+      if(!adList().some(function(x){return x.id===gid})){adList().push({id:gid,title:e.summary||'Senza titolo',area:ar,from:e.start.date,to:addDays(en,-1)<e.start.date?e.start.date:addDays(en,-1),loc:e.location||'',note:'',al:ov&&ov.length?ov[0]:''});n++}
+      if(!rem.map[key])rem.map[key]={id:e.id,h:'',one:false};
+      return}
+    var sl=extSlots(e);if(sl.length!==1)return;var u=sl[0];
+    if(!calFindBlock(gid)){var nb={id:gid,s:u.s,n:u.n,title:e.summary||'Senza titolo',area:ar,kind:'fixed',ref:'',st:'',loc:e.location||''};if(ov)nb.al=ov;day(u.k).blocks.push(nb);n++}
+    if(!rem.map[gid])rem.map[gid]={id:e.id,h:'',one:false}});
+  if(n)save();return n}
 async function calPool(jobs,lim,tick){var i=0,err=null;async function w(){while(!err&&i<jobs.length){var j=jobs[i++];try{await j();tick()}catch(e){err=e}}}var ws=[];for(var k=0;k<lim;k++)ws.push(w());await Promise.all(ws);if(err)throw err}
 /* Google -> Time Box: le modifiche fatte sul calendario «Time Box» di Google tornano nei blocchi */
 var PSK='timebox-pushed';
@@ -5100,7 +5116,7 @@ async function calSync(){
   cs.busy=true;cs.st='busy';cs.msg='';cs.auth=false;calShow();
   var force=cs.force;cs.force=false;
   try{
-    var id=await calEnsure(),rem=await calRemote(id),want=calWant(),pulled=calPull(want,rem,force),jobs=[],ep='/calendars/'+encodeURIComponent(id)+'/events',n={i:0,u:0,d:0,t:0},nw=Object.keys(want).length,nr=Object.keys(rem.map).length;
+    var id=await calEnsure(),rem=await calRemote(id),adopted=calAdopt(rem),want=calWant(),pulled=calPull(want,rem,force)+adopted,jobs=[],ep='/calendars/'+encodeURIComponent(id)+'/events',n={i:0,u:0,d:0,t:0},nw=Object.keys(want).length,nr=Object.keys(rem.map).length;
     if(pulled)want=calWant();
     Object.keys(want).forEach(function(k){var ev=want[k],r=rem.map[k];
       if(!r)jobs.push(function(){n.i++;return gcFetch(ep+(ev.attendees?'?sendUpdates=all':''),{method:'POST',headers:CJ,body:JSON.stringify(ev)})});
