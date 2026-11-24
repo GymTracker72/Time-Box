@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-24-1100">
+<meta name="tb-build" content="2026-11-24-1145">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -1920,16 +1920,15 @@ function typing(){var a=document.activeElement;return !!(a&&/^(INPUT|TEXTAREA|SE
 function rSoft(cl){if(typing()){rPend=Math.max(rPend,cl?2:1);return}if(cl)ui.sheet=null;render()}
 document.addEventListener('focusout',function(){setTimeout(function(){if(rPend&&!typing()){var c=rPend===2;rPend=0;if(c)ui.sheet=null;render()}},400)});
 var NAVS=[];
-function navTrack(){var cur={m:ui.mode,d:st.date,md:ui.mdet?1:0},pv=ui._np;
-  var cal=function(m){return m==='plan'||m==='sett'||m==='mese'||m==='anno'};if(pv&&(pv.m!==cur.m||pv.md!==cur.md)&&!ui._backing&&(cur.m==='oggi'||(cal(cur.m)&&!cal(pv.m)&&pv.m!=='voci'))){NAVS.length=0}else if(pv&&(pv.m!==cur.m||pv.md!==cur.md)&&!ui._backing){var t=NAVS[NAVS.length-1];if(!(t&&t.m===pv.m&&t.md===pv.md&&t.d===pv.d)){NAVS.push(pv);if(NAVS.length>30)NAVS.shift()}}
-  ui._backing=0;ui._np=cur;if(cur.m==='plan'||cur.m==='sett'||cur.m==='mese'||cur.m==='anno')ui.lastCalS=cur}
-function navBack(){var pv=NAVS.pop();if(!pv){var f={plan:'mese',sett:'plan',mese:'anno',anno:'oggi',voci:'oggi',rev:'oggi'}[ui.mode];if(ui.mode==='mese'&&ui.mdet){pv={m:'mese',d:st.date,md:0}}else if(f)pv={m:f,d:st.date,md:0};else return false}
-  ui._backing=1;ui.mode=pv.m;st.date=pv.d;ui.mdet=pv.md?1:0;ui.wsel='';ui.hmenu=0;ui.sheet=null;if(pv.m==='plan')ui.snap=true;if(pv.m==='mese'){ui.msJump=1;ui.scrollTop=1}if(pv.m==='sett'){ui.scrollDay=pv.d}return true}
-(function(){var x0=0,y0=0,on=0;
-document.addEventListener('touchstart',function(e){var t=e.touches[0];on=(e.touches.length===1&&t.clientX<28&&!ui.sheet&&!document.querySelector('.sheet-bg'))?1:0;x0=t.clientX;y0=t.clientY},{passive:true});
-document.addEventListener('touchend',function(e){if(!on)return;on=0;var t=e.changedTouches[0],dx=t.clientX-x0,dy=Math.abs(t.clientY-y0);if(dx>70&&dy<dx*.6&&ui.mode!=='oggi'){if(navBack())render()}},{passive:true})})();
-function navLab(fb){var pv=NAVS[NAVS.length-1];if(!pv)return fb;var d=pv.d||st.date,dt=parse(d),MN=function(i){var n=MON[i];return n.charAt(0).toUpperCase()+n.slice(1)};
-  return {plan:dt.getDate()+' '+MON[dt.getMonth()].slice(0,3),sett:'Settimana',mese:pv.md?'Priorità':MN(dt.getMonth()),anno:String(dt.getFullYear()),oggi:'Oggi',voci:'Da programmare',rev:'Revisione'}[pv.m]||fb}
+function navTrack(){var cur={m:ui.mode,d:st.date,md:ui.mdet?1:0};if(cur.m==='plan'||cur.m==='sett'||cur.m==='mese'||cur.m==='anno')ui.lastCalS=cur}
+/* un passo in su: giorno → settimana → mese → anno */
+function navBack(){var m=ui.mode,up=null;
+  if(m==='mese'&&ui.mdet)up={m:'mese',md:0};else if(m==='plan')up={m:'sett'};else if(m==='sett')up={m:'mese',md:0};else if(m==='mese')up={m:'anno',md:0};
+  if(!up)return false;ui.mode=up.m;ui.mdet=up.md?1:0;ui.wsel='';ui.hmenu=0;ui.sheet=null;
+  if(up.m==='mese'){ui.msJump=1;ui.scrollTop=1}if(up.m==='sett')ui.scrollDay=st.date;if(up.m==='anno')ui.scrollTop=1;return true}
+function navLab(fb){var dt=parse(st.date),MN=function(i){var n=MON[i];return n.charAt(0).toUpperCase()+n.slice(1)};
+  if(ui.mode==='plan'){var m0=mondayOf(st.date),a=parse(m0),z=parse(addDays(m0,6));return a.getDate()+(a.getMonth()===z.getMonth()?'':' '+MON[a.getMonth()].slice(0,3))+'–'+z.getDate()+' '+MON[z.getMonth()].slice(0,3)}
+  if(ui.mode==='sett')return MN(dt.getMonth());if(ui.mode==='mese'&&!ui.mdet)return String(dt.getFullYear());return fb}
 function render(){
   navTrack();
   if(ui.mode!=='anno')ui.annoSc='';
@@ -2370,7 +2369,7 @@ function renderMese(){
       for(var k=0;k<7;k++){var dx=addDays(x,k);
         if(dx.slice(0,7)!==ym){h+='<span class="msx"></span>';continue}
         var du=(dueBy[dx]||[]).some(function(e){return !e.done});
-        h+='<button type="button" class="msd'+(k>4?' we':'')+(dx===today?' td':'')+(dx===msel?' sl':'')+'" data-act="mo-open" data-d="'+dx+'" aria-label="'+parse(dx).getDate()+' '+MON[+dx.slice(5,7)-1]+(du?', scadenza':'')+'"><b>'+parse(dx).getDate()+'</b>'+msBar(dx)+(du?'<u class="msu" aria-hidden="true"></u>':'')+'</button>'}
+        h+='<button type="button" class="msd'+(k>4?' we':'')+(dx===today?' td':'')+(dx===msel?' sl':'')+'" data-act="goto-week" data-d="'+dx+'" aria-label="'+parse(dx).getDate()+' '+MON[+dx.slice(5,7)-1]+(du?', scadenza':'')+'"><b>'+parse(dx).getDate()+'</b>'+msBar(dx)+(du?'<u class="msu" aria-hidden="true"></u>':'')+'</button>'}
       h+='</div>'}
   }else{
   h+='<div class="moc'+(mac?' mac':'')+'"><div class="mor mowd">'+['L','M','M','G','V','S','D'].map(function(l){return '<span>'+l+'</span>'}).join('')+'</div>';
@@ -4125,6 +4124,7 @@ document.addEventListener('click',function(e){
     case 'mo-open':st.date=t.getAttribute('data-d');ui.mode='plan';ui.snap=true;ui.scrollTop=1;break;
     case 'mo-today':st.date=isoOf(new Date());ui.msJump=1;break;
     case 'mode':if(t.getAttribute('data-m')==='mese'){ui.mdet=0;ui.msJump=1}
+      if(t.hasAttribute('data-cal')&&(ui.mode==='plan'||ui.mode==='sett'||ui.mode==='mese'||ui.mode==='anno')){navBack();break}
       if(t.hasAttribute('data-cal')&&!(ui.mode==='plan'||ui.mode==='sett'||ui.mode==='mese'||ui.mode==='anno')&&ui.lastCalS){var lc=ui.lastCalS;ui.mode=lc.m;st.date=lc.d;ui.mdet=lc.md?1:0;ui.wsel='';ui.snap=true;if(lc.m==='mese'){ui.msJump=1}break}
       if(t.hasAttribute('data-cal')){var cm=(ui.mode==='plan'||ui.mode==='sett'||ui.mode==='mese'||ui.mode==='anno')?ui.mode:(ui.lastCal||'plan');t.setAttribute('data-m',cm)}
       if(t.getAttribute('data-m')==='voci')ui.vback=ui.mode==='plan'?'plan':'oggi';if(t.getAttribute('data-m')==='oggi'){ui.oggiNav=0;if(t.closest('.tabs')){st.date=isoOf(new Date());ui.wsel='';window.scrollTo(0,0)}}if(t.getAttribute('data-m')==='mese'&&t.closest('.tabs,.cseg')){st.date=isoOf(new Date());ui.msel='';ui.scrollTop=1}if(t.getAttribute('data-m')==='anno'&&t.closest('.tabs,.cseg')){st.date=isoOf(new Date());ui.scrollTop=1}if(t.getAttribute('data-m')==='plan'&&ui.mode==='plan'&&t.closest('.tabs,.cseg')){st.date=isoOf(new Date());toast('Oggi')}if(t.getAttribute('data-m')==='sett'&&t.closest('.tabs,.cseg')){ui.wsel='';st.date=isoOf(new Date());ui.scrollToday=1}if(t.getAttribute('data-m')==='oggi'&&ui.mode==='oggi'&&t.closest('.tabs,.cseg')){st.date=isoOf(new Date());setTimeout(centerNext,40);toast('Oggi')}ui.mode=t.getAttribute('data-m');if(ui.mode==='plan')ui.snap=true;if(ui.mode==='voci')setTimeout(function(){window.scrollTo(0,0)},0);break;
