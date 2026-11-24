@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="tb-build" content="2026-11-24-1130">
+<meta name="tb-build" content="2026-11-24-1425">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Time Box">
 <title>Time Box</title>
@@ -4161,7 +4161,7 @@ document.addEventListener('click',function(e){
     case 'goto-month':st.date=t.getAttribute('data-d');ui.mode='mese';ui.scrollTop=1;break;
     case 'yr-prev':st.date=isoOf(new Date(+st.date.slice(0,4)-1,+st.date.slice(5,7)-1,1));break;
     case 'yr-next':st.date=isoOf(new Date(+st.date.slice(0,4)+1,+st.date.slice(5,7)-1,1));break;
-    case 'wsel':ui.wsel=t.getAttribute('data-d');if(ui.wall){var wd=ui.wsel;setTimeout(function(){var e=document.querySelector('.w2x[data-wd="'+wd+'"]');if(e)window.scrollTo({top:Math.max(0,e.getBoundingClientRect().top+window.scrollY-16),behavior:'smooth'})},60)}break;
+    case 'wsel':if(ui.mode==='sett'){st.date=t.getAttribute('data-d');ui.wsel='';ui.mode='plan';ui.snap=true;break}ui.wsel=t.getAttribute('data-d');if(ui.wall){var wd=ui.wsel;setTimeout(function(){var e=document.querySelector('.w2x[data-wd="'+wd+'"]');if(e)window.scrollTo({top:Math.max(0,e.getBoundingClientRect().top+window.scrollY-16),behavior:'smooth'})},60)}break;
     case 'wk-prev':st.date=addDays(st.date,-7);break;
     case 'wk-next':st.date=addDays(st.date,7);break;
     case 'mo-prev':st.date=isoOf(new Date(+st.date.slice(0,4),+st.date.slice(5,7)-2,1));break;
